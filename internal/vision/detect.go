@@ -153,23 +153,28 @@ func DetectCheckerboard(img *Gray, opt DetectOptions) (Detection, error) {
 	corners := refineAll(work, peaks, opt.RefineWindow)
 	corners = mergeDuplicates(corners, spacing*0.25)
 
+	// From here on the thresholds are local. A board tilted the way a
+	// calibration shot needs it to be does not have one square size: at 35° the
+	// near edge's squares are a fifth wider on screen than the far edge's, and
+	// foreshortening compresses one axis on top of that. A single figure for the
+	// whole board is right in the middle and wrong at both ends, and what it
+	// costs is a whole row of real corners at the far edge.
+	scales := localScales(corners)
+
 	// Drop everything that is not a true four-quadrant crossing. Without this
 	// the board's own perimeter dominates: where the outer squares meet the
 	// background they form T-junctions, which are saddles too, and they lie
-	// outside every real corner — so the convex hull would be built from them
-	// and the grid search would never see the actual pattern.
-	corners = filterCrossings(work, corners, spacing*0.35)
+	// outside every real corner.
+	corners = filterCrossings(work, corners, scales, 0.30)
 	if len(corners) < want {
 		return det, fmt.Errorf("%w: настоящих пересечений клеток найдено %d из нужных %d. "+
 			"Проверьте резкость и что мишень не перекрыта", ErrNoCorners, len(corners), want)
 	}
 
-	// Re-estimate the spacing now that only real crossings remain, then drop
-	// whatever stands alone. Anything left outside the pattern would push the
-	// convex hull outward, and the grid search works from that hull.
-	spacing = medianNearestNeighbour(corners)
-	det.MeanSpacingPx = spacing
-	corners = filterConnected(corners, spacing)
+	// Then drop whatever survived but stands alone: a real corner always has
+	// neighbours, a response raised by noise or a bolt head has none.
+	det.MeanSpacingPx = medianNearestNeighbour(corners)
+	corners = filterConnected(corners, localScales(corners), 1.35)
 	if len(corners) < want {
 		return det, fmt.Errorf("%w: связных углов сетки найдено %d из нужных %d",
 			ErrNoCorners, len(corners), want)
@@ -412,6 +417,47 @@ func medianNearestNeighbour(pts []Point2) float64 {
 	return d[len(d)/2]
 }
 
+// localScales estimates the on-screen square size in the neighbourhood of each
+// point, as the median of its four nearest neighbour distances.
+//
+// The obvious choice — the single nearest neighbour — is not robust, and its
+// failure is nasty. One spurious response eight pixels from a real corner makes
+// that corner's nearest-neighbour distance eight instead of thirty; every
+// threshold scaled from it then collapses, the sampling ring shrinks to nothing
+// and the connectivity reach no longer stretches to the corner's genuine
+// neighbours. A single intruder does not merely add a bad point, it destroys a
+// good one.
+//
+// The median of four survives up to two intruders. For a real corner the four
+// smallest distances are two orthogonal neighbours at one square and two
+// diagonals at √2, so the result lands around 1.2 squares — a consistent
+// overestimate the callers' coefficients are chosen against.
+func localScales(pts []Point2) []float64 {
+	const k = 4
+	out := make([]float64, len(pts))
+	d := make([]float64, 0, len(pts))
+
+	for i, p := range pts {
+		d = d[:0]
+		for j, q := range pts {
+			if i != j {
+				d = append(d, p.DistTo(q))
+			}
+		}
+		if len(d) == 0 {
+			out[i] = math.Inf(1)
+			continue
+		}
+		n := k
+		if len(d) < n {
+			n = len(d)
+		}
+		sort.Float64s(d)
+		out[i] = d[(n-1)/2]
+	}
+	return out
+}
+
 // filterCrossings keeps only true checkerboard crossings.
 //
 // Walk a circle around a candidate and watch the brightness. At a real X
@@ -422,18 +468,20 @@ func medianNearestNeighbour(pts []Point2) float64 {
 // or twice. Counting sign changes therefore separates the pattern's interior
 // from its edge with no threshold to tune.
 //
-// This matters more than it sounds: the perimeter junctions lie outside every
-// real corner, so leaving them in hands the convex hull — and with it the whole
-// grid search — a quadrilateral that is not the pattern.
-func filterCrossings(img *Gray, pts []Point2, radius float64) []Point2 {
-	if radius < 1.5 {
-		return pts
-	}
+// The ring radius is a fraction of each corner's OWN local scale rather than of
+// one figure for the board, so that a tilted board — which is what a useful
+// calibration shot is — does not have the ring spilling into the next square at
+// its far edge.
+func filterCrossings(img *Gray, pts []Point2, scales []float64, fraction float64) []Point2 {
 	const samples = 32
 	ring := make([]float64, samples)
 
 	out := pts[:0:0]
-	for _, p := range pts {
+	for pi, p := range pts {
+		radius := fraction * scales[pi]
+		if radius < 1.5 || math.IsInf(radius, 0) {
+			continue
+		}
 		if !img.InBounds(p.X, p.Y, radius+2) {
 			continue
 		}
@@ -502,21 +550,27 @@ func mergeDuplicates(pts []Point2, minSep float64) []Point2 {
 // by sensor noise, a bolt head or a reflection has none — nothing else in the
 // frame happens to lie exactly one square size away from it.
 //
-// Diagonal neighbours are √2 square sizes away and fall outside the band, so
-// only the four orthogonal ones count, which is what makes the threshold of two
-// exactly right rather than merely convenient.
-func filterConnected(pts []Point2, spacing float64) []Point2 {
-	const lo, hi = 0.7, 1.35
-	minD, maxD := lo*spacing, hi*spacing
-
+// The reach is a multiple of each corner's own local scale, so a tilted board
+// keeps its far-edge corners. Since that scale already sits around 1.2 squares,
+// a reach of 1.35 spans roughly 1.6 squares — enough to hold the orthogonal
+// neighbours through heavy foreshortening, at the cost of sometimes counting a
+// diagonal too. That trade is the right way round: admitting a diagonal only
+// makes this filter more permissive, and it is the second line of defence. The
+// ring test above is what actually rejects clutter, and the lattice growth
+// downstream ignores whatever gets through.
+func filterConnected(pts []Point2, scales []float64, reach float64) []Point2 {
 	out := pts[:0:0]
 	for i, p := range pts {
+		if math.IsInf(scales[i], 0) {
+			continue
+		}
+		limit := reach * scales[i]
 		n := 0
 		for j, q := range pts {
 			if i == j {
 				continue
 			}
-			if d := p.DistTo(q); d >= minD && d <= maxD {
+			if p.DistTo(q) <= limit {
 				n++
 				if n >= 2 {
 					break
@@ -544,7 +598,25 @@ func idealGrid(cols, rows int) []Point2 {
 }
 
 // fitGrid labels detected corners with their grid positions.
+//
+// Growing the lattice from a seed comes first: it asks only local questions and
+// so is indifferent to how much clutter is in the frame. The convex-hull search
+// stays as a fallback for the case where growth cannot get started — a board so
+// foreshortened or so sparsely detected that no seed has four usable
+// neighbours — since on a clean detection the hull genuinely is the board.
+//
+// Both routes end at the same place: a candidate quadrilateral fed to
+// assignByQuad, which tries all eight labellings and accepts only one that
+// covers every grid node.
 func fitGrid(corners []Point2, cols, rows int) ([]Point2, geom.Mat3, bool) {
+	for _, quad := range growGridQuads(corners, cols, rows) {
+		for _, oriented := range orientations(quad) {
+			if ordered, h, ok := assignByQuad(corners, oriented, cols, rows); ok {
+				return ordered, h, true
+			}
+		}
+	}
+
 	hull := convexHull(corners)
 	if len(hull) < 4 {
 		return nil, geom.Mat3{}, false

@@ -126,6 +126,11 @@ func TestDetectorFindsEveryCorner(t *testing.T) {
 		{R: geom.RotX(geom.Rad(10)), T: geom.V(0, 0, 900)},
 		{R: geom.RotY(geom.Rad(-28)).Mul(geom.RotX(geom.Rad(14))), T: geom.V(60, -30, 1000)},
 		{R: geom.RotZ(geom.Rad(35)).Mul(geom.RotY(geom.Rad(22))), T: geom.V(-80, 40, 850)},
+		// Steep tilts, the regime the hull-based grid search used to fail on and
+		// that seed-and-grow was written to handle. A calibration series lives
+		// here, so these must not be aspirational.
+		{R: geom.RotY(geom.Rad(-40)).Mul(geom.RotX(geom.Rad(33))), T: geom.V(70, -40, 820)},
+		{R: geom.RotZ(geom.Rad(28)).Mul(geom.RotY(geom.Rad(42))), T: geom.V(-60, 50, 900)},
 	} {
 		img := renderBoard(cam, tg, pose, 3, 0, rng)
 		det, err := vision.DetectCheckerboard(img, vision.DetectOptions{Target: tg})
@@ -152,8 +157,10 @@ func TestDetectorFindsEveryCorner(t *testing.T) {
 			det.MeanSpacingPx, rms, worst, det.GridRMSPx)
 
 		// A corner mismatched by a whole square would show up as a huge error,
-		// so this also proves the ordering is right.
-		if worst > 0.5 {
+		// so this also proves the ordering is right. Steep tilts foreshorten the
+		// far edge, so the ceiling is set against the steepest case rather than
+		// the easy ones.
+		if worst > 1.0 {
 			t.Errorf("worst corner off by %.3f px — ordering or localisation is wrong", worst)
 		}
 		// The tilted poses come in around 0.03 px. The near-fronto-parallel one
@@ -303,6 +310,49 @@ func TestDetectorSurvivesClutter(t *testing.T) {
 		det.CandidatesFound, tg.Cols*tg.Rows, worst)
 	if worst > 0.5 {
 		t.Errorf("worst corner off by %.3f px with clutter present", worst)
+	}
+}
+
+// TestDetectorSteepTiltWithClutter is the case that broke the hull-based grid
+// search and motivated seed-and-grow: a board tilted hard enough that its far
+// edge is heavily foreshortened, with clutter scattered around it. The hull
+// approach lost this because a few stray points stopped the board's real
+// outline from being the largest quadrilateral. Growing the lattice locally
+// does not care how much clutter is present — it is simply never adjacent to
+// the pattern — so this must pass cleanly.
+func TestDetectorSteepTiltWithClutter(t *testing.T) {
+	cam := detectTestCamera()
+	tg := vision.DefaultTarget()
+	rng := rand.New(rand.NewSource(13))
+	pose := geom.Pose{R: geom.RotZ(geom.Rad(24)).Mul(geom.RotY(geom.Rad(-43))).Mul(geom.RotX(geom.Rad(30))),
+		T: geom.V(50, -30, 820)}
+	img := renderBoard(cam, tg, pose, 3, 0.005, rng)
+
+	for _, c := range [][2]int{{70, 80}, {1200, 90}, {80, 650}, {1210, 640}, {620, 50}, {300, 690}} {
+		for dy := -7; dy <= 7; dy++ {
+			for dx := -7; dx <= 7; dx++ {
+				v := 0.12
+				if (dx >= 0) == (dy >= 0) {
+					v = 0.88
+				}
+				img.Set(c[0]+dx, c[1]+dy, v)
+			}
+		}
+	}
+
+	det, err := vision.DetectCheckerboard(img, vision.DetectOptions{Target: tg})
+	if err != nil {
+		t.Fatalf("сильный наклон с мусором не распознан: %v", err)
+	}
+	truth, _ := cam.ProjectPose(pose, tg.ModelPoints())
+	var worst float64
+	for i := range truth {
+		worst = math.Max(worst, det.Corners[i].DistTo(truth[i]))
+	}
+	t.Logf("наклон 43°, кандидатов %d при %d нужных; худший угол %.4f пикс",
+		det.CandidatesFound, tg.Cols*tg.Rows, worst)
+	if worst > 1.0 {
+		t.Errorf("worst corner off by %.3f px — grid recovery failed under steep tilt", worst)
 	}
 }
 
