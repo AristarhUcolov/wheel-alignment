@@ -23,9 +23,34 @@ import (
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 )
 
+const usage = `Сход-развал — открытый стенд.
+
+  wheelalign                       запустить стенд (веб-интерфейс)
+  wheelalign calibrate <каталог>   откалибровать камеру по снимкам мишени
+
+Ключи запуска стенда:
+  -addr   адрес, на котором слушать (по умолчанию 127.0.0.1:8700)
+  -open   открывать браузер (по умолчанию да)
+
+Ключи калибровки:
+  -cols   число внутренних углов мишени по горизонтали (по умолчанию 9)
+  -rows   то же по вертикали (по умолчанию 6)
+  -square размер клетки в миллиметрах, измеренный штангенциркулем (по умолчанию 30)
+  -out    куда записать калибровку (по умолчанию camera.json в каталоге снимков)
+`
+
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "calibrate" {
+		if err := runCalibrate(os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, "Ошибка:", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	addr := flag.String("addr", "127.0.0.1:8700", "адрес, на котором слушать")
 	open := flag.Bool("open", true, "открыть браузер при запуске")
+	flag.Usage = func() { fmt.Fprint(os.Stderr, usage) }
 	flag.Parse()
 
 	if err := run(*addr, *open); err != nil {
