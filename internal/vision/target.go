@@ -44,6 +44,17 @@ func (t Target) Validate() error {
 		return fmt.Errorf("vision: мишень %dx%d квадратная — её ориентация неоднозначна с точностью до поворота на 90°, "+
 			"из-за чего развал можно принять за схождение. Используйте прямоугольную, например 9x6",
 			t.Cols, t.Rows)
+	case (t.Cols+t.Rows)%2 == 0:
+		// A checkerboard looks identical rotated 180°, and geometry alone can
+		// never tell the two apart. The only thing that can is the pattern's own
+		// colouring — and turning the board over swaps black squares for white
+		// ones only when the two dimensions sum to an odd number. With an even
+		// sum the board is genuinely, irreducibly ambiguous, and a detector that
+		// silently guessed would flip the recovered pose at random between
+		// frames, destroying runout compensation.
+		return fmt.Errorf("vision: у мишени %dx%d сумма сторон чётная — такая доска выглядит одинаково "+
+			"при повороте на 180°, и ориентацию невозможно определить в принципе. "+
+			"Возьмите доску с нечётной суммой, например 9x6 или 7x6", t.Cols, t.Rows)
 	case t.SquareMM <= 0:
 		return fmt.Errorf("vision: не задан размер клетки мишени")
 	}
