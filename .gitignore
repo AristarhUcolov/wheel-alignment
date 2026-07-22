@@ -1,0 +1,13 @@
+# Собранный бинарник — только в корне репозитория.
+# Ведущий слэш обязателен: без него шаблон «wheelalign» совпадает и с
+# каталогом cmd/wheelalign, и точка входа тихо не попадает в коммит.
+/wheelalign
+/wheelalign.exe
+
+*.exe
+*.test
+*.out
+coverage.*
+
+.DS_Store
+Thumbs.db
