@@ -45,6 +45,8 @@ func New(db *specs.DB) (*Server, error) {
 	s.mux.HandleFunc("GET /api/specs/search", s.searchSpecs)
 	s.mux.HandleFunc("GET /api/specs/{id}", s.getSpec)
 	s.mux.HandleFunc("POST /api/measure/manual", s.measureManual)
+	s.mux.HandleFunc("POST /api/optical/calibrate", s.calibrate)
+	s.mux.HandleFunc("POST /api/optical/camber", s.opticalCamber)
 	s.mux.HandleFunc("GET /api/demo", s.demo)
 	return s, nil
 }

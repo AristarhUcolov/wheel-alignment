@@ -21,6 +21,7 @@
     </div>
   </div>
   <div class="top-actions">
+    <button id="btn-optical" class="ghost">Оптика <em class="beta">β</em></button>
     <button id="btn-demo" class="ghost">Демо-режим</button>
     <button id="btn-help" class="ghost">Как измерять</button>
   </div>
@@ -115,6 +116,104 @@
 </section>
 
 </main>
+
+<div id="optical" class="modal">
+  <div class="modal-inner wide">
+    <button class="close" data-close>✕</button>
+    <h2>Оптический режим <em class="beta">бета</em></h2>
+
+    <div class="disclaimer soft">
+      Камера измеряет <b>развал</b> — и делает это точнее угломера: мишень можно закрепить на диске
+      как угодно криво, программа сама находит ось вращения колеса. <b>Схождение и угол тяги</b> камерой
+      пока не измеряются: для этого нужно связать все четыре колеса в одну систему координат, а это
+      ещё не сделано. Схождение выставляйте по струне (вкладка «Замеры»).
+    </div>
+
+    <div class="opt-tabs">
+      <button class="opt-tab active" data-opt="calib">1. Калибровка камеры</button>
+      <button class="opt-tab" data-opt="camber">2. Развал по фото</button>
+    </div>
+
+    <!-- ── Калибровка ── -->
+    <div id="opt-calib" class="opt-pane active">
+      <p class="lede">Калибровка нужна один раз для каждой камеры. Снимите шахматную мишень
+        10–20 раз под разными углами и по всем углам кадра, затем загрузите все снимки сюда.
+        Программа посчитает параметры камеры и сохранит их в файл, который понадобится при замере.</p>
+
+      <div class="grid3">
+        <label>Углов по горизонтали
+          <input id="calibCols" type="number" value="9" min="3">
+          <small>Внутренних углов, не клеток. Доска 10×7 клеток = 9×6 углов.</small>
+        </label>
+        <label>Углов по вертикали
+          <input id="calibRows" type="number" value="6" min="3">
+          <small>Сумма сторон должна быть нечётной (9+6=15). Иначе ориентация неоднозначна.</small>
+        </label>
+        <label>Размер клетки, мм
+          <input id="calibSquare" type="number" value="30" step="0.1">
+          <small>Измерьте штангенциркулем по реальной распечатке — принтеры масштабируют.</small>
+        </label>
+      </div>
+
+      <label class="filedrop">
+        <input id="calibFiles" type="file" accept="image/png,image/jpeg" multiple hidden>
+        <span>Выберите снимки мишени (можно сразу все)</span>
+      </label>
+      <div id="calibCount" class="hint"></div>
+
+      <div class="actions">
+        <button id="btn-calib-run" class="primary" disabled>Откалибровать</button>
+      </div>
+      <div id="calibProgress" class="hint"></div>
+      <div id="calibResult"></div>
+    </div>
+
+    <!-- ── Развал ── -->
+    <div id="opt-camber" class="opt-pane">
+      <p class="lede">Вывесите колесо, закрепите на диске мишень (как угодно — перекос программа
+        учтёт), поставьте камеру <b>строго по уровню</b> сбоку от колеса. Сделайте 4–6 снимков,
+        проворачивая колесо на 10–20° между кадрами. Загрузите снимки — программа найдёт ось
+        вращения колеса и посчитает развал.</p>
+
+      <div class="grid3">
+        <label>Какое колесо
+          <select id="camberPos">
+            <option value="FL">Переднее левое</option>
+            <option value="FR">Переднее правое</option>
+            <option value="RL">Заднее левое</option>
+            <option value="RR">Заднее правое</option>
+          </select>
+        </label>
+        <label>Файл калибровки камеры
+          <input id="camberCamera" type="file" accept="application/json,.json">
+          <small>camera.json, полученный на вкладке «Калибровка».</small>
+        </label>
+        <label class="chk">
+          <input id="camberLevel" type="checkbox" checked>
+          <span>Камера стояла строго по уровню</span>
+          <small>Если нет — развал сместится ровно на наклон камеры.</small>
+        </label>
+      </div>
+
+      <label class="filedrop">
+        <input id="camberFiles" type="file" accept="image/png,image/jpeg" multiple hidden>
+        <span>Выберите снимки колеса (4–6 штук)</span>
+      </label>
+      <div id="camberCount" class="hint"></div>
+
+      <div class="actions">
+        <button id="btn-camber-run" class="primary" disabled>Измерить развал</button>
+      </div>
+      <div id="camberProgress" class="hint"></div>
+      <div id="camberResult"></div>
+    </div>
+
+    <p class="warn" style="margin-top:1.5rem">
+      Как собрать мишень и провести калибровку — подробно в <code>docs/PROCEDURE.md</code>.
+      Мишень должна быть на жёстком плоском листе (не мятая бумага), печать — чёткая.
+    </p>
+  </div>
+</div>
 
 <div id="help" class="modal">
   <div class="modal-inner">

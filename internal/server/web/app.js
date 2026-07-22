@@ -396,8 +396,171 @@ $('#btn-demo').onclick = async () => {
   goto('result');
 };
 $('#btn-help').onclick = () => $('#help').classList.add('open');
-$('#help').onclick = e => { if (e.target.id === 'help' || e.target.dataset.close !== undefined) $('#help').classList.remove('open'); };
-document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#help').classList.remove('open'); });
+
+// Every modal closes the same way: click the backdrop, the ✕, or press Escape.
+$$('.modal').forEach(m => {
+  m.onclick = e => {
+    if (e.target === m || e.target.dataset.close !== undefined) m.classList.remove('open');
+  };
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') $$('.modal').forEach(m => m.classList.remove('open'));
+});
+
+/* ── Оптический режим ─────────────────────────────────────────────────── */
+
+$('#btn-optical').onclick = () => $('#optical').classList.add('open');
+
+$$('.opt-tab').forEach(b => b.onclick = () => {
+  $$('.opt-tab').forEach(x => x.classList.toggle('active', x === b));
+  $$('.opt-pane').forEach(p => p.classList.toggle('active', p.id === 'opt-' + b.dataset.opt));
+});
+
+// Wire a hidden file input to its drop-zone label and a count readout.
+function fileZone(inputId, countId, runBtn, minCount) {
+  const input = $('#' + inputId);
+  const zone = input.closest('.filedrop');
+  const count = $('#' + countId);
+  input.onchange = () => {
+    const n = input.files.length;
+    if (zone) zone.classList.toggle('ready', n > 0);
+    count.textContent = n ? `Выбрано снимков: ${n}` : '';
+    checkReady();
+  };
+  return input;
+}
+
+const calibInput = fileZone('calibFiles', 'calibCount');
+const camberInput = fileZone('camberFiles', 'camberCount');
+
+function checkReady() {
+  $('#btn-calib-run').disabled = calibInput.files.length < 3;
+  $('#btn-camber-run').disabled =
+    camberInput.files.length < 3 || !$('#camberCamera').files.length;
+}
+$('#camberCamera').onchange = checkReady;
+
+const degMin = deg => fmtDegMin(deg);
+
+// ── Калибровка ──
+$('#btn-calib-run').onclick = async () => {
+  const btn = $('#btn-calib-run');
+  const out = $('#calibResult');
+  btn.disabled = true;
+  $('#calibProgress').innerHTML = `<span class="spin"></span> Обработка ${calibInput.files.length} снимков — это может занять до минуты…`;
+  out.innerHTML = '';
+
+  const fd = new FormData();
+  fd.append('cols', $('#calibCols').value);
+  fd.append('rows', $('#calibRows').value);
+  fd.append('square_mm', $('#calibSquare').value);
+  for (const f of calibInput.files) fd.append('images', f);
+
+  try {
+    const r = await fetch('/api/optical/calibrate', { method: 'POST', body: fd });
+    const d = await r.json();
+    $('#calibProgress').textContent = '';
+    if (!r.ok) { out.innerHTML = `<div class="error">${d.error || 'Ошибка калибровки'}</div>`; return; }
+    renderCalib(d);
+  } catch (e) {
+    $('#calibProgress').textContent = '';
+    out.innerHTML = `<div class="error">${e}</div>`;
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+function renderCalib(d) {
+  const grade = { good: ['good', 'Хорошая — можно измерять'],
+                  ok: ['', 'Приемлемая, но см. замечания'],
+                  bad: ['bad', 'Плохая — переснимите серию'] }[d.quality] || ['', ''];
+  const json = JSON.stringify(d.camera, null, 2);
+  const blob = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+
+  $('#calibResult').innerHTML = `
+    <div class="opt-metrics">
+      <div class="metric"><div class="v ${grade[0]}">${d.rms_px.toFixed(3)}</div><div class="k">СКО, пикс</div></div>
+      <div class="metric"><div class="v">${d.views_used}</div><div class="k">кадров учтено</div></div>
+      <div class="metric"><div class="v">${Math.round(d.tilt_spread_deg)}°</div><div class="k">разброс наклона</div></div>
+      <div class="metric"><div class="v">${Math.round(d.coverage_fraction * 100)}%</div><div class="k">покрытие кадра</div></div>
+    </div>
+    <p><b>Качество: ${grade[1]}</b></p>
+    <div class="copybar">
+      <a class="primary" style="text-decoration:none;padding:.55rem 1rem;border-radius:8px" href="${blob}" download="camera.json">Сохранить camera.json</a>
+      <span style="color:var(--muted);font-size:.84rem">Этот файл понадобится на вкладке «Развал по фото» и при каждом замере.</span>
+    </div>
+    ${warnBlock(d.warnings)}`;
+}
+
+// ── Развал по фото ──
+$('#btn-camber-run').onclick = async () => {
+  const btn = $('#btn-camber-run');
+  const out = $('#camberResult');
+  btn.disabled = true;
+  $('#camberProgress').innerHTML = `<span class="spin"></span> Распознаю мишень на ${camberInput.files.length} кадрах…`;
+  out.innerHTML = '';
+
+  const fd = new FormData();
+  fd.append('position', $('#camberPos').value);
+  fd.append('camera', $('#camberCamera').files[0]);
+  for (const f of camberInput.files) fd.append('images', f);
+  // The server measures relative to gravity, and with no tilt data it assumes a
+  // level camera. If the operator has told us it was not level, we cannot fix
+  // that here — so we say so plainly rather than print a number that is wrong by
+  // the unknown tilt.
+  const notLevel = !$('#camberLevel').checked;
+
+  try {
+    const r = await fetch('/api/optical/camber', { method: 'POST', body: fd });
+    const d = await r.json();
+    $('#camberProgress').textContent = '';
+    if (!r.ok) {
+      out.innerHTML = `<div class="error">${d.error || 'Не удалось измерить'}</div>` + frameStrip(d.frames);
+      return;
+    }
+    if (notLevel) {
+      d.warnings = ['Вы отметили, что камера стояла не по уровню. Показанный развал смещён ровно на ' +
+        'наклон камеры — выставьте её по пузырьковому уровню и переснимите. Учесть наклон камеры ' +
+        'программа пока не умеет.', ...(d.warnings || [])];
+    }
+    renderCamber(d);
+  } catch (e) {
+    $('#camberProgress').textContent = '';
+    out.innerHTML = `<div class="error">${e}</div>`;
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+function renderCamber(d) {
+  const sweepOK = d.sweep_deg >= 15;
+  $('#camberResult').innerHTML = `
+    <div class="bigcamber">
+      <div class="num">${degMin(d.camber_deg)}</div>
+      <div class="lbl">развал, ${d.position_ru.toLowerCase()} · ${d.camber_deg.toFixed(2)}°</div>
+    </div>
+    <div class="opt-metrics">
+      <div class="metric"><div class="v">${d.runout_deg.toFixed(1)}°</div><div class="k">биение мишени</div></div>
+      <div class="metric"><div class="v ${sweepOK ? '' : 'bad'}">${Math.round(d.sweep_deg)}°</div><div class="k">поворот колеса</div></div>
+      <div class="metric"><div class="v">${d.axis_residual_mm.toFixed(1)}</div><div class="k">разброс оси, мм</div></div>
+      <div class="metric"><div class="v">${d.used}</div><div class="k">кадров учтено</div></div>
+    </div>
+    ${frameStrip(d.frames)}
+    ${warnBlock(d.warnings)}`;
+}
+
+function frameStrip(frames) {
+  if (!frames || !frames.length) return '';
+  const dots = frames.map(f =>
+    `<div class="frame-dot ${f.ok ? 'ok' : 'bad'}" title="${f.error || ('СКО ' + (f.rms_px || 0).toFixed(2) + ' пикс')}">${f.index + 1}</div>`
+  ).join('');
+  return `<div class="frame-strip">${dots}</div>`;
+}
+
+function warnBlock(warnings) {
+  if (!warnings || !warnings.length) return '';
+  return `<ul class="warnlist">${warnings.map(w => `<li>${w}</li>`).join('')}</ul>`;
+}
 
 buildWheelForm();
 runSearch();
