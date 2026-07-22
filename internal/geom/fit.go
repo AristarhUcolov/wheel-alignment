@@ -177,21 +177,49 @@ func FitConeAxis(dirs []Vec3, hint Vec3) (Vec3, error) {
 
 // AxisFit describes a physical axis of rotation recovered from a motion.
 type AxisFit struct {
-	Direction Vec3    // unit vector along the axis
-	Point     Vec3    // the point on the axis closest to the origin of the input frame
-	Sweep     float64 // total rotation observed, radians — a quality indicator
-	Residual  float64 // rms of the point-fit residual, input length units
+	Direction Vec3 // unit vector along the axis
+	Point     Vec3 // the point on the axis closest to the origin of the input frame
+
+	// Center is the point on the axis closest to the moving body's OWN origin —
+	// for a wheel target, the point on the spin axis nearest the middle of the
+	// board. It is the practical place to apply a clamp's known offset when
+	// locating the wheel centre.
+	//
+	// It is not "the" centre of anything. Every point on the axis is equally
+	// stationary, so the position along the axis is not observable from the
+	// motion at all; Point and Center are simply two canonical choices of where
+	// to stand on the same line. Anything that needs a specific point along it —
+	// track width, wheelbase — must get that from the clamp geometry.
+	Center Vec3
+
+	Sweep    float64 // total rotation observed, radians — a quality indicator
+	Residual float64 // rms of the point-fit residual, input length units
 }
 
 // FitRotationAxis recovers the line a rigid body rotated about, from a sequence
-// of its poses. For a body pinned to a fixed axis through point c, every pose
-// satisfies R_i·c + t_i = c, i.e. (I − R_i)·c = t_i. Stacking that over all
-// poses and solving in the least-squares sense gives c; the direction comes
-// from the axis of the relative rotations.
+// of its poses.
 //
-// The system is singular along the axis itself (sliding a point along the axis
-// changes nothing), so we solve with a truncated pseudo-inverse and return the
-// axis point nearest the origin.
+// The direction comes from the axis of the relative rotations. The position
+// takes more care than it first appears. A point of the body that stays still
+// has body-frame coordinates p and world position R_i·p + t_i, and that
+// position must be the same in every frame. Subtracting the mean gives
+//
+//	(R_i − R̄)·p = t̄ − t_i
+//
+// which is linear in p and solvable by least squares. The fixed point in the
+// world is then c = mean(R_i·p + t_i).
+//
+// The tempting shortcut — requiring R_i·c + t_i = c, i.e. (I − R_i)·c = t_i —
+// is a special case that silently assumes the body frame is aligned with the
+// world frame. It is not, for a target clamped to a wheel at whatever angle the
+// clamp happened to sit at, and using it puts the recovered axis hundreds of
+// millimetres away from the real one while leaving its direction perfectly
+// correct. Direction-only users would never notice; wheelbase and track would
+// be nonsense.
+//
+// The system is singular along the axis itself — every point on the axis is
+// equally fixed — so it is solved with a truncated pseudo-inverse. Only the
+// line is determined, never a particular point along it.
 func FitRotationAxis(poses []Pose) (AxisFit, error) {
 	if len(poses) < 2 {
 		return AxisFit{}, ErrDegenerate
@@ -224,28 +252,49 @@ func FitRotationAxis(poses []Pose) (AxisFit, error) {
 	}
 	dir := acc.Unit()
 
-	// Point: least squares on (I − R_i)·c = t_i.
+	// Point: least squares on (R_i − R̄)·p = t̄ − t_i, for the stationary point
+	// p expressed in the BODY frame.
+	n := float64(len(poses))
+	var rBar Mat3
+	var tBar Vec3
+	for _, p := range poses {
+		rBar = rBar.AddM(p.R)
+		tBar = tBar.Add(p.T)
+	}
+	rBar = rBar.Scale(1 / n)
+	tBar = tBar.Scale(1 / n)
+
 	var ata Mat3
 	var atb Vec3
 	for _, p := range poses {
-		a := Identity().SubM(p.R)
+		a := p.R.SubM(rBar)
 		ata = ata.AddM(a.T().Mul(a))
-		atb = atb.Add(a.T().MulVec(p.T))
+		atb = atb.Add(a.T().MulVec(tBar.Sub(p.T)))
 	}
-	c := pseudoSolveSym(ata, atb)
-	// Slide to the point closest to the origin (removes the free parameter).
-	c = c.Sub(dir.Scale(c.Dot(dir)))
+	body := pseudoSolveSym(ata, atb)
 
+	// Carry it into the world and average: c = mean(R_i·p + t_i).
+	var c Vec3
+	for _, p := range poses {
+		c = c.Add(p.Apply(body))
+	}
+	c = c.Scale(1 / n)
+
+	// Only the line is determined; report the point on it nearest the origin so
+	// the answer is canonical.
+	axisPoint := c.Sub(dir.Scale(c.Dot(dir)))
+
+	// Residual: how far the supposedly stationary point actually wandered.
 	var ss float64
 	for _, p := range poses {
-		r := Identity().SubM(p.R).MulVec(c).Sub(p.T)
-		ss += r.Len2()
+		ss += p.Apply(body).Sub(c).Len2()
 	}
 	return AxisFit{
 		Direction: dir,
-		Point:     c,
+		Point:     axisPoint,
+		Center:    c,
 		Sweep:     sweep,
-		Residual:  math.Sqrt(ss / float64(len(poses))),
+		Residual:  math.Sqrt(ss / n),
 	}, nil
 }
 

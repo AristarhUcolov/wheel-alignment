@@ -1,0 +1,73 @@
+name: CI
+
+# Быстрая проверка на каждый push и pull request.
+#
+# Отдельно вынесена проверка базы автомобилей: большинство вкладов в этот
+# проект — не код, а данные по автомобилям, и присылать их будут люди, у
+# которых Go не установлен. Пусть за них проверяет CI: происхождение данных,
+# корректность допусков и то, что запись вообще находится поиском.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          check-latest: true
+
+      - name: Форматирование
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "Не отформатировано (запустите gofmt -w .):"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: Тесты
+        run: go test -race ./...
+
+      - name: Сборка
+        run: go build ./...
+
+  # Отдельный шаг, чтобы в списке проверок PR было прямо видно: данные по
+  # автомобилям прошли валидацию или нет.
+  vehicle-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          check-latest: true
+
+      - name: Проверка базы автомобилей
+        run: go test -v -run 'Provenance|Guidance|Search|Validate|Millimetre' ./internal/specs/
+
+      - name: База загружается без ошибок
+        run: |
+          go build -o /tmp/wheelalign ./cmd/wheelalign
+          /tmp/wheelalign -open=false -addr=127.0.0.1:8799 &
+          sleep 3
+          health=$(curl -sf http://127.0.0.1:8799/api/health)
+          echo "$health"
+          # Любая запись, отвергнутая при загрузке, валит сборку — иначе
+          # сломанные данные тихо исчезают из базы и никто не замечает.
+          echo "$health" | grep -q '"load_errors": null' || {
+            echo "В базе есть записи, отвергнутые при загрузке — см. выше."
+            exit 1
+          }

@@ -108,19 +108,32 @@ func TestFitPlane(t *testing.T) {
 }
 
 // TestFitRotationAxis is the runout-compensation primitive: given poses of a
-// body pinned to a fixed axis, recover that axis as a line in space. Both the
-// direction and the position must come back, and the position is the part the
-// least-squares fit exists for.
+// body pinned to a fixed axis, recover that axis as a line in space.
+//
+// The body frame here is deliberately NOT aligned with the world frame, and
+// the body's origin is deliberately nowhere near the axis — exactly the
+// situation of a checkerboard clamped to a wheel rim at whatever angle the
+// clamp happened to sit. An earlier version of both this test and the fit
+// assumed the two frames coincided; the fit's direction came out perfect and
+// its position came out hundreds of millimetres wrong, and the test agreed with
+// it because it had been built on the same assumption. Constructing the poses
+// from the physical statement instead — "this body point stays at this world
+// point" — is what makes the test independent of the code.
 func TestFitRotationAxis(t *testing.T) {
-	dir := geom.V(-0.08, 0.05, 1).Unit() // a steering axis: caster and SAI
-	pivot := geom.V(120, -340, 55)
+	dir := geom.V(-0.08, 0.05, 1).Unit() // a steering axis: some caster and SAI
+	pivot := geom.V(120, -340, 55)       // the fixed point, in world coordinates
+
+	// The body's own frame is rotated arbitrarily, and the fixed point sits at
+	// an arbitrary place within it.
+	bodyFrame := geom.RotZ(0.9).Mul(geom.RotX(-1.2)).Mul(geom.RotY(0.4))
+	fixedInBody := geom.V(-37, 210, 64)
 
 	var poses []geom.Pose
 	for _, ang := range []float64{-0.35, -0.18, 0, 0.2, 0.4} {
-		r := geom.Rodrigues(dir, ang)
-		// A body rotating about a line through `pivot` has translation
-		// (I − R)·pivot, which is exactly what the fit inverts.
-		poses = append(poses, geom.Pose{R: r, T: pivot.Sub(r.MulVec(pivot))})
+		r := geom.Rodrigues(dir, ang).Mul(bodyFrame)
+		// Whatever the rotation, the body point `fixedInBody` must land on the
+		// world point `pivot`.
+		poses = append(poses, geom.Pose{R: r, T: pivot.Sub(r.MulVec(fixedInBody))})
 	}
 
 	fit, err := geom.FitRotationAxis(poses)
@@ -130,13 +143,22 @@ func TestFitRotationAxis(t *testing.T) {
 	if ang := geom.Deg(fit.Direction.AngleTo(dir)); ang > 1e-6 {
 		t.Errorf("axis direction off by %.9f°", ang)
 	}
-	// The returned point is the one nearest the origin, so compare the lines
-	// rather than the points: the offset from pivot must lie along the axis.
-	off := fit.Point.Sub(pivot)
-	perp := off.Sub(dir.Scale(off.Dot(dir)))
-	if perp.Len() > 1e-6 {
-		t.Errorf("axis line misses the true pivot by %.9f mm", perp.Len())
+	// Only the line is determined, so compare lines: the offset from the true
+	// pivot must lie along the axis.
+	for name, p := range map[string]geom.Vec3{"Point": fit.Point, "Center": fit.Center} {
+		off := p.Sub(pivot)
+		perp := off.Sub(dir.Scale(off.Dot(dir)))
+		if perp.Len() > 1e-6 {
+			t.Errorf("%s misses the true axis by %.9f mm", name, perp.Len())
+		}
 	}
+	// What is NOT recoverable is where along the axis the point sits: every
+	// point on the line is equally stationary, so the fit is free to return any
+	// of them. Asserting that Center equals the pivot we happened to build the
+	// test from would be asserting something the physics does not determine.
+	slide := fit.Center.Sub(pivot).Dot(dir)
+	t.Logf("восстановленная точка смещена вдоль оси на %.1f мм — это ожидаемо и ненаблюдаемо", slide)
+
 	if fit.Residual > 1e-6 {
 		t.Errorf("residual %.9f on exact input", fit.Residual)
 	}
