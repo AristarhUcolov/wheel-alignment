@@ -283,6 +283,14 @@ label.chk small { flex-basis: 100%; }
 .bigcamber .num { font-family: var(--mono); font-size: 2.4rem; font-weight: 700; color: var(--accent); }
 .bigcamber .lbl { color: var(--muted); font-size: .85rem; margin-top: .3rem; }
 
+.tgrow { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .35rem; margin-top: .3rem; }
+.tgrow input { width: 100%; }
+.opt-h3 { margin: 1.75rem 0 .4rem; font-size: 1rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+#linkRow.hidden { display: none; }
+.wheelfile { background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: .9rem 1rem; }
+.wheelfile h4 { margin: 0 0 .6rem; font-size: .9rem; font-weight: 650; }
+.wheelfile .filedrop { margin: .5rem 0 .2rem; padding: 1rem .8rem; font-size: .84rem; }
+
 .copybar { display: flex; gap: .5rem; align-items: center; margin-top: .8rem; }
 .copybar code { flex: 1; overflow-x: auto; white-space: nowrap; padding: .5rem .7rem; }
 .spin { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--line);

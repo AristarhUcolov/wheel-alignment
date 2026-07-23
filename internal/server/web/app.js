@@ -562,5 +562,135 @@ function warnBlock(warnings) {
   return `<ul class="warnlist">${warnings.map(w => `<li>${w}</li>`).join('')}</ul>`;
 }
 
+/* ── Полный оптический замер ──────────────────────────────────────────── */
+
+// Per-wheel file inputs, each with the reference board that wheel was shot
+// against. Front wheels default to the front board, rear to the rear one —
+// which is the only arrangement in which a board is actually visible.
+function buildFullWheelForm() {
+  const box = $('#fullWheels');
+  box.replaceChildren();
+  for (const w of WHEELS) {
+    const card = document.createElement('div');
+    card.className = 'wheelfile';
+    card.innerHTML = `
+      <h4>${w.name}</h4>
+      <label>Напольная мишень в кадре
+        <select data-ref="${w.key}">
+          <option value="0"${w.front ? ' selected' : ''}>Передняя</option>
+          <option value="1"${w.front ? '' : ' selected'}>Задняя</option>
+        </select>
+      </label>
+      <label class="filedrop">
+        <input type="file" accept="image/png,image/jpeg" multiple hidden data-full="${w.key}">
+        <span>Выбрать снимки</span>
+      </label>
+      <div class="hint" data-count="${w.key}"></div>`;
+    box.append(card);
+  }
+  $$('[data-full]').forEach(inp => {
+    inp.onchange = () => {
+      const k = inp.dataset.full;
+      const n = inp.files.length;
+      inp.closest('.filedrop').classList.toggle('ready', n > 0);
+      $(`[data-count="${k}"]`).textContent = n ? `Снимков: ${n}` : '';
+      checkFullReady();
+    };
+  });
+}
+
+const fullLinkInput = fileZone('fullLink', 'fullLinkCount');
+
+function usingOneRef() { return $('#oneRef').checked; }
+
+$('#oneRef').onchange = () => {
+  $('#linkRow').classList.toggle('hidden', usingOneRef());
+  checkFullReady();
+};
+$('#fullCamera').onchange = checkFullReady;
+
+function checkFullReady() {
+  const haveCam = $('#fullCamera').files.length > 0;
+  const haveWheels = WHEELS.every(w => {
+    const inp = document.querySelector(`[data-full="${w.key}"]`);
+    return inp && inp.files.length >= 3;
+  });
+  const haveLink = usingOneRef() || fullLinkInput.files.length > 0;
+  $('#btn-full-run').disabled = !(haveCam && haveWheels && haveLink);
+}
+
+$('#btn-full-run').onclick = async () => {
+  const btn = $('#btn-full-run');
+  const out = $('#fullResult');
+  btn.disabled = true;
+  out.innerHTML = '';
+  $('#fullProgress').innerHTML =
+    '<span class="spin"></span> Распознаю мишени на всех кадрах. Это самая долгая часть — до нескольких минут.';
+
+  const fd = new FormData();
+  fd.append('camera', $('#fullCamera').files[0]);
+  fd.append('rim_diameter_in', $('#fullRim').value);
+  if (state.spec) fd.append('spec_id', state.spec.id);
+
+  fd.append('wheel_cols', $('#wCols').value);
+  fd.append('wheel_rows', $('#wRows').value);
+  fd.append('wheel_square_mm', $('#wSq').value);
+
+  fd.append('ref0_cols', $('#r0Cols').value);
+  fd.append('ref0_rows', $('#r0Rows').value);
+  fd.append('ref0_square_mm', $('#r0Sq').value);
+  if (!usingOneRef()) {
+    fd.append('ref1_cols', $('#r1Cols').value);
+    fd.append('ref1_rows', $('#r1Rows').value);
+    fd.append('ref1_square_mm', $('#r1Sq').value);
+    for (const f of fullLinkInput.files) fd.append('images_link', f);
+  }
+
+  for (const w of WHEELS) {
+    const inp = document.querySelector(`[data-full="${w.key}"]`);
+    for (const f of inp.files) fd.append('images_' + w.key, f);
+    const ref = usingOneRef() ? '0' : document.querySelector(`[data-ref="${w.key}"]`).value;
+    fd.append('ref_' + w.key, ref);
+  }
+
+  try {
+    const r = await fetch('/api/optical/align', { method: 'POST', body: fd });
+    const d = await r.json();
+    $('#fullProgress').textContent = '';
+    if (!r.ok) {
+      out.innerHTML = `<div class="error">${d.error || 'Не удалось рассчитать'}</div>` + frameStrip(d.frames);
+      return;
+    }
+    // The response is an ordinary alignment result, so it goes through exactly
+    // the same rendering as a string-line measurement.
+    out.innerHTML = opticalSummary(d.optical);
+    render(d);
+    $('#optical').classList.remove('open');
+    goto('result');
+  } catch (e) {
+    $('#fullProgress').textContent = '';
+    out.innerHTML = `<div class="error">${e}</div>`;
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+function opticalSummary(optical) {
+  if (!optical || !optical.length) return '';
+  const rows = optical.map(o => `
+    <tr>
+      <td>${o.position_ru}</td>
+      <td class="val">${o.used}/${o.total}</td>
+      <td class="val">${Math.round(o.sweep_deg)}°</td>
+      <td class="val">${o.runout_deg.toFixed(1)}°</td>
+      <td class="val">${o.axis_residual_mm.toFixed(1)}</td>
+    </tr>`).join('');
+  return `<table class="params" style="margin-top:1rem">
+      <thead><tr><th>Колесо</th><th>Кадров</th><th>Поворот</th><th>Биение мишени</th><th>Разброс оси, мм</th></tr></thead>
+      <tbody>${rows}</tbody></table>`;
+}
+
 buildWheelForm();
+buildFullWheelForm();
+checkFullReady();
 runSearch();

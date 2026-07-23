@@ -28,17 +28,31 @@ const maxUpload = 64 << 20 // 64 MiB of photographs per request
 // targetFromForm reads the checkerboard description from form fields, with the
 // A4 9×6 / 30 mm default the docs recommend.
 func targetFromForm(f *multipart.Form) (vision.Target, error) {
+	return targetFromPrefix(f, "")
+}
+
+// targetFromPrefix reads a board description from fields named
+// "<prefix>cols" and so on, so one request can describe several boards.
+func targetFromPrefix(f *multipart.Form, prefix string) (vision.Target, error) {
 	t := vision.DefaultTarget()
-	if v := formInt(f, "cols"); v > 0 {
+	if v := formInt(f, prefix+"cols"); v > 0 {
 		t.Cols = v
 	}
-	if v := formInt(f, "rows"); v > 0 {
+	if v := formInt(f, prefix+"rows"); v > 0 {
 		t.Rows = v
 	}
-	if v := formFloat(f, "square_mm"); v > 0 {
+	if v := formFloat(f, prefix+"square_mm"); v > 0 {
 		t.SquareMM = v
 	}
+	if prefix != "" {
+		t.Name = prefix
+	}
 	return t, t.Validate()
+}
+
+// hasPrefixFields reports whether a board was described under this prefix.
+func hasPrefixFields(f *multipart.Form, prefix string) bool {
+	return formValue(f, prefix+"cols") != "" || formValue(f, prefix+"rows") != ""
 }
 
 func decodeUploads(files []*multipart.FileHeader) ([]*vision.Gray, []string, []string) {
