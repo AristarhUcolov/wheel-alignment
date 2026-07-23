@@ -27,6 +27,7 @@ const usage = `Сход-развал — открытый стенд.
 
   wheelalign                       запустить стенд (веб-интерфейс)
   wheelalign calibrate <каталог>   откалибровать камеру по снимкам мишени
+  wheelalign check-spec <файл>     проверить данные по автомобилю перед отправкой
 
 Ключи запуска стенда:
   -addr   адрес, на котором слушать (по умолчанию 127.0.0.1:8700)
@@ -40,12 +41,21 @@ const usage = `Сход-развал — открытый стенд.
 `
 
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "calibrate" {
-		if err := runCalibrate(os.Args[2:]); err != nil {
-			fmt.Fprintln(os.Stderr, "Ошибка:", err)
-			os.Exit(1)
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "calibrate":
+			if err := runCalibrate(os.Args[2:]); err != nil {
+				fmt.Fprintln(os.Stderr, "Ошибка:", err)
+				os.Exit(1)
+			}
+			return
+		case "check-spec":
+			if err := runCheckSpec(os.Args[2:]); err != nil {
+				fmt.Fprintln(os.Stderr, "Ошибка:", err)
+				os.Exit(1)
+			}
+			return
 		}
-		return
 	}
 
 	addr := flag.String("addr", "127.0.0.1:8700", "адрес, на котором слушать")

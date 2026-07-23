@@ -284,6 +284,9 @@ label.chk small { flex-basis: 100%; }
 .bigcamber .lbl { color: var(--muted); font-size: .85rem; margin-top: .3rem; }
 
 .tgrow { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .35rem; margin-top: .3rem; }
+.tgrow.two { grid-template-columns: 1fr 1fr; }
+input[type=text], input:not([type]) { width: 100%; padding: .55rem .7rem; background: var(--bg);
+  color: var(--text); border: 1px solid var(--line); border-radius: 8px; }
 .tgrow input { width: 100%; }
 .opt-h3 { margin: 1.75rem 0 .4rem; font-size: 1rem; padding-top: 1rem; border-top: 1px solid var(--line); }
 #linkRow.hidden { display: none; }

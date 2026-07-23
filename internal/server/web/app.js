@@ -690,6 +690,172 @@ function opticalSummary(optical) {
       <tbody>${rows}</tbody></table>`;
 }
 
+/* ── Добавление автомобиля в базу ─────────────────────────────────────── */
+
+// Only the fields a manual actually prints. Anything left blank is simply
+// absent from the entry, which is the honest outcome — a missing figure is far
+// better than a guessed one.
+const AXLE_FIELDS = [
+  { key: 'camber', label: 'Развал', hint: '+ верх колеса наружу' },
+  { key: 'caster', label: 'Кастер', hint: '+ верх оси поворота назад; только передняя ось' },
+  { key: 'sai', label: 'Поперечный наклон оси (SAI)', hint: 'только передняя ось' },
+  { key: 'total_toe', label: 'Суммарное схождение оси', hint: '+ колёса сходятся спереди' },
+];
+
+function buildAxleForms() {
+  const box = $('#axles');
+  box.replaceChildren();
+  for (const ax of [{ k: 'front', n: 'Передняя ось' }, { k: 'rear', n: 'Задняя ось' }]) {
+    const card = document.createElement('div');
+    card.className = 'wheelfile';
+    card.style.marginBottom = '1rem';
+    const rows = AXLE_FIELDS.map(f => `
+      <label>${f.label}, градусы
+        <span class="tgrow two">
+          <input type="number" step="0.01" placeholder="от" data-ax="${ax.k}" data-f="${f.key}" data-b="min">
+          <input type="number" step="0.01" placeholder="до" data-ax="${ax.k}" data-f="${f.key}" data-b="max">
+        </span>
+        <small>${f.hint}</small>
+      </label>`).join('');
+    card.innerHTML = `
+      <h4>${ax.n}</h4>
+      <div class="grid3">${rows}</div>
+      <label>Схождение в миллиметрах (если в документе так)
+        <span class="tgrow two">
+          <input type="number" step="0.1" placeholder="от, мм" data-ax="${ax.k}" data-mm="min">
+          <input type="number" step="0.1" placeholder="до, мм" data-ax="${ax.k}" data-mm="max">
+        </span>
+        <small>Суммарное по оси. Программа переведёт в градусы по диаметру обода и покажет результат.</small>
+      </label>
+      <div class="grid3">
+        <label class="chk"><input type="checkbox" data-ax="${ax.k}" data-adj="camber"><span>Развал регулируется</span></label>
+        <label class="chk"><input type="checkbox" data-ax="${ax.k}" data-adj="caster"><span>Кастер регулируется</span></label>
+        <label class="chk"><input type="checkbox" data-ax="${ax.k}" data-adj="toe"><span>Схождение регулируется</span></label>
+      </div>
+      <label>Чем регулируется
+        <input data-ax="${ax.k}" data-method="toe" placeholder="например: резьбовые рулевые тяги">
+      </label>`;
+    box.append(card);
+  }
+}
+
+const numOrNull = el => {
+  if (!el || el.value.trim() === '') return null;
+  const v = parseFloat(el.value);
+  return Number.isFinite(v) ? v : null;
+};
+
+function axleFromForm(ax) {
+  const out = { adjustable: {} };
+  for (const f of AXLE_FIELDS) {
+    const lo = numOrNull(document.querySelector(`[data-ax="${ax}"][data-f="${f.key}"][data-b="min"]`));
+    const hi = numOrNull(document.querySelector(`[data-ax="${ax}"][data-f="${f.key}"][data-b="max"]`));
+    if (lo === null || hi === null) continue;
+    out[f.key] = { min: lo, nominal: (lo + hi) / 2, max: hi };
+  }
+  for (const a of ['camber', 'caster', 'toe']) {
+    out.adjustable[a] = document.querySelector(`[data-ax="${ax}"][data-adj="${a}"]`).checked;
+  }
+  const m = document.querySelector(`[data-ax="${ax}"][data-method="toe"]`).value.trim();
+  if (m) out.adjustable.toe_method = m;
+  return out;
+}
+
+function toeMMFromForm(ax) {
+  const lo = numOrNull(document.querySelector(`[data-ax="${ax}"][data-mm="min"]`));
+  const hi = numOrNull(document.querySelector(`[data-ax="${ax}"][data-mm="max"]`));
+  return (lo === null || hi === null) ? null : { min: lo, max: hi };
+}
+
+function buildSpecDraft() {
+  const slug = s => s.toLowerCase().replace(/[^a-zа-я0-9]+/gi, '-').replace(/^-|-$/g, '');
+  const make = $('#cMake').value.trim(), model = $('#cModel').value.trim();
+  const from = parseInt($('#cFrom').value, 10) || 0;
+
+  const spec = {
+    id: [slug(make), slug(model), from || ''].filter(Boolean).join('-') || 'new-entry',
+    make, model,
+    trim: $('#cTrim').value.trim(),
+    notes: $('#cNotes').value.trim(),
+    year_from: from,
+    year_to: parseInt($('#cTo').value, 10) || 0,
+    rim_diameter_in: numOrNull($('#cRim')) || 0,
+    front: axleFromForm('front'),
+    rear: axleFromForm('rear'),
+    conditions: {
+      load: $('#cLoad').value.trim(),
+      pressure: $('#cPress').value.trim(),
+      settle: $('#cSettle').value.trim(),
+    },
+    source: {
+      kind: $('#cSrcKind').value,
+      reference: $('#cSrcRef').value.trim(),
+      contributor: $('#cSrcWho').value.trim(),
+      added: new Date().toISOString().slice(0, 10),
+    },
+  };
+  const fm = toeMMFromForm('front'), rm = toeMMFromForm('rear');
+  if (fm) spec.front_total_toe_mm = fm;
+  if (rm) spec.rear_total_toe_mm = rm;
+  return spec;
+}
+
+$('#btn-contrib').onclick = () => {
+  if (!$('#axles').children.length) buildAxleForms();
+  $('#contrib').classList.add('open');
+};
+
+$('#btn-contrib-check').onclick = async () => {
+  const out = $('#contribResult');
+  out.innerHTML = '<span class="spin"></span> Проверяю…';
+  try {
+    const r = await fetch('/api/specs/check', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildSpecDraft()),
+    });
+    renderContribCheck(await r.json());
+  } catch (e) {
+    out.innerHTML = `<div class="error">${e}</div>`;
+  }
+};
+
+function renderContribCheck(d) {
+  const errs = (d.errors || []).length
+    ? `<div class="disclaimer"><b>Так запись не загрузится:</b><ul style="margin:.5rem 0 0 1rem">
+         ${d.errors.map(e => `<li>${e}</li>`).join('')}</ul></div>` : '';
+
+  const resolved = (d.resolved || []).length ? `
+    <h3 class="opt-h3">Как это поймёт программа</h3>
+    <table class="params"><tbody>
+      ${d.resolved.map(x => `<tr><td>${x.axle}</td><td>${x.name}</td>
+        <td class="val">${x.range}</td>
+        <td class="spec">${x.detail || ''}</td></tr>`).join('')}
+    </tbody></table>` : '';
+
+  let file = '';
+  if (d.ok && d.file) {
+    const blob = URL.createObjectURL(new Blob([d.file], { type: 'application/json' }));
+    file = `
+      <div class="copybar">
+        <a class="primary" style="text-decoration:none;padding:.55rem 1rem;border-radius:8px"
+           href="${blob}" download="vehicle.json">Скачать файл записи</a>
+        <span style="color:var(--muted);font-size:.84rem">
+          Положите его в <code>internal/specs/data/</code> и пришлите как pull request —
+          или просто отправьте файл в issue, если с git не работаете.</span>
+      </div>`;
+  }
+
+  $('#contribResult').innerHTML = `
+    ${errs}
+    ${d.ok ? '<p><b>Запись корректна.</b> ' + (d.verified
+        ? 'Источник заводской — предупреждений не будет.'
+        : 'Источник не заводской, поэтому программа покажет предупреждение:') + '</p>' : ''}
+    ${d.disclaimer ? `<div class="disclaimer soft">${d.disclaimer}</div>` : ''}
+    ${warnBlock(d.warnings)}
+    ${resolved}
+    ${file}`;
+}
+
 buildWheelForm();
 buildFullWheelForm();
 checkFullReady();
