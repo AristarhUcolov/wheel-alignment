@@ -132,6 +132,7 @@ func TestDetectorFindsEveryCorner(t *testing.T) {
 		{R: geom.RotY(geom.Rad(-40)).Mul(geom.RotX(geom.Rad(33))), T: geom.V(70, -40, 820)},
 		{R: geom.RotZ(geom.Rad(28)).Mul(geom.RotY(geom.Rad(42))), T: geom.V(-60, 50, 900)},
 	} {
+		pose = faceCamera(pose)
 		img := renderBoard(cam, tg, pose, 3, 0, rng)
 		det, err := vision.DetectCheckerboard(img, vision.DetectOptions{Target: tg})
 		if err != nil {
@@ -183,7 +184,7 @@ func TestDetectorFindsEveryCorner(t *testing.T) {
 func TestDetectorSubpixelUnderNoise(t *testing.T) {
 	cam := detectTestCamera()
 	tg := vision.DefaultTarget()
-	pose := geom.Pose{R: geom.RotY(geom.Rad(-25)).Mul(geom.RotX(geom.Rad(12))), T: geom.V(0, 0, 950)}
+	pose := faceCamera(geom.Pose{R: geom.RotY(geom.Rad(-25)).Mul(geom.RotX(geom.Rad(12))), T: geom.V(0, 0, 950)})
 	truth, _ := cam.ProjectPose(pose, tg.ModelPoints())
 
 	for _, noise := range []float64{0, 0.01, 0.03} {
@@ -218,7 +219,7 @@ func TestDetectorResolvesHalfTurn(t *testing.T) {
 	tg := vision.DefaultTarget()
 	rng := rand.New(rand.NewSource(4))
 
-	base := geom.Pose{R: geom.RotY(geom.Rad(-20)).Mul(geom.RotX(geom.Rad(15))), T: geom.V(0, 0, 950)}
+	base := faceCamera(geom.Pose{R: geom.RotY(geom.Rad(-20)).Mul(geom.RotX(geom.Rad(15))), T: geom.V(0, 0, 950)})
 	turned := geom.Pose{R: base.R.Mul(geom.RotZ(math.Pi)), T: base.T}
 
 	solve := func(p geom.Pose) geom.Pose {
@@ -280,7 +281,7 @@ func TestDetectorSurvivesClutter(t *testing.T) {
 	cam := detectTestCamera()
 	tg := vision.DefaultTarget()
 	rng := rand.New(rand.NewSource(6))
-	pose := geom.Pose{R: geom.RotY(geom.Rad(-18)).Mul(geom.RotX(geom.Rad(12))), T: geom.V(0, 0, 950)}
+	pose := faceCamera(geom.Pose{R: geom.RotY(geom.Rad(-18)).Mul(geom.RotX(geom.Rad(12))), T: geom.V(0, 0, 950)})
 	img := renderBoard(cam, tg, pose, 3, 0.004, rng)
 
 	// Scatter small checker-like patches around the frame, well clear of the
@@ -324,8 +325,9 @@ func TestDetectorSteepTiltWithClutter(t *testing.T) {
 	cam := detectTestCamera()
 	tg := vision.DefaultTarget()
 	rng := rand.New(rand.NewSource(13))
-	pose := geom.Pose{R: geom.RotZ(geom.Rad(24)).Mul(geom.RotY(geom.Rad(-43))).Mul(geom.RotX(geom.Rad(30))),
-		T: geom.V(50, -30, 820)}
+	pose := faceCamera(geom.Pose{
+		R: geom.RotZ(geom.Rad(24)).Mul(geom.RotY(geom.Rad(-43))).Mul(geom.RotX(geom.Rad(30))),
+		T: geom.V(50, -30, 820)})
 	img := renderBoard(cam, tg, pose, 3, 0.005, rng)
 
 	for _, c := range [][2]int{{70, 80}, {1200, 90}, {80, 650}, {1210, 640}, {620, 50}, {300, 690}} {

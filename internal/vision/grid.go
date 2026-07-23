@@ -139,14 +139,26 @@ func nearestLists(pts []Point2, k int) [][]int {
 }
 
 // seedBases proposes pairs of neighbours that could be the seed's two lattice
-// directions: comparable in length and roughly perpendicular.
+// directions.
 //
-// The tolerances are wide because perspective is wide. A board tilted 45° turns
-// its right angles into 60° and 120° on screen and compresses one axis by a
-// third, and a calibration shot is supposed to be tilted like that. What the
-// bounds still exclude is a diagonal neighbour, which sits at √2 the spacing
-// and 45° off.
+// The bounds here are deliberately loose, and that is a correction of an earlier
+// mistake. Requiring the two directions to be similar in length and roughly
+// perpendicular is right for a board held up facing the camera, and wrong for
+// the case that matters most: a reference board lying flat on the floor is
+// always seen at a grazing angle, which compresses one lattice axis several
+// times over and shears the right angle between them into something far from
+// 90°. Such a board failed to be found at all.
+//
+// So the only things excluded are a degenerate pair — two neighbours in nearly
+// the same or exactly opposite direction, which span no lattice — and wildly
+// mismatched lengths. Everything else is left for growth to judge, which is the
+// right place: a wrong basis simply fails to grow a complete lattice and the
+// next candidate is tried, whereas a basis rejected here can never be
+// reconsidered.
 func seedBases(pts []Point2, nbrs [][]int, s int) [][2]int {
+	const maxRatio = 3.5 // a floor board at a grazing angle reaches about 3
+	const maxCos = 0.95  // exclude only near-parallel pairs (under ~18° apart)
+
 	p := pts[s]
 	var out [][2]int
 	list := nbrs[s]
@@ -163,13 +175,12 @@ func seedBases(pts []Point2, nbrs [][]int, s int) [][2]int {
 			if lb < 1e-9 {
 				continue
 			}
-			if ratio := lb / la; ratio < 0.55 || ratio > 1.8 {
+			if ratio := lb / la; ratio < 1/maxRatio || ratio > maxRatio {
 				continue
 			}
 			ux, uy := (a.X-p.X)/la, (a.Y-p.Y)/la
 			vx, vy := (b.X-p.X)/lb, (b.Y-p.Y)/lb
-			cos := ux*vx + uy*vy
-			if math.Abs(cos) > 0.62 { // outside roughly 52°…128°
+			if math.Abs(ux*vx+uy*vy) > maxCos {
 				continue
 			}
 			// Keep a consistent winding so the lattice axes do not flip between
@@ -181,8 +192,8 @@ func seedBases(pts []Point2, nbrs [][]int, s int) [][2]int {
 			}
 		}
 	}
-	if len(out) > 6 {
-		out = out[:6]
+	if len(out) > 10 {
+		out = out[:10]
 	}
 	return out
 }

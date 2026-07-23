@@ -121,71 +121,78 @@ func DetectCheckerboard(img *Gray, opt DetectOptions) (Detection, error) {
 	if err := opt.Target.Validate(); err != nil {
 		return Detection{}, err
 	}
-	cols, rows := opt.Target.Cols, opt.Target.Rows
-	want := cols * rows
-
 	work := img.Normalize().Blur(opt.BlurSigma)
 
+	corners, det, err := detectCorners(work, opt)
+	if err != nil {
+		return det, err
+	}
+	fitted, _, ok := fitBoard(work, corners, opt.Target)
+	if !ok {
+		return det, fmt.Errorf("%w: кандидатов %d, требуется сетка %dx%d",
+			ErrNoGrid, len(corners), opt.Target.Cols, opt.Target.Rows)
+	}
+	fitted.CandidatesFound = len(corners)
+	return fitted, nil
+}
+
+// detectCorners finds and cleans the checkerboard corner cloud, without yet
+// committing to any particular board layout. It is the shared front half of the
+// detector: single-board detection fits one grid to its output, multi-board
+// detection fits several. Splitting here is what lets one image hold a wheel
+// target and a floor reference target and be read for both.
+func detectCorners(work *Gray, opt DetectOptions) ([]Point2, Detection, error) {
+	var det Detection
 	peaks := saddlePeaks(work, opt.NMSRadius, opt.MaxCandidates)
-	det := Detection{CandidatesFound: len(peaks)}
-	if len(peaks) < want {
-		return det, fmt.Errorf("%w: найдено %d углов, а мишень %dx%d требует %d. "+
-			"Проверьте резкость, освещение и что мишень целиком в кадре",
-			ErrNoCorners, len(peaks), cols, rows, want)
+	det.CandidatesFound = len(peaks)
+	if len(peaks) < 8 {
+		return nil, det, fmt.Errorf("%w: найдено всего %d углов. Проверьте резкость, освещение и что мишень в кадре",
+			ErrNoCorners, len(peaks))
 	}
 
-	// The square size in pixels is estimated from the corners themselves, since
-	// nothing tells us in advance how far away the board is. It is measured
-	// over the STRONGEST `want` peaks only: weak responses along the pattern's
-	// edges cluster near real corners, and including them drags the median down
-	// to a fraction of the true spacing — which then poisons every threshold
-	// derived from it.
+	// A rough square size from the strongest peaks, used only to merge near-
+	// duplicate detections. It is measured over the strongest handful because
+	// weak responses along a board's edges cluster near real corners and drag a
+	// global median down to a fraction of the true spacing.
 	strongest := peaks
-	if len(strongest) > want {
-		strongest = strongest[:want]
+	if len(strongest) > 40 {
+		strongest = strongest[:40]
 	}
 	spacing := medianNearestNeighbour(strongest)
-	det.MeanSpacingPx = spacing
 	if spacing < 4 {
-		return det, fmt.Errorf("%w: клетки мишени неразличимы (оценка шага %.1f пикс)", ErrNoCorners, spacing)
+		return nil, det, fmt.Errorf("%w: клетки мишени неразличимы (оценка шага %.1f пикс)", ErrNoCorners, spacing)
 	}
 
 	corners := refineAll(work, peaks, opt.RefineWindow)
 	corners = mergeDuplicates(corners, spacing*0.25)
 
-	// From here on the thresholds are local. A board tilted the way a
-	// calibration shot needs it to be does not have one square size: at 35° the
-	// near edge's squares are a fifth wider on screen than the far edge's, and
-	// foreshortening compresses one axis on top of that. A single figure for the
-	// whole board is right in the middle and wrong at both ends, and what it
-	// costs is a whole row of real corners at the far edge.
-	scales := localScales(corners)
-
-	// Drop everything that is not a true four-quadrant crossing. Without this
-	// the board's own perimeter dominates: where the outer squares meet the
-	// background they form T-junctions, which are saddles too, and they lie
-	// outside every real corner.
-	corners = filterCrossings(work, corners, scales, 0.30)
-	if len(corners) < want {
-		return det, fmt.Errorf("%w: настоящих пересечений клеток найдено %d из нужных %d. "+
-			"Проверьте резкость и что мишень не перекрыта", ErrNoCorners, len(corners), want)
-	}
-
-	// Then drop whatever survived but stands alone: a real corner always has
-	// neighbours, a response raised by noise or a bolt head has none.
-	det.MeanSpacingPx = medianNearestNeighbour(corners)
+	// Every threshold from here is per-corner, against that corner's own nearest
+	// neighbours, not one figure for the whole frame. A tilted board does not
+	// have a single square size — at 35° the near edge is a fifth wider than the
+	// far edge — and with two boards at different depths there is certainly no
+	// common scale. Local scales are the only thing that works for both.
+	corners = filterCrossings(work, corners, localScales(corners), 0.30)
 	corners = filterConnected(corners, localScales(corners), 1.35)
-	if len(corners) < want {
-		return det, fmt.Errorf("%w: связных углов сетки найдено %d из нужных %d",
-			ErrNoCorners, len(corners), want)
+	if len(corners) < 4 {
+		return nil, det, fmt.Errorf("%w: после отсева осталось %d настоящих пересечений клеток",
+			ErrNoCorners, len(corners))
 	}
+	det.MeanSpacingPx = medianNearestNeighbour(corners)
+	return corners, det, nil
+}
 
+// fitBoard recovers one board of the given layout from a corner cloud. It
+// returns the ordered corners, the corners it consumed (so a caller looking for
+// a second board can set them aside), and whether it succeeded.
+func fitBoard(work *Gray, corners []Point2, target Target) (Detection, []Point2, bool) {
+	cols, rows := target.Cols, target.Rows
 	ordered, h, ok := fitGrid(corners, cols, rows)
 	if !ok {
-		return det, fmt.Errorf("%w: кандидатов %d, требуется сетка %dx%d", ErrNoGrid, len(corners), cols, rows)
+		return Detection{}, nil, false
 	}
 
 	// Resolve the 180° ambiguity from the pattern's own colours.
+	var det Detection
 	if flipped, err := needsHalfTurn(work, h, cols, rows); err != nil {
 		det.Warnings = append(det.Warnings, err.Error())
 	} else if flipped {
@@ -195,7 +202,6 @@ func DetectCheckerboard(img *Gray, opt DetectOptions) (Detection, error) {
 
 	det.Corners = ordered
 	det.GridRMSPx, det.MeanSpacingPx = gridQuality(ordered, h, cols, rows)
-
 	if det.GridRMSPx > 1.0 {
 		det.Warnings = append(det.Warnings, fmt.Sprintf(
 			"Углы ложатся на проективную сетку с разбросом %.2f пикс — это много. "+
@@ -207,7 +213,100 @@ func DetectCheckerboard(img *Gray, opt DetectOptions) (Detection, error) {
 			"Клетка мишени занимает всего %.0f пикс — субпиксельное уточнение на таком масштабе работает плохо. "+
 				"Подойдите ближе или возьмите мишень крупнее.", det.MeanSpacingPx))
 	}
-	return det, nil
+	return det, ordered, true
+}
+
+// DetectBoards finds several checkerboards of different layouts in one image —
+// the wheel target and the fixed floor reference, together in every frame of a
+// full optical alignment. The boards must differ in size (cols×rows or square
+// count), because two identical boards in one frame cannot be told apart and,
+// laid near each other, would be grown into a single lattice.
+//
+// The corner cloud is found once and shared. Boards are fitted largest-first,
+// and each board's corners are removed before the next is sought, so a corner is
+// never claimed by two boards. The result is aligned one-to-one with targets;
+// a board that could not be found is a nil-Corners entry with an error in the
+// returned slice.
+func DetectBoards(img *Gray, targets []Target, opt DetectOptions) ([]Detection, []error) {
+	errs := make([]error, len(targets))
+	dets := make([]Detection, len(targets))
+	for i, t := range targets {
+		if err := t.Validate(); err != nil {
+			errs[i] = err
+		}
+	}
+
+	opt = opt.withDefaults()
+	if opt.MaxCandidates < 4*totalCorners(targets) {
+		opt.MaxCandidates = 4 * totalCorners(targets)
+	}
+	work := img.Normalize().Blur(opt.BlurSigma)
+
+	corners, base, err := detectCorners(work, opt)
+	if err != nil {
+		for i := range errs {
+			if errs[i] == nil {
+				errs[i] = err
+			}
+		}
+		return dets, errs
+	}
+
+	// Largest board first, and this ordering is load-bearing rather than a
+	// preference. A smaller layout can sit entirely inside a larger one — an
+	// 8×5 lattice is a sub-window of a 9×6 — so searching for the small board
+	// first can latch it onto part of the big board and return a confident,
+	// completely wrong pose. Fitting the largest first cannot go that way round,
+	// because a board has too few corners to host a bigger lattice, and removing
+	// its corners before the next search leaves the small board only its own.
+	order := make([]int, len(targets))
+	for i := range order {
+		order[i] = i
+	}
+	sort.SliceStable(order, func(a, b int) bool {
+		return targets[order[a]].Cols*targets[order[a]].Rows > targets[order[b]].Cols*targets[order[b]].Rows
+	})
+
+	remaining := corners
+	for _, idx := range order {
+		if errs[idx] != nil {
+			continue
+		}
+		det, used, ok := fitBoard(work, remaining, targets[idx])
+		if !ok {
+			errs[idx] = fmt.Errorf("%w: мишень %dx%d не найдена среди %d углов",
+				ErrNoGrid, targets[idx].Cols, targets[idx].Rows, len(remaining))
+			continue
+		}
+		det.CandidatesFound = base.CandidatesFound
+		dets[idx] = det
+		remaining = removePoints(remaining, used)
+	}
+	return dets, errs
+}
+
+func totalCorners(targets []Target) int {
+	n := 0
+	for _, t := range targets {
+		n += t.Cols * t.Rows
+	}
+	return n
+}
+
+// removePoints returns src with every point in drop removed. The points in drop
+// are the exact cloud values fitBoard consumed, so identity comparison is right.
+func removePoints(src, drop []Point2) []Point2 {
+	gone := make(map[Point2]bool, len(drop))
+	for _, p := range drop {
+		gone[p] = true
+	}
+	out := src[:0:0]
+	for _, p := range src {
+		if !gone[p] {
+			out = append(out, p)
+		}
+	}
+	return out
 }
 
 // saddlePeaks computes the saddle response and returns the strongest local
@@ -606,11 +705,13 @@ func idealGrid(cols, rows int) []Point2 {
 // neighbours — since on a clean detection the hull genuinely is the board.
 //
 // Both routes end at the same place: a candidate quadrilateral fed to
-// assignByQuad, which tries all eight labellings and accepts only one that
-// covers every grid node.
+// assignByQuad, which tries the four rotations of the board's one physically
+// possible winding and accepts only a labelling that covers every grid node.
 func fitGrid(corners []Point2, cols, rows int) ([]Point2, geom.Mat3, bool) {
+	sign := gridWindingSign(cols, rows)
+
 	for _, quad := range growGridQuads(corners, cols, rows) {
-		for _, oriented := range orientations(quad) {
+		for _, oriented := range orientations(quad, sign) {
 			if ordered, h, ok := assignByQuad(corners, oriented, cols, rows); ok {
 				return ordered, h, true
 			}
@@ -622,7 +723,7 @@ func fitGrid(corners []Point2, cols, rows int) ([]Point2, geom.Mat3, bool) {
 		return nil, geom.Mat3{}, false
 	}
 	for _, quad := range candidateQuads(hull) {
-		for _, oriented := range orientations(quad) {
+		for _, oriented := range orientations(quad, sign) {
 			ordered, h, ok := assignByQuad(corners, oriented, cols, rows)
 			if ok {
 				return ordered, h, true
@@ -876,19 +977,56 @@ func candidateQuads(hull []Point2) [][4]Point2 {
 	return res
 }
 
-// orientations returns the eight ways a quadrilateral's vertices can be matched
-// to the grid's four outer nodes: four rotations, each in both winding senses.
-// Only one of them labels the board correctly; the coverage check rejects the
-// rest.
-func orientations(q [4]Point2) [][4]Point2 {
-	rev := [4]Point2{q[3], q[2], q[1], q[0]}
-	out := make([][4]Point2, 0, 8)
-	for _, base := range [][4]Point2{q, rev} {
-		for s := 0; s < 4; s++ {
-			out = append(out, [4]Point2{base[s%4], base[(s+1)%4], base[(s+2)%4], base[(s+3)%4]})
-		}
+// orientations returns the four ways a quadrilateral's vertices can be matched
+// to the grid's four outer nodes: the four rotations, in the single winding a
+// visible board can actually have.
+//
+// Excluding the other winding is a physical statement, not an optimisation. A
+// checkerboard is mirror-symmetric, so the flipped labelling — the board turned
+// over, 180° about an axis in its own plane — reproduces the image just as
+// exactly, at a fraction of a pixel. It differs only in that its recovered
+// normal points the other way. Left available, it gets chosen about half the
+// time, and then the whole reference frame is upside down: rolling radii come
+// out negative and every camber sign inverts. Nothing downstream can detect
+// that, because the fit is perfect.
+//
+// Which winding is the real one follows from the board being opaque. The model
+// frame is right-handed with +Z the outward normal of the printed face, so that
+// face is visible only when its normal points back toward the camera — and a
+// plane seen from the side its normal points at projects with its (X, Y) axes
+// REVERSED in the image relative to the model's own winding. Hence the test:
+// keep the image quad wound opposite to the model grid.
+//
+// Getting this backwards is not a subtle failure. It is the difference between
+// the reference frame being right side up and upside down.
+func orientations(q [4]Point2, modelSign float64) [][4]Point2 {
+	base := q
+	if signedArea(q)*modelSign > 0 {
+		base = [4]Point2{q[3], q[2], q[1], q[0]}
+	}
+	out := make([][4]Point2, 0, 4)
+	for s := 0; s < 4; s++ {
+		out = append(out, [4]Point2{base[s%4], base[(s+1)%4], base[(s+2)%4], base[(s+3)%4]})
 	}
 	return out
+}
+
+// signedArea is the shoelace area of a quadrilateral, whose sign encodes the
+// winding.
+func signedArea(q [4]Point2) float64 {
+	var a float64
+	for i := range q {
+		j := (i + 1) % len(q)
+		a += q[i].X*q[j].Y - q[j].X*q[i].Y
+	}
+	return a / 2
+}
+
+// gridWindingSign is the winding of the model grid's four outer nodes, taken in
+// the order assignByQuad matches them.
+func gridWindingSign(cols, rows int) float64 {
+	c, r := float64(cols-1), float64(rows-1)
+	return signedArea([4]Point2{{0, 0}, {c, 0}, {c, r}, {0, r}})
 }
 
 func polyArea(p []Point2) float64 {

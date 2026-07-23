@@ -180,16 +180,20 @@ type AxisFit struct {
 	Direction Vec3 // unit vector along the axis
 	Point     Vec3 // the point on the axis closest to the origin of the input frame
 
-	// Center is the point on the axis closest to the moving body's OWN origin —
-	// for a wheel target, the point on the spin axis nearest the middle of the
-	// board. It is the practical place to apply a clamp's known offset when
-	// locating the wheel centre.
+	// Center is the point on the axis level with the moving body's own origin:
+	// for a wheel target, the point on the spin axis at the board's axial
+	// station. For a board clamped to a wheel that is the wheel centre plus the
+	// clamp's axial offset — an offset that lies ALONG the axis, so it displaces
+	// left and right wheels symmetrically and leaves axle midpoints, and with
+	// them the vehicle's longitudinal axis, untouched.
 	//
-	// It is not "the" centre of anything. Every point on the axis is equally
-	// stationary, so the position along the axis is not observable from the
-	// motion at all; Point and Center are simply two canonical choices of where
-	// to stand on the same line. Anything that needs a specific point along it —
-	// track width, wheelbase — must get that from the clamp geometry.
+	// Position along the axis is not observable from the rotation: every point
+	// on the line is equally stationary. So it is not left to the least-squares
+	// solve to decide — doing that let noise slide the point hundreds of
+	// millimetres along the axis, which scattered the wheel centres sideways and
+	// yawed the whole vehicle frame. Instead the perpendicular position comes
+	// from the well-conditioned part of the fit and the axial station is set
+	// explicitly, from where the body actually sits.
 	Center Vec3
 
 	Sweep    float64 // total rotation observed, radians — a quality indicator
@@ -280,9 +284,22 @@ func FitRotationAxis(poses []Pose) (AxisFit, error) {
 	}
 	c = c.Scale(1 / n)
 
-	// Only the line is determined; report the point on it nearest the origin so
-	// the answer is canonical.
+	// Only the line is determined. The component of c PERPENDICULAR to the axis
+	// is well conditioned and fixes where the line runs; the component along it
+	// is meaningless, so it is dropped rather than reported.
 	axisPoint := c.Sub(dir.Scale(c.Dot(dir)))
+
+	// Give the line a definite station by placing it level with the body's own
+	// origin, averaged over the poses. A body origin off the axis traces a
+	// circle about it, and the mean of a circle's points is its centre, which
+	// lies on the axis — so this is stable whether or not the target was
+	// clamped square.
+	var meanOrigin Vec3
+	for _, p := range poses {
+		meanOrigin = meanOrigin.Add(p.T)
+	}
+	meanOrigin = meanOrigin.Scale(1 / n)
+	center := axisPoint.Add(dir.Scale(meanOrigin.Sub(axisPoint).Dot(dir)))
 
 	// Residual: how far the supposedly stationary point actually wandered.
 	var ss float64
@@ -292,7 +309,7 @@ func FitRotationAxis(poses []Pose) (AxisFit, error) {
 	return AxisFit{
 		Direction: dir,
 		Point:     axisPoint,
-		Center:    c,
+		Center:    center,
 		Sweep:     sweep,
 		Residual:  math.Sqrt(ss / n),
 	}, nil
@@ -302,7 +319,14 @@ func FitRotationAxis(poses []Pose) (AxisFit, error) {
 // discarding directions whose eigenvalue is negligible relative to the largest.
 func pseudoSolveSym(a Mat3, b Vec3) Vec3 {
 	vals, vecs := SymEigen(a)
-	tol := 1e-9 * math.Abs(vals[0])
+	// The cut is deliberately blunt. In the rotation-axis fit one direction —
+	// along the axis — is exactly unconstrained in theory and merely tiny in
+	// practice, and dividing a noise-sized residual by a tiny eigenvalue throws
+	// the answer hundreds of millimetres along that direction. A relative
+	// threshold of 1e-9 is small enough to let that happen; 1e-6 discards the
+	// direction outright and returns the minimum-norm solution, which is the
+	// honest answer when a direction carries no information.
+	tol := 1e-6 * math.Abs(vals[0])
 	var x Vec3
 	for i := 0; i < 3; i++ {
 		if vals[i] <= tol {

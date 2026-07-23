@@ -104,20 +104,7 @@ func WheelSpinAxis(cam Camera, target Target, imgs []*Gray, opt DetectOptions) (
 	res.SweepDeg = geom.Deg(fit.Sweep)
 	res.AxisResidualMM = fit.Residual
 
-	// Runout: the mean tilt of the target out of the wheel plane. It should be
-	// nearly constant across frames, so the spread is itself a quality signal.
-	var sum, maxDev float64
-	for _, n := range normals {
-		a := n.AngleTo(axis)
-		if a > math.Pi/2 {
-			a = math.Pi - a // normal sign is arbitrary; fold onto the axis
-		}
-		sum += a
-		if a > maxDev {
-			maxDev = a
-		}
-	}
-	res.RunoutDeg = geom.Deg(sum / float64(len(normals)))
+	res.RunoutDeg = geom.Deg(meanTiltTo(normals, axis))
 
 	res.Warnings = spinAxisWarnings(res, cam)
 	return res, nil
@@ -152,6 +139,29 @@ func spinAxisWarnings(res SpinAxisResult, cam Camera) []string {
 	}
 	out = append(out, cam.Warnings()...)
 	return out
+}
+
+// meanTiltTo is the average angle between a set of plane normals and an axis,
+// folded onto the axis because a plane's normal has no inherent sign.
+//
+// For a target clamped to a wheel this is the mounting error: the target's
+// normal makes a constant angle with the spin axis and precesses around it as
+// the wheel turns. Runout compensation removes that error from the result, but
+// its size is worth reporting on its own — a badly clamped target swings so far
+// between frames that each individual frame becomes imprecise.
+func meanTiltTo(normals []geom.Vec3, axis geom.Vec3) float64 {
+	if len(normals) == 0 {
+		return 0
+	}
+	var sum float64
+	for _, n := range normals {
+		a := n.AngleTo(axis)
+		if a > math.Pi/2 {
+			a = math.Pi - a
+		}
+		sum += a
+	}
+	return sum / float64(len(normals))
 }
 
 // CamberFromSpinAxis returns the camber angle from an outboard-pointing spin
