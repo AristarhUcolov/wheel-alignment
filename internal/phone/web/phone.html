@@ -123,6 +123,7 @@ const EN = {
   "Другое колесо": "Other wheel",
   "Телефон прижимайте к ровной планке, лежащей на закраинах обода, экраном наружу. Не к шине.": "Press the phone, screen facing out, against a straight bar resting on the rim flanges. Not against the tyre.",
   "ссылка устарела — отсканируйте код заново": "link expired — scan the code again",
+  "отключён": "disconnected",
   "Развал": "Camber",
   "колесо не выбрано": "no wheel selected",
   "норма": "spec",
@@ -207,6 +208,7 @@ async function send(extra) {
   try {
     const r = await fetch(`/p/${token}/data`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     if (r.status === 404) { conn(false, tr('ссылка устарела — отсканируйте код заново')); return; }
+    if (r.status === 410) { disconnected(await r.text()); return; }
     const st = await r.json();
     lastOK = Date.now();
     conn(true);
@@ -264,6 +266,20 @@ function render(st) {
 }
 
 // ── Экраны ─────────────────────────────────────────────────────────
+// Компьютер отключил этот телефон: перестаём слать и объясняем почему.
+let stopped = false;
+function disconnected(why) {
+  stopped = true;
+  running = false;
+  window.removeEventListener('devicemotion', onMotion);
+  conn(false, tr('отключён'));
+  show('main');
+  $('#actions').classList.add('hide');
+  const err = $('#err');
+  err.textContent = (why || '').trim();
+  err.classList.remove('hide');
+}
+
 function show(which) {
   for (const s of ['pick', 'start', 'main']) $('#' + s).classList.toggle('hide', s !== which);
   if (which === 'main') $('#main').style.display = 'flex';
@@ -304,8 +320,8 @@ $('#go').onclick = async () => {
   }, 2500);
 };
 
-setInterval(() => { if (running || Object.keys(pending).length) send(); }, 100);
-setInterval(() => { if (!running) send(); }, 1500);
+setInterval(() => { if (!stopped && (running || Object.keys(pending).length)) send(); }, 100);
+setInterval(() => { if (!stopped && !running) send(); }, 1500);
 show(wheel ? 'start' : 'pick');
 send(wheel ? { wheel } : null);
 </script>

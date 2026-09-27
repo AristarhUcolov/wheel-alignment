@@ -26,18 +26,52 @@
       "class": "truck",
       "front_suspension": "beam_kingpin",
       "rear_suspension": "live_axle_leaf",
-      "guidance_id": "guidance-truck-bus-beam",
-      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал не регулируется, схождение — поперечной рулевой тягой.",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал не регулируется, схождение — поперечной рулевой тягой. Схождение — разность расстояний между краями ободьев спереди и сзади оси колеса, 1–4 мм (на заводе выставляют нижнее значение). Поперечный наклон шкворня — 8°.",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "stroy-technics.ru, «Подвеска автомобиля ЗИЛ» (значения для ЗИЛ-431410 — так с 1986 года обозначается ЗИЛ-130). Постранично с печатным изданием не сверено.",
+        "url": "https://stroy-technics.ru/article/podveska-avtomobilya-zil",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "ZIL",
         "model": "130",
-        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber is not adjustable; toe is set with the cross tie rod.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber is not adjustable; toe is set with the cross tie rod. Toe is the difference of the distances between the rim edges in front of and behind the wheel axis, 1–4 mm (the factory sets the lower value). Kingpin inclination is 8°.",
+        "reference": "stroy-technics.ru, “ZIL suspension” (values for the ZIL-431410, the designation of the ZIL-130 since 1986). Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "camber_method": "not adjustable",
+          "caster_method": "not adjustable",
+          "toe_method": "change the length of the cross tie rod"
+        }
+      },
+      "rim_diameter_in": 20,
+      "front_total_toe_mm": {
+        "min": 1.0,
+        "max": 4.0
+      },
+      "front": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется",
+          "caster_method": "не регулируется",
+          "toe_method": "изменение длины поперечной рулевой тяги"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа"
       }
     },
     {

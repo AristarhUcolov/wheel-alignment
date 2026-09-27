@@ -29,18 +29,70 @@
       "class": "lcv",
       "front_suspension": "beam_kingpin",
       "rear_suspension": "live_axle_leaf",
-      "guidance_id": "guidance-truck-bus-beam",
-      "notes": "Передний ведущий мост на рессорах, классическое исполнение — шкворневое. Если у вашей машины бесшкворневой мост на шаровых опорах — смените тип подвески в настройках.",
+      "notes": "Передний ведущий мост на рессорах, классическое исполнение — шкворневое. Если у вашей машины бесшкворневой мост на шаровых опорах — смените тип подвески в настройках. Схождение по источнику — 1,5–3 мм между внутренними краями шин на уровне оси; здесь пересчитано в градусы по диаметру шины 215/90-15 (≈768 мм).",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "auto.kombat.com.ua, «Углы установки колес переднего моста УАЗ-452, развал и схождение». Постранично с печатным изданием не сверено.",
+        "url": "https://auto.kombat.com.ua/uglyi-ustanovki-koles-perednego-mosta-uaz452-razval-ishozhdenie-prodolnyiy-ipoperechn/",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "UAZ",
         "model": "452 / 2206 / 3303 “Bukhanka”",
-        "notes": "Driven front axle on leaf springs, kingpin type in the classic version. If your vehicle has a kingpin-less axle on ball joints, change the suspension type in the settings.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "Driven front axle on leaf springs, kingpin type in the classic version. If your vehicle has a kingpin-less axle on ball joints, change the suspension type in the settings. The source gives toe as 1.5–3 mm between the inner tyre edges at axle height; converted here to degrees using the diameter of a 215/90-15 tyre (≈768 mm).",
+        "reference": "auto.kombat.com.ua, “UAZ-452 front axle wheel alignment angles, camber and toe”. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "fully laden"
+        },
+        "front": {
+          "camber_method": "not adjustable — set by the axle",
+          "caster_method": "not adjustable — set by the axle",
+          "toe_method": "the cross tie rod"
+        }
+      },
+      "rim_diameter_in": 15,
+      "front": {
+        "camber": {
+          "min": 1.25,
+          "nominal": 1.5,
+          "max": 1.75
+        },
+        "caster": {
+          "min": 2.5,
+          "nominal": 3.0,
+          "max": 3.5
+        },
+        "sai": {
+          "min": 5.0,
+          "nominal": 5.5,
+          "max": 6.0
+        },
+        "total_toe": {
+          "min": 0.1119,
+          "nominal": 0.1679,
+          "max": 0.2238
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется — задан мостом",
+          "caster_method": "не регулируется — задан мостом",
+          "toe_method": "поперечная рулевая тяга"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "полная нагрузка"
       }
     },
     {

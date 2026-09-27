@@ -304,18 +304,64 @@
       "class": "car",
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон (штатно регулируется только схождение), сзади полузависимая балка.",
+      "notes": "Спереди Макферсон (штатно регулируется только схождение), сзади полузависимая балка. Поперечный наклон оси поворота по руководству — 13°04′ (справочно, не регулируется).",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "vaz-samara.ru, «Регулировка углов установки колес ВАЗ 2114, 2115, 2113». Постранично с печатным изданием не сверено.",
+        "url": "https://vaz-samara.ru/VAZ-2115/4-1-4.html",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "VAZ (Lada)",
         "model": "2113 / 2114 / 2115 “Samara-2”",
-        "notes": "MacPherson struts at the front (only toe is adjustable as standard), twist beam at the rear.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "MacPherson struts at the front (only toe is adjustable as standard), twist beam at the rear. Steering axis inclination per the manual is 13°04′ (for reference, not adjustable).",
+        "reference": "vaz-samara.ru, “Wheel alignment adjustment, VAZ 2114, 2115, 2113”. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "kerb weight plus 3136 N (320 kgf): four people and 40 kg in the boot"
+        },
+        "front": {
+          "camber_method": "the upper adjusting (eccentric) bolt joining the knuckle to the strut",
+          "caster_method": "number of washers at the ends of the longitudinal tension rod",
+          "toe_method": "turn the tie rods with the nuts loosened"
+        }
+      },
+      "rim_diameter_in": 13,
+      "front_total_toe_mm": {
+        "min": -1.0,
+        "max": 1.0
+      },
+      "front": {
+        "camber": {
+          "min": -0.5,
+          "nominal": 0.0,
+          "max": 0.5
+        },
+        "caster": {
+          "min": 1.0,
+          "nominal": 1.5,
+          "max": 2.0
+        },
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "верхний регулировочный (эксцентриковый) болт крепления кулака к стойке",
+          "caster_method": "количество шайб на концах продольной растяжки",
+          "toe_method": "вращение рулевых тяг при ослабленных гайках"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "снаряжённая масса и нагрузка 3136 Н (320 кгс): четыре человека и 40 кг в багажнике"
       }
     },
     {
@@ -338,18 +384,57 @@
       "class": "car",
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
       "notes": "Спереди Макферсон, сзади полузависимая балка.",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "carpedia.club, «Углы установки передних колес Lada Kalina 1117 2004–2013» (ссылается на wiki.zr.ru, «За рулём»). Постранично с печатным изданием не сверено.",
+        "url": "https://carpedia.club/Ugly-ustanovki-perednikh-koles-Lada-Kalina-1117-2004-2013",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "VAZ (Lada)",
         "model": "Kalina (1117–1119, 2192–2194)",
         "notes": "MacPherson struts at the front, twist beam at the rear.",
-        "reference": "Design description. No tolerances entered."
+        "reference": "carpedia.club, “Front wheel alignment angles, Lada Kalina 1117 2004–2013” (citing wiki.zr.ru, Za Rulem). Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "kerb weight (unladen)"
+        }
+      },
+      "rim_diameter_in": 14,
+      "front": {
+        "camber": {
+          "min": -0.1667,
+          "nominal": 0.3333,
+          "max": 0.8333
+        },
+        "caster": {
+          "min": 0.4167,
+          "nominal": 0.9167,
+          "max": 1.4167
+        },
+        "total_toe": {
+          "min": 0.1667,
+          "nominal": 0.3333,
+          "max": 0.5
+        },
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "снаряжённое состояние (без нагрузки)"
       }
     },
     {
@@ -370,18 +455,65 @@
       "class": "car",
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Сначала кастер, затем развал и схождение. Разница кастера слева и справа — не более 1°.",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "priora-vaz.ru, «Углы установки колёс (сход-развал) Лада Приора (ВАЗ 2170, 2171, 2172)». Постранично с печатным изданием не сверено.",
+        "url": "https://priora-vaz.ru/2170/4-4-6.html",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "VAZ (Lada)",
         "model": "Priora (2170–2172)",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "MacPherson struts at the front, twist beam at the rear. Caster first, then camber and toe. The left–right caster difference must not exceed 1°.",
+        "reference": "priora-vaz.ru, “Wheel alignment angles, Lada Priora (VAZ 2170, 2171, 2172)”. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "half a tank of fuel, 70 kg on each front seat"
+        },
+        "front": {
+          "camber_method": "turn the upper (eccentric) bolt joining the knuckle to the strut",
+          "caster_method": "change the number of adjusting washers",
+          "toe_method": "turn the adjusting rods"
+        }
+      },
+      "rim_diameter_in": 14,
+      "front_total_toe_mm": {
+        "min": -1.0,
+        "max": 1.0
+      },
+      "front": {
+        "camber": {
+          "min": -0.5,
+          "nominal": 0.0,
+          "max": 0.5
+        },
+        "caster": {
+          "min": 1.0,
+          "nominal": 1.5,
+          "max": 2.0
+        },
+        "max_cross_caster": 1.0,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "поворот верхнего (эксцентрикового) болта крепления кулака к стойке",
+          "caster_method": "изменение количества регулировочных шайб",
+          "toe_method": "вращение регулировочных тяг"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "полбака топлива, по 70 кг на передних сиденьях"
       }
     },
     {
@@ -402,7 +534,7 @@
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
       "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Единственная найденная таблица (autoruk.ru) читается неоднозначно, а таблица АвтоВАЗа на drive2 — нечитаемое изображение. Цифры не внесены.",
       "source": {
         "kind": "catalog",
         "reference": "Описание конструкции. Допуски не внесены.",
@@ -411,7 +543,7 @@
       "en": {
         "make": "VAZ (Lada)",
         "model": "Granta (2190, 2191)",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "notes": "MacPherson struts at the front, twist beam at the rear. The only table found (autoruk.ru) reads ambiguously, and the AvtoVAZ table on drive2 is an unreadable image. No figures entered.",
         "reference": "Design description. No tolerances entered."
       }
     },
@@ -430,18 +562,71 @@
       "class": "car",
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Схождение передних колёс не внесено: в таблице источника оно стоит не в своей колонке (градусы в колонке миллиметров), и прочитать его однозначно нельзя.",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "largus-mcv.ru, «Регулировка углов установки колёс, сход-развал, кастор Lada Largus», таблицы 2 и 3. Постранично с печатным изданием не сверено.",
+        "url": "https://largus-mcv.ru/html/ugol-koles.html",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "VAZ (Lada)",
         "model": "Largus",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "MacPherson struts at the front, twist beam at the rear. Front toe is not entered: in the source table it sits in the wrong column (degrees under millimetres) and cannot be read unambiguously.",
+        "reference": "largus-mcv.ru, “Wheel alignment, Lada Largus”, tables 2 and 3. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "unladen"
+        },
+        "front": {
+          "camber_method": "not adjustable — set by the design",
+          "caster_method": "not adjustable — set by the design",
+          "toe_method": "tie-rod sleeves"
+        }
+      },
+      "rim_diameter_in": 15,
+      "front": {
+        "camber": {
+          "min": -0.8333,
+          "nominal": -0.1667,
+          "max": 0.5
+        },
+        "caster": {
+          "min": 2.2,
+          "nominal": 2.7,
+          "max": 3.2
+        },
+        "max_cross_caster": 1.0,
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется — задан конструкцией",
+          "caster_method": "не регулируется — задан конструкцией",
+          "toe_method": "муфты рулевых тяг"
+        }
+      },
+      "rear": {
+        "camber": {
+          "min": -1.1,
+          "nominal": -0.85,
+          "max": -0.6
+        },
+        "total_toe": {
+          "min": 0.4833,
+          "nominal": 0.7333,
+          "max": 0.9833
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "без нагрузки"
       }
     },
     {
@@ -460,7 +645,7 @@
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
       "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Открытые источники расходятся: кастер 3°00′±30′ (lada-vesta.com.ru) и 5°12′±30′ (форум sw-cross.ru), развал 0°±30′ и −0°30′±30′. Пока расхождение не разрешено руководством, цифры не внесены.",
       "source": {
         "kind": "catalog",
         "reference": "Описание конструкции. Допуски не внесены.",
@@ -469,7 +654,7 @@
       "en": {
         "make": "VAZ (Lada)",
         "model": "Vesta",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "notes": "MacPherson struts at the front, twist beam at the rear. Open sources disagree: caster 3°00′±30′ (lada-vesta.com.ru) vs 5°12′±30′ (sw-cross.ru forum), camber 0°±30′ vs −0°30′±30′. Until a manual settles it, no figures are entered.",
         "reference": "Design description. No tolerances entered."
       }
     },

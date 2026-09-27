@@ -304,6 +304,12 @@ export default {
 "Точность.": "Accuracy.",
 "После калибровки телефон даёт развал с точностью около 0,1° — если планка ровная и прижата к закраинам обода, а не к резине. Сверьте один раз с известным углом (например, уровнем на ровной стене), прежде чем доверять регулировку.": "After calibration the phone gives camber to about 0.1° — if the bar is straight and pressed against the rim flanges, not the tyre. Check it once against a known angle (for example a level on a flat wall) before trusting it with an adjustment.",
 "Выключить доступ по Wi-Fi": "Switch Wi-Fi access off",
+"Отключить «{name}»? Его показания уйдут с экрана регулировки, а подключиться снова он сможет, только если вы разрешите.": "Disconnect “{name}”? Its readings leave the adjustment screen, and it can connect again only if you allow it.",
+"Отключить этот телефон": "Disconnect this phone",
+"Отключить": "Disconnect",
+"Отключённые": "Disconnected",
+"Эти телефоны не смогут присылать показания, пока вы их не разрешите или не включите доступ заново.": "These phones cannot send readings until you allow them or switch access on again.",
+"Разрешить снова": "Allow again",
 
 // ── Регулировка ────────────────────────────────────────────────────
 "Общий вид": "Overview",

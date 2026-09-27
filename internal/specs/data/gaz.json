@@ -57,18 +57,66 @@
       "class": "car",
       "front_suspension": "double_wishbone_kingpin",
       "rear_suspension": "live_axle_leaf",
-      "guidance_id": "guidance-rwd-classic-sedan",
-      "notes": "Передняя подвеска двухрычажная шкворневая, задний мост на продольных рессорах. Перед регулировкой обязательно проверьте люфт шкворней и резьбовых шарниров стоек и прошприцуйте их.",
+      "notes": "Передняя подвеска двухрычажная шкворневая, задний мост на продольных рессорах. Перед регулировкой обязательно проверьте люфт шкворней и резьбовых шарниров стоек и прошприцуйте их. Схождение 0,8–1,5 мм по ободьям соответствует 1,5–3 мм по боковинам шин. Кастер у ГАЗ-21 близок к нулю — так устроена подвеска.",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "supergaz21.narod.ru, раздел IV «Ходовая часть» руководства по ГАЗ-21, табл. 4.1. Постранично с печатным изданием не сверено.",
+        "url": "https://supergaz21.narod.ru/book/raz4/raz4.htm",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "GAZ",
         "model": "21 Volga",
-        "notes": "Double-wishbone kingpin front suspension, rear axle on longitudinal leaf springs. Before adjusting, always check the play of the kingpins and of the threaded strut bushings, and grease them.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "Double-wishbone kingpin front suspension, rear axle on longitudinal leaf springs. Before adjusting, always check the play of the kingpins and of the threaded strut bushings, and grease them. Toe of 0.8–1.5 mm at the rims equals 1.5–3 mm at the tyre sidewalls. The GAZ-21 caster is close to zero — that is how the suspension is designed.",
+        "reference": "supergaz21.narod.ru, section IV “Chassis” of the GAZ-21 manual, table 4.1. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "unladen; laden (5 people) camber −0°30′…+0°30′, kingpin caster −1°…+1°"
+        },
+        "front": {
+          "camber_method": "eccentric threaded bushings of the strut: the lower one changes camber and kingpin caster together, the upper one fine-tunes",
+          "caster_method": "the same eccentric bushings",
+          "toe_method": "the cross tie rod"
+        }
+      },
+      "rim_diameter_in": 15,
+      "front_total_toe_mm": {
+        "min": 0.8,
+        "max": 1.5
+      },
+      "front": {
+        "camber": {
+          "min": -0.6667,
+          "nominal": -0.1667,
+          "max": 0.3333
+        },
+        "caster": {
+          "min": -1.5,
+          "nominal": -0.5,
+          "max": 0.5
+        },
+        "max_cross_camber": 0.5,
+        "max_cross_caster": 0.5,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "эксцентриковые резьбовые втулки стойки: нижняя меняет развал и наклон шкворня одновременно, верхняя — дополнительная поправка",
+          "caster_method": "те же эксцентриковые втулки",
+          "toe_method": "поперечная рулевая тяга"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "без нагрузки; с нагрузкой (5 человек) развал −0°30′…+0°30′, наклон шкворня −1°…+1°"
       }
     },
     {
@@ -89,18 +137,65 @@
       "class": "car",
       "front_suspension": "double_wishbone_kingpin",
       "rear_suspension": "live_axle_leaf",
-      "guidance_id": "guidance-rwd-classic-sedan",
-      "notes": "Передняя подвеска двухрычажная шкворневая, задний мост на продольных рессорах. Перед регулировкой обязательно проверьте люфт шкворней и резьбовых шарниров стоек и прошприцуйте их.",
+      "notes": "Передняя подвеска двухрычажная шкворневая, задний мост на продольных рессорах. Перед регулировкой обязательно проверьте люфт шкворней и резьбовых шарниров стоек и прошприцуйте их. Знак кастера по книге: плюс — нижний конец шкворня отклонён вперёд. Таблица стенда, процитированная на форуме allgaz.ru, даёт для ГАЗ-24/31029 −1…−4° — источники расходятся, сверьте с руководством. Схождение 0,8–1,5 мм по ободьям = 1,5–3 мм по шинам.",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "long-vehicle.narod.ru, «Книга по ГАЗ-24», раздел «Передняя подвеска». Постранично с печатным изданием не сверено.",
+        "url": "https://long-vehicle.narod.ru/gaz24/book24/24_podveska.htm",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "GAZ",
         "model": "24 / 24-10 Volga",
-        "notes": "Double-wishbone kingpin front suspension, rear axle on longitudinal leaf springs. Before adjusting, always check the play of the kingpins and of the threaded strut bushings, and grease them.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "Double-wishbone kingpin front suspension, rear axle on longitudinal leaf springs. Before adjusting, always check the play of the kingpins and of the threaded strut bushings, and grease them. Caster sign per the book: plus — the lower end of the kingpin deflected forward. An aligner table quoted on the allgaz.ru forum gives −1…−4° for the GAZ-24/31029 — the sources disagree, check against the manual. Toe of 0.8–1.5 mm at the rims = 1.5–3 mm at the tyres.",
+        "reference": "long-vehicle.narod.ru, “Book on the GAZ-24”, section “Front suspension”. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "without passengers or load"
+        },
+        "front": {
+          "camber_method": "adjusting shims on the upper arm shafts: equally at both bolts — camber",
+          "caster_method": "the same shims moved from one bolt to the other",
+          "toe_method": "the cross tie rod"
+        }
+      },
+      "rim_diameter_in": 14,
+      "front_total_toe_mm": {
+        "min": 0.8,
+        "max": 1.5
+      },
+      "front": {
+        "camber": {
+          "min": -0.5,
+          "nominal": 0.0,
+          "max": 0.5
+        },
+        "caster": {
+          "min": -1.0,
+          "nominal": 0.0,
+          "max": 1.0
+        },
+        "max_cross_camber": 0.5,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "регулировочные прокладки на осях верхних рычагов: поровну с обоих болтов — развал",
+          "caster_method": "те же прокладки, переставленные с одного болта на другой",
+          "toe_method": "поперечная рулевая тяга"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "без пассажиров и груза"
       }
     },
     {
@@ -298,18 +393,53 @@
       "class": "truck",
       "front_suspension": "beam_kingpin",
       "rear_suspension": "live_axle_leaf",
-      "guidance_id": "guidance-truck-bus-beam",
-      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал не регулируется, схождение — поперечной рулевой тягой.",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал не регулируется, схождение — поперечной рулевой тягой. Схождение ГАЗ-53А по книге — 1,5–3 мм между внутренними краями шин в горизонтальной плоскости; здесь пересчитано в градусы по диаметру шины 8,25-20 (≈974 мм).",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "tech.wikireading.ru, И. Мельников, «Грузовые автомобили. Колёса», глава «Углы установки передних колёс». Постранично с печатным изданием не сверено.",
+        "url": "https://tech.wikireading.ru/16121",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "GAZ",
         "model": "53 / 3307",
-        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber is not adjustable; toe is set with the cross tie rod.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber is not adjustable; toe is set with the cross tie rod. The book gives GAZ-53A toe as 1.5–3 mm between the inner tyre edges in a horizontal plane; converted here to degrees using the diameter of an 8.25-20 tyre (≈974 mm).",
+        "reference": "tech.wikireading.ru, I. Melnikov, “Trucks. Wheels”, chapter “Front wheel alignment angles”. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "camber_method": "not adjustable",
+          "caster_method": "not adjustable",
+          "toe_method": "the cross tie rod"
+        }
+      },
+      "rim_diameter_in": 20,
+      "front": {
+        "total_toe": {
+          "min": 0.0882,
+          "nominal": 0.1324,
+          "max": 0.1765
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется",
+          "caster_method": "не регулируется",
+          "toe_method": "поперечная рулевая тяга"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа"
       }
     },
     {
@@ -448,18 +578,68 @@
       "class": "lcv",
       "front_suspension": "double_wishbone_ball",
       "rear_suspension": "live_axle_leaf",
-      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах. Полноприводные версии имеют передний мост — для них выберите тип подвески «Неразрезная балка на шкворнях».",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах. Полноприводные версии имеют передний мост — для них выберите тип подвески «Неразрезная балка на шкворнях». Порядок: кастер, развал, схождение.",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "aubito.ru, «Регулировка углов установки передних колес ГАЗель Некст». Постранично с печатным изданием не сверено.",
+        "url": "https://aubito.ru/gazel-next/regulirovka-uglov-ustanovki-perednikh-koles-gazel-nekst",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "GAZ",
         "model": "GAZelle NEXT",
-        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs. Four-wheel-drive versions have a front axle — choose “Rigid beam, kingpins” for them.",
-        "reference": "Design description. No tolerances entered.",
-        "trim": "rear-wheel drive"
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs. Four-wheel-drive versions have a front axle — choose “Rigid beam, kingpins” for them. Order: caster, camber, toe.",
+        "reference": "aubito.ru, “Adjusting the front wheel angles of the GAZelle NEXT”. Not checked page by page against the printed edition.",
+        "trim": "rear-wheel drive",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "kerb weight (per the title of the same table on auto.kombat.com.ua); before measuring, press the suspension down with 60–70 kgf"
+        },
+        "front": {
+          "camber_method": "the adjusting bolts of the upper arm in the subframe brackets",
+          "caster_method": "the front and rear adjusting bolts of the upper arm — turn them in opposite directions by the same number of marks",
+          "toe_method": "the tie rods, separately for the left and right wheel"
+        }
+      },
+      "rim_diameter_in": 16,
+      "front": {
+        "camber": {
+          "min": 0.0,
+          "nominal": 0.5,
+          "max": 1.0
+        },
+        "caster": {
+          "min": 2.0,
+          "nominal": 3.0,
+          "max": 4.0
+        },
+        "individual_toe": {
+          "min": 0.0,
+          "nominal": 0.0583,
+          "max": 0.1167
+        },
+        "max_cross_camber": 0.5,
+        "max_cross_caster": 0.5,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "регулировочные болты верхнего рычага в кронштейнах подрамника",
+          "caster_method": "передний и задний регулировочные болты верхнего рычага — поворачивать в противоположные стороны на одинаковое число меток",
+          "toe_method": "рулевые тяги, отдельно для левого и правого колеса"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "снаряжённая масса (по заголовку той же таблицы на auto.kombat.com.ua); перед замером прожать подвеску усилием 60–70 кгс"
       }
     },
     {

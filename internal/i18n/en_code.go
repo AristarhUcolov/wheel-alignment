@@ -330,6 +330,22 @@ func init() {
 	})
 
 	add(map[string]string{
+		"Загрузятся все записи (%d). С замечаниями: %d — проверьте их выше:\n  это возможные, но необычные значения, и чаще всего так выглядит опечатка.": "All entries will load (%d). With remarks: %d — check them above:\n  these are possible but unusual values, and most often that is what a typo looks like.",
+		"Не пройдено: %d из %d. Такие записи не загрузятся.":               "Failed: %d of %d. Such entries will not load.",
+		"Проверено записей: %d — все в порядке.":                           "Entries checked: %d — all fine.",
+		"Проверка %s, записей в файле: %d":                                 "Checking %s, entries in the file: %d",
+		"в файле есть ошибки":                                              "the file has errors",
+		"в файле нет записей — ожидается объект вида {\"specs\": [ ... ]}": "the file has no entries — expected an object like {\"specs\": [ ... ]}",
+		"запись %d (без id)":                                               "entry %d (no id)",
+		"источник: %s":                                                     "source: %s",
+		"не удалось прочитать файл: %w":                                    "could not read the file: %w",
+		"укажите файл с данными: wheelalign check-spec <файл.json>":        "give the data file: wheelalign check-spec <file.json>",
+		"файл не разобран как JSON: %w":                                    "the file could not be parsed as JSON: %w",
+		"— будет показано с предупреждением":                               "— will be shown with a warning",
+	})
+
+	add(map[string]string{
+		"Этот телефон отключён на компьютере. Чтобы подключить его снова, разрешите его в списке телефонов или отсканируйте новый код.": "This phone was disconnected on the computer. To connect it again, allow it in the list of phones or scan a new code.",
 		"встроенная база": "built-in database",
 		"ваши данные":     "your data",
 	})

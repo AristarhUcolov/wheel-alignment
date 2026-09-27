@@ -27,7 +27,7 @@
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
       "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Таблица руководства (carmanuals.ru) даёт одно значение без допуска (развал 0°02′, кастер 5°20′) — для нормы этого мало. Цифры не внесены.",
       "source": {
         "kind": "catalog",
         "reference": "Описание конструкции. Допуски не внесены.",
@@ -36,7 +36,7 @@
       "en": {
         "make": "Renault",
         "model": "Megane II",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "notes": "MacPherson struts at the front, twist beam at the rear. The manual table (carmanuals.ru) gives single values with no tolerance (camber 0°02′, caster 5°20′) — not enough for limits. No figures entered.",
         "reference": "Design description. No tolerances entered."
       }
     },
@@ -119,7 +119,7 @@
       "front_suspension": "macpherson",
       "rear_suspension": "trailing_arm",
       "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади продольные рычаги с поперечными торсионами.",
+      "notes": "Спереди Макферсон, сзади продольные рычаги с поперечными торсионами. Руководство (carmanuals.ru) даёт развал, кастер и поперечный наклон как функцию высоты кузова — без таблицы высот их не применить; а схождение Renault записывает в своём соглашении о знаке. Цифры не внесены.",
       "source": {
         "kind": "catalog",
         "reference": "Описание конструкции. Допуски не внесены.",
@@ -128,7 +128,7 @@
       "en": {
         "make": "Renault",
         "model": "Kangoo I",
-        "notes": "MacPherson struts at the front, trailing arms with transverse torsion bars at the rear.",
+        "notes": "MacPherson struts at the front, trailing arms with transverse torsion bars at the rear. The manual (carmanuals.ru) gives camber, caster and SAI as a function of ride height — unusable without its height tables; and Renault writes toe in its own sign convention. No figures entered.",
         "reference": "Design description. No tolerances entered."
       }
     },

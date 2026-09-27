@@ -29,18 +29,67 @@
       "class": "car",
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. У «Москвича-2141» по руководству отрицательный развал и отрицательное схождение (расхождение): −1,3±0,5 мм на оба колеса по ободам 14″. Это не опечатка. Порядок: кастер, развал, равенство углов поворота, схождение.",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "automend.ru, «Проверка и регулировка параметров установки передних колес» (руководство по ремонту АЗЛК-2141). Постранично с печатным изданием не сверено.",
+        "url": "https://automend.ru/azlk-2141/azlk-32457-10.m_id-4025.m_id2-4026.html",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "Moskvich (AZLK)",
         "model": "2141 / 2142",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "MacPherson struts at the front, twist beam at the rear. Per the manual the Moskvich-2141 has negative camber and negative toe (toe-out): −1.3±0.5 mm for both wheels at the 14″ rims. This is not a typo. Order: caster, camber, equal steering lock, toe.",
+        "reference": "automend.ru, “Checking and adjusting the front wheel angles” (AZLK-2141 workshop manual). Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "kerb weight; at full mass camber −0°30′±30′, caster 1°20′±30′, toe −0°10′±5′ per wheel"
+        },
+        "front": {
+          "camber_method": "two eccentric bolts on the suspension arms (together with caster)",
+          "caster_method": "the same eccentric bolts",
+          "toe_method": "the tie rods"
+        }
+      },
+      "rim_diameter_in": 14,
+      "front": {
+        "camber": {
+          "min": -0.6667,
+          "nominal": -0.1667,
+          "max": 0.3333
+        },
+        "caster": {
+          "min": -0.1667,
+          "nominal": 0.3333,
+          "max": 0.8333
+        },
+        "individual_toe": {
+          "min": -0.2,
+          "nominal": -0.1167,
+          "max": -0.0333
+        },
+        "max_cross_camber": 0.5,
+        "max_cross_caster": 0.5,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "два болта с эксцентриками на рычагах подвески (вместе с кастером)",
+          "caster_method": "те же эксцентриковые болты",
+          "toe_method": "рулевые тяги"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "снаряжённая масса; при полной массе развал −0°30′±30′, продольный наклон 1°20′±30′, схождение −0°10′±5′ на колесо"
       }
     }
   ]

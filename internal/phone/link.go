@@ -8,6 +8,7 @@ import (
 	"embed"
 	"encoding/base32"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -47,12 +48,19 @@ type Link struct {
 	ips     []net.IP
 	devices map[string]*Device
 	cals    map[string]Calibration
+
+	// blocked holds phones disconnected from the desktop, by id, with the name
+	// they had. A disconnected phone that keeps sending is refused, so a
+	// wrongly connected phone cannot come straight back; it is let in again
+	// when the person allows it or switches access off and on.
+	blocked map[string]string
 }
 
 // NewLink returns a switched-off link that feeds hub and keeps phone
 // calibrations in dir.
 func NewLink(hub *live.Hub, dir string) *Link {
-	l := &Link{hub: hub, dir: dir, now: time.Now, devices: map[string]*Device{}, cals: map[string]Calibration{}}
+	l := &Link{hub: hub, dir: dir, now: time.Now, devices: map[string]*Device{}, cals: map[string]Calibration{},
+		blocked: map[string]string{}}
 	l.loadCals()
 	return l
 }
@@ -93,6 +101,8 @@ func (l *Link) Enable() error {
 	}
 	l.token = newToken()
 	l.ips = ips
+	// A new key is a fresh start: phones disconnected last time may join again.
+	l.blocked = map[string]string{}
 	l.srv = &http.Server{
 		Handler:           l.Handler(),
 		ReadHeaderTimeout: 10 * time.Second,
@@ -122,6 +132,38 @@ func (l *Link) Disable() {
 // Close is Disable, for deferred shutdown.
 func (l *Link) Close() { l.Disable() }
 
+// ErrForgotten is what a disconnected phone is told.
+var ErrForgotten = i18n.Err("Этот телефон отключён на компьютере. Чтобы подключить его снова, разрешите его в списке телефонов или отсканируйте новый код.")
+
+// Forget disconnects one phone: it leaves the list, its readings leave the
+// live screen, and it is refused until allowed back. Its calibration is kept —
+// it belongs to the phone, not to this session. Reports whether the phone was
+// known.
+func (l *Link) Forget(id string) bool {
+	l.mu.Lock()
+	d, ok := l.devices[id]
+	if ok {
+		delete(l.devices, id)
+		l.blocked[id] = d.Name
+	}
+	l.mu.Unlock()
+	if ok {
+		src := "phone:" + id
+		l.hub.Clear(src)
+		l.hub.RemoveSource(src)
+	}
+	return ok
+}
+
+// Allow lets a disconnected phone connect again.
+func (l *Link) Allow(id string) bool {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	_, ok := l.blocked[id]
+	delete(l.blocked, id)
+	return ok
+}
+
 func newToken() string {
 	b := make([]byte, 6)
 	_, _ = rand.Read(b)
@@ -148,13 +190,16 @@ type Info struct {
 	URLs    []string     `json:"urls"`
 	QRSVG   string       `json:"qr_svg,omitempty"`
 	Devices []DeviceInfo `json:"devices"`
+	// Blocked lists phones disconnected from the desktop, so they can be let
+	// back in.
+	Blocked []DeviceInfo `json:"blocked"`
 }
 
 // Info describes the link for the desktop interface.
 func (l *Link) Info() Info {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	inf := Info{Enabled: l.enabled, Devices: []DeviceInfo{}}
+	inf := Info{Enabled: l.enabled, Devices: []DeviceInfo{}, Blocked: []DeviceInfo{}}
 	if l.enabled {
 		for _, ip := range l.ips {
 			inf.URLs = append(inf.URLs, fmt.Sprintf("https://%s:%d/p/%s", ip, l.port, l.token))
@@ -179,6 +224,10 @@ func (l *Link) Info() Info {
 		inf.Devices = append(inf.Devices, di)
 	}
 	sort.Slice(inf.Devices, func(i, j int) bool { return inf.Devices[i].ID < inf.Devices[j].ID })
+	for id, name := range l.blocked {
+		inf.Blocked = append(inf.Blocked, DeviceInfo{ID: id, Name: name})
+	}
+	sort.Slice(inf.Blocked, func(i, j int) bool { return inf.Blocked[i].ID < inf.Blocked[j].ID })
 	return inf
 }
 
@@ -275,6 +324,11 @@ func (l *Link) data(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	st, err := l.handle(id, req)
+	if errors.Is(err, ErrForgotten) {
+		// 410: the page stops sending instead of retrying ten times a second.
+		http.Error(w, err.Error(), http.StatusGone)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	if err != nil {
 		st.Error = err.Error()
@@ -285,6 +339,10 @@ func (l *Link) data(w http.ResponseWriter, r *http.Request) {
 // handle applies one request from a phone and returns what it should show.
 func (l *Link) handle(id string, req phoneRequest) (PhoneState, error) {
 	l.mu.Lock()
+	if _, no := l.blocked[id]; no {
+		l.mu.Unlock()
+		return PhoneState{Lang: string(i18n.Current())}, ErrForgotten
+	}
 	d, ok := l.devices[id]
 	if !ok {
 		d = newDevice(id, l.cals[id])

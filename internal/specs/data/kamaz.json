@@ -28,18 +28,53 @@
       "class": "truck",
       "front_suspension": "beam_kingpin",
       "rear_suspension": "live_axle_leaf",
-      "guidance_id": "guidance-truck-bus-beam",
-      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал и поперечный наклон шкворня не регулируются; кастер — клиновыми прокладками, схождение — поперечной рулевой тягой. Задняя тележка на балансирной рессорной подвеске: программа считает машину двухосной — параллельность задних мостов проверяйте отдельно.",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал и поперечный наклон шкворня не регулируются; кастер — клиновыми прокладками, схождение — поперечной рулевой тягой. Задняя тележка на балансирной рессорной подвеске: программа считает машину двухосной — параллельность задних мостов проверяйте отдельно. По документу: развал 1°, поперечный наклон шкворня 8°, продольный наклон шкворня относительно рамы 2°40′ — заданы конструкцией, допуска документ не даёт, поэтому они здесь не внесены как нормы. Схождение 0,9–1,9 мм — разность расстояний между краями ободьев сзади и спереди на высоте 300 мм от опорной поверхности (статический радиус 476 мм), что соответствует повороту плоскости колеса на 4–8′.",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "banga.ua, «Передняя ось. Колеса. Шины КамАЗ-5320, -53212, -5410, -54112» (из «Техническое обслуживание и ремонт КамАЗ»). Постранично с печатным изданием не сверено.",
+        "url": "https://banga.ua/pages/gruzovie-sng/kamaz/tehnicheskaya-dokumentatsiya-kamaz/avtomobili-kamaz-texnicheskoe-obsluzhivanie-i-remont/kamaz-2-gl3-04",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "KAMAZ",
         "model": "5320 / 5511 / 5410",
-        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber and kingpin inclination are not adjustable; caster by taper shims, toe by the cross tie rod. The rear bogie is on a balancer leaf suspension: the program treats the truck as two-axle — check the rear axles for parallelism separately.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber and kingpin inclination are not adjustable; caster by taper shims, toe by the cross tie rod. The rear bogie is on a balancer leaf suspension: the program treats the truck as two-axle — check the rear axles for parallelism separately. Per the document: camber 1°, kingpin inclination 8°, kingpin caster relative to the frame 2°40′ — set by the design; the document gives no tolerance, so they are not entered as limits here. Toe of 0.9–1.9 mm is the difference between the rim-edge distances behind and in front at 300 mm above the ground (static radius 476 mm), which corresponds to 4–8′ of each wheel plane.",
+        "reference": "banga.ua, “Front axle. Wheels. Tyres KAMAZ-5320, -53212, -5410, -54112” (from “KAMAZ maintenance and repair”). Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "camber_method": "not adjustable",
+          "caster_method": "not adjustable",
+          "toe_method": "cross tie rod: loosen the end clamp bolts and turn the rod"
+        }
+      },
+      "rim_diameter_in": 20,
+      "front": {
+        "individual_toe": {
+          "min": 0.0667,
+          "nominal": 0.1,
+          "max": 0.1333
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется",
+          "caster_method": "не регулируется",
+          "toe_method": "поперечная рулевая тяга: ослабить болты наконечников и вращать тягу"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа"
       }
     },
     {

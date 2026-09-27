@@ -1,6 +1,7 @@
 package phone
 
 import (
+	"errors"
 	"math"
 	"math/rand"
 	"net/http"
@@ -368,5 +369,50 @@ func TestQRCode(t *testing.T) {
 	}
 	if !strings.HasPrefix(svg, "<svg") || !strings.Contains(svg, "<path") {
 		t.Error("not an SVG QR code")
+	}
+}
+
+// TestForgetPhone: a phone connected by mistake is disconnected from the
+// desktop — its readings leave the live screen, it cannot come straight back
+// while still sending, and it is let in again only when allowed.
+func TestForgetPhone(t *testing.T) {
+	r := newRig(t)
+	p := typicalPhone(5, 1)
+	r.cmd(phoneRequest{Wheel: "FR"})
+	r.calibrate(p, spinAxis(align.FR, 0.3, 0))
+	r.hold(p, p.onRim(spinAxis(align.FR, 0.3, 0), true), 3*time.Second)
+	if !r.hub.Frame().Params["camber_FR"].Has {
+		t.Fatal("setup: no camber on the live screen")
+	}
+
+	if !r.l.Forget(r.id) {
+		t.Fatal("a connected phone was not found")
+	}
+	if r.hub.Frame().Params["camber_FR"].Has {
+		t.Error("the disconnected phone's camber stayed on the live screen")
+	}
+	if _, err := r.l.handle(r.id, phoneRequest{Samples: []Sample{p.read(flatUp(), geom.Vec3{}, 0.1)}}); !errors.Is(err, ErrForgotten) {
+		t.Errorf("a disconnected phone was let back in: %v", err)
+	}
+	inf := r.l.Info()
+	if len(inf.Devices) != 0 || len(inf.Blocked) != 1 || inf.Blocked[0].ID != r.id {
+		t.Errorf("lists after disconnecting: devices %v, blocked %v", inf.Devices, inf.Blocked)
+	}
+
+	// Over HTTP the page is told 410, so it stops instead of retrying.
+	r.l.SetToken("k")
+	body := `{"d":"` + r.id + `","samples":[]}`
+	rec := httptest.NewRecorder()
+	r.l.Handler().ServeHTTP(rec, httptest.NewRequest("POST", "/p/k/data", strings.NewReader(body)))
+	if rec.Code != http.StatusGone {
+		t.Errorf("status %d for a disconnected phone, want 410", rec.Code)
+	}
+
+	if !r.l.Allow(r.id) {
+		t.Fatal("allow: phone not in the blocked list")
+	}
+	st := r.cmd(phoneRequest{Wheel: "FR"})
+	if !st.Mounted {
+		t.Error("the phone's calibration was lost on disconnecting — it belongs to the phone")
 	}
 }

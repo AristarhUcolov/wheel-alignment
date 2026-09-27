@@ -54,6 +54,10 @@ func (s *Server) phoneInfo(w http.ResponseWriter, r *http.Request) {
 func (s *Server) phoneSet(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Enable bool `json:"enable"`
+		// Forget disconnects one phone, Allow lets it back; either leaves
+		// access as it is.
+		Forget string `json:"forget"`
+		Allow  string `json:"allow"`
 	}
 	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<12)).Decode(&req); err != nil {
 		writeErr(w, http.StatusBadRequest, err)
@@ -63,12 +67,17 @@ func (s *Server) phoneSet(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusServiceUnavailable, phone.ErrDisabled)
 		return
 	}
-	if req.Enable {
+	switch {
+	case req.Forget != "":
+		s.phone.Forget(req.Forget)
+	case req.Allow != "":
+		s.phone.Allow(req.Allow)
+	case req.Enable:
 		if err := s.phone.Enable(); err != nil {
 			writeErr(w, http.StatusInternalServerError, err)
 			return
 		}
-	} else {
+	default:
 		s.phone.Disable()
 	}
 	writeJSON(w, http.StatusOK, s.phone.Info())

@@ -28,18 +28,52 @@
       "class": "truck",
       "front_suspension": "beam_kingpin",
       "rear_suspension": "live_axle_leaf",
-      "guidance_id": "guidance-truck-bus-beam",
-      "notes": "Передний ведущий мост на шкворнях и рессорах, задние мосты на рессорах. Программа считает машину двухосной: параллельность задних мостов тележки проверяйте отдельно.",
+      "notes": "Передний ведущий мост на шкворнях и рессорах, задние мосты на рессорах. Программа считает машину двухосной: параллельность задних мостов тележки проверяйте отдельно. Схождение 1–3 мм — по ободу. Наибольший угол поворота внутреннего колеса — 32°.",
       "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
+        "kind": "unverified",
+        "reference": "uzst.ru, руководство по эксплуатации «Урал-4320», приложение 2 «Данные для контроля и регулировок». Постранично с печатным изданием не сверено.",
+        "url": "https://uzst.ru/poleznaya-informaciya/poleznaya-informaciya-po-avtomobilyam-ural/instrukcii-po-ekspluatacii-avtomobilej/ural-4320/prilozhenie-2-dannye-dlya-kontrolya-i-regulirovok",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
       },
       "en": {
         "make": "Ural",
         "model": "4320 / 375",
-        "notes": "Driven kingpin front axle on leaf springs, rear axles on leaf springs. The program treats the vehicle as two-axle: check the rear bogie axles for parallelism separately.",
-        "reference": "Design description. No tolerances entered."
+        "notes": "Driven kingpin front axle on leaf springs, rear axles on leaf springs. The program treats the vehicle as two-axle: check the rear bogie axles for parallelism separately. Toe of 1–3 mm is measured at the rim. The maximum steering angle of the inner wheel is 32°.",
+        "reference": "uzst.ru, Ural-4320 owner's manual, appendix 2 “Data for checks and adjustments”. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "camber_method": "not adjustable",
+          "caster_method": "not adjustable",
+          "toe_method": "the cross tie rod"
+        }
+      },
+      "rim_diameter_in": 20,
+      "front_total_toe_mm": {
+        "min": 1.0,
+        "max": 3.0
+      },
+      "front": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется",
+          "caster_method": "не регулируется",
+          "toe_method": "поперечная рулевая тяга"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа"
       }
     }
   ]

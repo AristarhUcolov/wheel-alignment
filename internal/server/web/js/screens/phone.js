@@ -22,6 +22,15 @@ async function refresh() {
   draw();
 }
 
+async function forget(id, name) {
+  if (!confirm(t('Отключить «{name}»? Его показания уйдут с экрана регулировки, а подключиться снова он сможет, только если вы разрешите.', { name }))) return;
+  try { info = await api('/api/phone', { method: 'POST', body: { forget: id } }); draw(); } catch (e) { toast(e.message, true); }
+}
+
+async function allow(id) {
+  try { info = await api('/api/phone', { method: 'POST', body: { allow: id } }); draw(); } catch (e) { toast(e.message, true); }
+}
+
 async function setEnabled(on) {
   try {
     info = await api('/api/phone', { method: 'POST', body: { enable: on } });
@@ -69,15 +78,22 @@ function draw() {
       </div>
     </div>
     <h3>${t('Подключённые телефоны')}</h3>
-    ${devs.length ? `<table class="params"><thead><tr><th>${t('Телефон')}</th><th>${t('Колесо')}</th><th>${t('Калибровка')}</th><th>${t('Развал')}</th><th>${t('Что делает')}</th></tr></thead><tbody>
+    ${devs.length ? `<table class="params"><thead><tr><th>${t('Телефон')}</th><th>${t('Колесо')}</th><th>${t('Калибровка')}</th><th>${t('Развал')}</th><th>${t('Что делает')}</th><th></th></tr></thead><tbody>
       ${devs.map(d => `<tr>
         <td>${esc(d.name)}<br><span class="dim" style="font-size:12px">${d.online ? t('на связи') : t('нет связи {s} с', { s: Math.round(d.age_s) })}</span></td>
         <td>${esc(wheelName(d.wheel))}</td>
         <td>${d.calibrated ? `<span class="yes">${t('готов')}</span>` : `<span class="no">${t('нужна')}</span>`}</td>
         <td class="v">${d.camber === null || d.camber === undefined ? '—' : fmtDM(d.camber)}</td>
-        <td>${esc(d.prompt || '')}</td></tr>`).join('')}
+        <td>${esc(d.prompt || '')}</td>
+        <td><button class="btn small" data-forget="${esc(d.id)}" data-name="${esc(d.name)}" title="${esc(t('Отключить этот телефон'))}">${t('Отключить')}</button></td></tr>`).join('')}
     </tbody></table>` : `<p class="muted">${t('Пока ни одного. Откройте адрес на телефоне.')}</p>`}
+    ${(info.blocked || []).length ? `<h3>${t('Отключённые')}</h3>
+      <p class="muted" style="font-size:13px">${t('Эти телефоны не смогут присылать показания, пока вы их не разрешите или не включите доступ заново.')}</p>
+      <table class="params"><tbody>${info.blocked.map(d => `<tr><td>${esc(d.name)}</td>
+        <td style="width:1%"><button class="btn small" data-allow="${esc(d.id)}">${t('Разрешить снова')}</button></td></tr>`).join('')}</tbody></table>` : ''}
     <div class="warn" style="margin-top:14px"><b>${t('Точность.')}</b> ${t('После калибровки телефон даёт развал с точностью около 0,1° — если планка ровная и прижата к закраинам обода, а не к резине. Сверьте один раз с известным углом (например, уровнем на ровной стене), прежде чем доверять регулировку.')}</div>
     <div class="actions"><button class="btn danger" id="phOff">${t('Выключить доступ по Wi-Fi')}</button></div>`;
   $('#phOff', box).onclick = () => setEnabled(false);
+  box.querySelectorAll('[data-forget]').forEach(b => b.onclick = () => forget(b.dataset.forget, b.dataset.name));
+  box.querySelectorAll('[data-allow]').forEach(b => b.onclick = () => allow(b.dataset.allow));
 }
