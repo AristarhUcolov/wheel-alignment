@@ -205,3 +205,38 @@ func get(t *testing.T, srv http.Handler, path string) *httptest.ResponseRecorder
 	srv.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, path, nil))
 	return rec
 }
+
+// TestForeignPagesAreRefused: another website open in the same browser must
+// not be able to drive the interface — neither by a cross-site POST nor by
+// pointing its own domain at 127.0.0.1.
+func TestForeignPagesAreRefused(t *testing.T) {
+	srv := server.Guard(testServer(t))
+	do := func(method, host, origin string) int {
+		path := "/api/session"
+		if method == "POST" {
+			path = "/api/sim"
+		}
+		req := httptest.NewRequest(method, path, strings.NewReader(`{"action":"stop"}`))
+		req.Host = host
+		if origin != "" {
+			req.Header.Set("Origin", origin)
+		}
+		rec := httptest.NewRecorder()
+		srv.ServeHTTP(rec, req)
+		return rec.Code
+	}
+	for _, c := range []struct {
+		method, host, origin string
+		want                 int
+	}{
+		{"POST", "127.0.0.1:8700", "http://127.0.0.1:8700", http.StatusOK},       // the interface itself
+		{"POST", "127.0.0.1:8700", "", http.StatusOK},                            // curl, a sensor script
+		{"POST", "127.0.0.1:8700", "https://evil.example", http.StatusForbidden}, // cross-site form
+		{"GET", "evil.example:8700", "", http.StatusForbidden},                   // DNS rebinding
+		{"GET", "localhost:8700", "", http.StatusOK},
+	} {
+		if got := do(c.method, c.host, c.origin); got != c.want {
+			t.Errorf("%s host=%s origin=%q: %d, want %d", c.method, c.host, c.origin, got, c.want)
+		}
+	}
+}

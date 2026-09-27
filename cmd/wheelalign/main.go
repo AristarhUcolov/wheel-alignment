@@ -139,7 +139,7 @@ func run(addr string, open, forceBrowser bool, dataFlag string) error {
 	fmt.Printf("  Данные пользователя: %s\n\n", data)
 	log.Printf("старт: %s, данные %s", url, data)
 
-	hs := &http.Server{Handler: srv, ReadHeaderTimeout: 10 * time.Second}
+	hs := &http.Server{Handler: server.Guard(srv), ReadHeaderTimeout: 10 * time.Second}
 	errc := make(chan error, 1)
 	go func() {
 		if err := hs.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) {

@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"io/fs"
 	"mime"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -119,6 +120,44 @@ func (s *Server) Close() {
 func (s *Server) Hub() *live.Hub { return s.hub }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) { s.mux.ServeHTTP(w, r) }
+
+// Guard protects the interface from other web pages. Use it around the server
+// wherever it is exposed to a browser.
+//
+// The interface listens on 127.0.0.1 only, but any website open in the same
+// person's browser can still send requests there: a hidden form could switch
+// on the phone link or write a vehicle file into their profile. Two checks
+// close that:
+//
+//   - Host must name this computer. A site whose domain is made to resolve to
+//     127.0.0.1 (DNS rebinding) arrives with its own name in Host.
+//   - A request that changes something and carries an Origin must come from
+//     this interface's own origin. Browsers always attach Origin to such
+//     cross-site requests; curl and sensor scripts send none and keep working.
+func Guard(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !localHost(r.Host) {
+			http.Error(w, "forbidden host", http.StatusForbidden)
+			return
+		}
+		if r.Method != http.MethodGet && r.Method != http.MethodHead {
+			if o := r.Header.Get("Origin"); o != "" && o != "http://"+r.Host {
+				http.Error(w, "cross-origin request refused", http.StatusForbidden)
+				return
+			}
+		}
+		h.ServeHTTP(w, r)
+	})
+}
+
+func localHost(hostport string) bool {
+	host := hostport
+	if h, _, err := net.SplitHostPort(hostport); err == nil {
+		host = h
+	}
+	host = strings.Trim(host, "[]")
+	return host == "127.0.0.1" || host == "localhost" || host == "::1"
+}
 
 // noCache stops the embedded window from holding on to an old copy of the
 // interface after the program is updated: the files are small and local.
