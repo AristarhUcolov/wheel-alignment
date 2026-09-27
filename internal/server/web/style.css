@@ -413,7 +413,11 @@ details.help div { margin-top: 6px; font-size: 13px; color: var(--muted); }
 }
 .live-empty .panel { pointer-events: auto; max-width: 560px; }
 
-/* Выезжающая панель: как регулировать выбранный угол. */
+/* Выезжающая панель: как регулировать выбранный угол. На широком экране
+   экран регулировки сдвигается, чтобы панель не закрывала правые колёса. */
+@media (min-width: 1300px) {
+  .app.drawer-open #screen-live.active { padding-right: 414px; }
+}
 .drawer {
   position: fixed; top: 54px; right: 0; bottom: 46px; width: 400px; max-width: 92vw;
   background: #0e1628; border-left: 1px solid var(--line2);

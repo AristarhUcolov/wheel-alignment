@@ -2,7 +2,7 @@
 
 import { state, on, emit, api, save, toast, h, $, $$ } from '../state.js';
 import { ValueBox, CarView, camberPicto, casterPicto, toePicto, colorOf } from '../widgets.js';
-import { WHEELS, fmtParam, fmtRangeParam, specValue, shortLabel, paramKind, paramWheel, esc, STATUS_RU, inches } from '../fmt.js';
+import { WHEELS, fmtParam, fmtRangeParam, specValue, shortLabel, paramKind, paramWheel, esc, STATUS_RU, inches, fmtDM } from '../fmt.js';
 import { openDrawer, closeDrawer, go, drawerKey } from '../app.js';
 
 let root, body, boxes = {}, car = null, pictos = {}, crossEls = {};
@@ -32,7 +32,7 @@ export function mount(el) {
   $$('#views button', root).forEach(b => b.onclick = () => setView(b.dataset.v));
 
   on('frame', render);
-  on('session', () => { build(); render(); });
+  on('session', () => { build(); drawerBuiltFor = null; render(); });
   build();
 }
 
@@ -63,6 +63,7 @@ export function cycleView() {
 
 function pick(key) {
   state.selected = key;
+  drawerBuiltFor = null;
   openParam(key);
   render();
 }
@@ -258,28 +259,44 @@ function suspAdvice(key) {
   return { susp, adj: susp[field] };
 }
 
+// Помощник регулировки: сколько градусов даёт один шаг регулятора на этой
+// машине, узнаётся из первого же шага — дальше программа считает, сколько
+// ещё крутить и в какую сторону. Схема из руководства не нужна.
+const helper = (() => { try { return JSON.parse(localStorage.getItem('wa.helper')) || {}; } catch { return {}; } })();
+const helperKey = key => ((state.session && state.session.vehicle && state.session.vehicle.id) || '-') + '|' + key;
+function saveHelper() { try { localStorage.setItem('wa.helper', JSON.stringify(helper)); } catch { /* без сохранения */ } }
+
+function quarters(n) {
+  const q = Math.round(Math.abs(n) * 4);
+  const whole = Math.floor(q / 4), frac = ['', '¼', '½', '¾'][q % 4];
+  return (whole ? String(whole) : '') + frac || '0';
+}
+
+// «¼ оборота», «1 оборот», «2 оборота», «5 оборотов».
+function stepWord(key, n = 0.5) {
+  const toe = paramKind(key) === 'toe';
+  const forms = toe ? ['оборот тяги', 'оборота тяги', 'оборотов тяги'] : ['шаг регулятора', 'шага регулятора', 'шагов регулятора'];
+  const q = Math.round(Math.abs(n) * 4) / 4;
+  if (q % 1) return forms[1];
+  const k = q % 100, d = q % 10;
+  if (k >= 11 && k <= 14) return forms[2];
+  if (d === 1) return forms[0];
+  if (d >= 2 && d <= 4) return forms[1];
+  return forms[2];
+}
+
+let drawerBuiltFor = null;
+
+// openParam строит панель один раз; дальше updateParam меняет только цифры —
+// иначе перестройка 12 раз в секунду съедала бы нажатия на кнопки.
 export function openParam(key, refresh = false) {
-  const f = state.frame;
+  if (refresh && drawerBuiltFor === key) { updateParam(key); return; }
   const ss = state.session;
-  const p = f && f.params[key];
   const info = ss && ss.params ? ss.params[key] : null;
-  const units = state.units;
-  const rimMM = ss ? inches(ss.rim_diameter_in || 0) : 0;
-  const fmt = d => specValue(key, d, units, rimMM);
   const kind = paramKind(key);
-  const status = !p || !p.has ? 'none' : p.status;
+  const perWheel = !!paramWheel(key);
 
-  let togo = '';
-  if (p && p.has && p.spec) {
-    const d = p.to_nominal;
-    const arrow = Math.abs(d) < 1e-4 ? '' : d > 0
-      ? '<svg viewBox="0 0 24 24"><path d="M12 3 L21 14 H15 V21 H9 V14 H3 Z" fill="currentColor"/></svg>'
-      : '<svg viewBox="0 0 24 24"><path d="M12 21 L21 10 H15 V3 H9 V10 H3 Z" fill="currentColor"/></svg>';
-    const color = p.status === 'bad' ? 'var(--red)' : 'var(--green)';
-    togo = `<div class="togo" style="color:${color}">${arrow}<span>до номинала ${fmt(d)}</span></div>`;
-  }
-
-  const simAdjustable = ss && ss.sim_running && ['camber', 'toe', 'caster'].includes(kind) && paramWheel(key);
+  const simAdjustable = ss && ss.sim_running && ['camber', 'toe', 'caster'].includes(kind) && perWheel;
   const adv = suspAdvice(key);
   const method = info && info.method;
   let adjust = '';
@@ -289,13 +306,14 @@ export function openParam(key, refresh = false) {
     if (adv.adj.tip) adjust += `<p class="note">${esc(adv.adj.tip)}</p>`;
   }
   const notAdjustable = info && !info.adjustable && ['camber', 'toe', 'caster', 'thrust_angle'].includes(kind) && (adv && adv.adj && !adv.adj.usual);
+  const canHelp = perWheel && ['camber', 'toe', 'caster'].includes(kind);
 
   const html = `
     <h2>${esc(info ? info.label : shortLabel(key))}</h2>
-    <div class="muted">${p && p.has ? esc(STATUS_RU[p.status] || '') + (p.stable ? ' · показания стабильны' : ' · показания меняются') : 'нет показаний'}</div>
-    <div class="big ${status}">${fmtParam(key, p, units)}</div>
-    ${p && p.spec ? `<div class="target">норма ${fmtRangeParam(key, p.spec, units, rimMM)} · номинал ${fmt(p.spec.nominal)}</div>` : '<div class="target muted">допуск не задан</div>'}
-    ${togo}
+    <div class="muted" id="dStatus"></div>
+    <div class="big" id="dBig"></div>
+    <div class="target" id="dTarget"></div>
+    <div class="togo" id="dTogo"></div>
     ${simAdjustable ? `
       <div class="sect"><h3>Демонстрация: крутим регулировку</h3>
         <div class="adj-btns">
@@ -305,13 +323,107 @@ export function openParam(key, refresh = false) {
         <p class="muted" style="text-align:center;font-size:12.5px">Или стрелками ← → на клавиатуре (с Shift — крупнее).
           Обратите внимание: кастер и развал тянут за собой схождение.</p>
       </div>` : ''}
+    ${canHelp ? `
+      <div class="sect"><h3>Помощник: сколько крутить</h3>
+        <p class="muted" style="font-size:13px">Нажмите «Запомнить», поверните регулятор на известную величину, дождитесь
+          «стабильно» и нажмите, на сколько повернули. Программа узнает, сколько даёт шаг на вашей машине, и дальше будет
+          подсказывать, сколько ещё крутить.</p>
+        <div id="dHelp"></div>
+        <div class="adj-btns" style="flex-wrap:wrap">
+          <button class="btn small" data-h="mark">Запомнить положение</button>
+          <button class="btn small" data-h="0.25">¼</button><button class="btn small" data-h="0.5">½</button>
+          <button class="btn small" data-h="1">1</button><button class="btn small" data-h="2">2</button>
+          <button class="btn small danger" data-h="forget">Забыть</button>
+        </div>
+        <p class="dim" style="text-align:center;font-size:12px">¼, ½, 1, 2 — на сколько ${paramKind(key) === 'toe' ? 'оборотов тяги' : 'шагов регулятора'} вы повернули</p>
+      </div>` : ''}
     <div class="sect"><h3>Что это</h3><p>${esc(EXPLAIN[kind] || '')}</p></div>
     ${adjust ? `<div class="sect"><h3>Чем регулируется</h3>${adjust}</div>` : ''}
     ${notAdjustable ? `<div class="warn">На этой конструкции угол штатно не регулируется. Если он вне допуска — ищите износ или деформацию, а не регулировочный болт.</div>` : ''}
-    ${p && p.src ? `<p class="dim" style="margin-top:14px;font-size:12px">Источник: ${esc(srcName(p.src))}</p>` : ''}`;
+    <p class="dim" id="dSrc" style="margin-top:14px;font-size:12px"></p>`;
 
   openDrawer(html, key, refresh);
-  $$('[data-adj]', $('#drawerBody')).forEach(b => b.onclick = () => simAdjust(key, parseFloat(b.dataset.adj)));
+  drawerBuiltFor = key;
+  const body = $('#drawerBody');
+  $$('[data-adj]', body).forEach(b => b.onclick = () => simAdjust(key, parseFloat(b.dataset.adj)));
+  $$('[data-h]', body).forEach(b => b.onclick = () => helperAction(key, b.dataset.h));
+  updateParam(key);
+}
+
+function helperAction(key, what) {
+  const p = state.frame && state.frame.params[key];
+  const hk = helperKey(key);
+  const h = helper[hk] || {};
+  if (what === 'forget') { delete helper[hk]; saveHelper(); updateParam(key); return; }
+  if (!p || !p.has) { toast('Нет показаний по этому углу', true); return; }
+  if (what === 'mark') {
+    h.base = p.v;
+    helper[hk] = h;
+    saveHelper();
+    toast('Запомнено. Поверните регулятор и нажмите, на сколько.');
+  } else {
+    if (h.base === undefined) { toast('Сначала нажмите «Запомнить положение», потом поворачивайте', true); return; }
+    if (!p.stable) { toast('Дождитесь, пока показания успокоятся', true); return; }
+    const turns = parseFloat(what);
+    const delta = p.v - h.base;
+    if (Math.abs(delta) < 0.005) { toast('Угол почти не изменился — поверните сильнее или проверьте, тот ли регулятор', true); return; }
+    h.rate = delta / turns;
+    h.base = p.v;
+    helper[hk] = h;
+    saveHelper();
+    toast(`Один ${paramKind(key) === 'toe' ? 'оборот' : 'шаг'} даёт ${fmtDM(Math.abs(h.rate), { sign: false })}`);
+  }
+  updateParam(key);
+}
+
+function updateParam(key) {
+  const body = $('#drawerBody');
+  if (!body || drawerBuiltFor !== key) return;
+  const f = state.frame;
+  const ss = state.session;
+  const p = f && f.params[key];
+  const units = state.units;
+  const rimMM = ss ? inches(ss.rim_diameter_in || 0) : 0;
+  const fmt = d => specValue(key, d, units, rimMM);
+  const status = !p || !p.has ? 'none' : p.status;
+  const set = (id, v) => { const el = $(id, body); if (el) el.innerHTML = v; };
+
+  set('#dStatus', p && p.has ? esc(STATUS_RU[p.status] || '') + (p.stable ? ' · показания стабильны' : ' · показания меняются') : 'нет показаний');
+  const big = $('#dBig', body);
+  big.className = 'big ' + status;
+  big.textContent = fmtParam(key, p, units);
+  const target = $('#dTarget', body);
+  target.className = 'target' + (p && p.spec ? '' : ' muted');
+  target.textContent = p && p.spec ? `норма ${fmtRangeParam(key, p.spec, units, rimMM)} · номинал ${fmt(p.spec.nominal)}` : 'допуск не задан';
+
+  const togo = $('#dTogo', body);
+  if (p && p.has && p.spec) {
+    const d = p.to_nominal;
+    const arrow = Math.abs(d) < 1e-4 ? '' : d > 0
+      ? '<svg viewBox="0 0 24 24"><path d="M12 3 L21 14 H15 V21 H9 V14 H3 Z" fill="currentColor"/></svg>'
+      : '<svg viewBox="0 0 24 24"><path d="M12 21 L21 10 H15 V3 H9 V10 H3 Z" fill="currentColor"/></svg>';
+    togo.style.display = '';
+    togo.style.color = p.status === 'bad' ? 'var(--red)' : 'var(--green)';
+    togo.innerHTML = `${arrow}<span>до номинала ${fmt(d)}</span>`;
+  } else togo.style.display = 'none';
+
+  const help = $('#dHelp', body);
+  if (help) {
+    const h = helper[helperKey(key)] || {};
+    let txt = '';
+    if (h.base !== undefined && p && p.has) {
+      txt += `<p class="num" style="text-align:center">запомнено ${fmtDM(h.base)} · сейчас ${fmtDM(p.v)} · сдвиг ${fmtDM(p.v - h.base)}</p>`;
+    }
+    if (h.rate && p && p.has && p.spec) {
+      const n = p.to_nominal / h.rate;
+      const q = quarters(n);
+      txt += `<div class="ok-box" style="margin:6px 0">Один ${paramKind(key) === 'toe' ? 'оборот тяги' : 'шаг'} ≈ ${fmtDM(Math.abs(h.rate), { sign: false })}.<br>`
+        + (Math.abs(n) < 0.125 ? '<b>Вы на номинале — дальше не крутите.</b>'
+          : `<b>До номинала ≈ ${q} ${stepWord(key, n)}</b> — ${n > 0 ? 'в ту же сторону, что и прошлый поворот' : 'в сторону, обратную прошлому повороту'}.`) + '</div>';
+    }
+    help.innerHTML = txt;
+  }
+  set('#dSrc', p && p.src ? 'Источник: ' + esc(srcName(p.src)) : '');
 }
 
 export function simAdjust(key, delta) {
@@ -323,6 +435,7 @@ export function selectedKey() { return state.selected; }
 
 export function closeParam() {
   state.selected = null;
+  drawerBuiltFor = null;
   closeDrawer();
   render();
 }

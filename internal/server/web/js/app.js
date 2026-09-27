@@ -44,9 +44,11 @@ export function openDrawer(html, key = null, refresh = false) {
   drawerFor = key;
   d.classList.add('open');
   d.setAttribute('aria-hidden', 'false');
+  document.querySelector('.app').classList.add('drawer-open');
 }
 export function closeDrawer() {
   drawerFor = null;
+  document.querySelector('.app').classList.remove('drawer-open');
   $('#drawer').classList.remove('open');
   $('#drawer').setAttribute('aria-hidden', 'true');
 }
