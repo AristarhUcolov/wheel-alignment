@@ -1,3 +1,7 @@
+<a id="ru"></a>
+
+**Русский** · [English](#eng)
+
 # Оптический режим: камера и печатные мишени
 
 Технические подробности оптического тракта — от пикселей до углов установки
@@ -175,3 +179,194 @@ T_реп→колесо = (T_кам→реп)⁻¹ · T_кам→колесо
 схемой, таблицей и порядком регулировки, потому что оптический замер выдаёт
 ровно тот же `align.Result`, что и замер по струне: способ измерения до слоя
 отчёта не доходит.
+
+---
+---
+
+<a id="eng"></a>
+
+[Русский](#ru) · **English**
+
+# The optical mode: a camera and printed targets
+
+The technical details of the optical pipeline — from pixels to wheel alignment
+angles. How to use it is in the program: “Measurement → Camera and targets” and
+the “Guide”.
+
+**The whole pipeline works: photo → wheel alignment angles.**
+
+- **chessboard detector.** A board corner is a saddle point of brightness, and
+  the response is taken exactly, with no tuned coefficients:
+  `R = I_xy² − I_xx·I_yy`, the negated determinant of the Hessian, positive
+  exactly where the brightness surface is a saddle. The sub-pixel position comes
+  from the analytic saddle of a quadratic surface fitted to the neighbourhood.
+  **Accuracy 0.025–0.04 px**;
+- **rejecting false responses.** Along the board's edge the squares meet the
+  background and form T-junctions — they are saddles too, lie outside all the
+  real corners and spoil the convex hull used to find the grid. They are removed
+  by an exact test: around a real X-junction the brightness along a ring changes
+  sign **exactly 4 times**, around a T-junction — 2. No thresholds to tune;
+- **resolving the 180° turn.** A chessboard looks the same upside down, and
+  geometry is powerless here — but on turning, the black squares swap with the
+  white ones if the sum of the board's sides is odd. So boards with an even sum
+  (8×6, 9×5) are **rejected**: they are ambiguous in principle, and a detector
+  that “guessed” the orientation would flip the pose between frames and destroy
+  the runout compensation;
+- camera model: pinhole + Brown–Conrady distortion. Distortion matters more than
+  usual here: the wheels sit at the edges of the frame, and radial distortion
+  grows with the fourth and sixth power of the radius;
+- PnP for a planar target: a DLT homography with Hartley normalisation,
+  decomposition into rotation and translation, refinement by Levenberg–Marquardt
+  on the true reprojection error in pixels. On clean data it recovers the pose to
+  10⁻⁶ degree;
+- **detecting planar-target ambiguity** — see below;
+- recovering the wheel's axis of rotation from a sequence of target poses
+  (runout compensation, `geom.FitRotationAxis`);
+- recovering the steering axis by the cone method
+  (`measure.SteeringAxisFromSweep`): while steering, the wheel's axis of rotation
+  sweeps a cone, and the cone's axis is the steering axis. Insensitive to the
+  wheel rolling on the turn plates, and needs no steer angle;
+- a vehicle coordinate system independent of where the equipment stands.
+
+The end-to-end test `TestImageToCamber` checks all of this at once, **from
+rendered pixels to the wheel angle, without a single hand-inserted number**. The
+target is **deliberately mounted crooked — by 2.5°**, worse than any real clamp
+and several times the whole camber tolerance. The wheel is turned, each position
+is rendered as a photo through the camera model with sensor noise, detected,
+solved for pose — and the wheel's axis of rotation is recovered from the
+sequence:
+
+```
+detector: grid scatter up to 0.113 px; PnP: residual up to 0.070 px
+axis recovered with an error of 0.0073°
+camber -1.3428° (set -1.35°), toe 0.2194° (set 0.22°)
+```
+
+The mounting error vanishes completely — because the axis **around** which the
+target rotates is the wheel's axis whatever the angle it sits at. That is why the
+clamps can be made in a garage from whatever is at hand, with no precision.
+
+### Camera calibration
+
+Our own, by Zhang's method — no OpenCV needed:
+
+```bash
+wheelalign calibrate ./target-photos
+```
+
+Every photo gives a homography from the board plane to the image. Since the
+board is flat, `H = λ·K·[r₁ r₂ t]`, and the first two columns of the rotation
+matrix are orthonormal — these two facts give two linear constraints each on
+`B = K⁻ᵀK⁻¹`. Three photos are already enough; `K` is then extracted in closed
+form, and everything is refined together on the true reprojection error, now
+with distortion.
+
+On noise-free synthetic data it recovers the camera **exactly** — all five
+distortion coefficients and both focal lengths. On 8-bit noisy images: fx 980.4
+against a true 980, k1 −0.205 against −0.21, RMS 0.043 px.
+
+**The warnings matter more than the numbers here.** A calibration fails
+silently: a series of photos all taken head-on or all in the middle of the frame
+gives an excellent residual and distortion coefficients that no data supports —
+and it shows exactly at the frame edges, where the wheels are. So the program
+measures not only the residual but also the **spread of target tilt** and
+**frame coverage**, and says plainly what to retake.
+
+### Finding the grid by growing it from a seed
+
+Putting the detected corners into a grid is a problem of its own, and it is
+solved not by a convex-hull search (the largest inscribed quadrilateral as the
+board outline) but by growing. The difference is fundamental: the hull asks
+“which four points are the board's corners?” and goes wrong as soon as a couple
+of stray points pass the filters — the board outline stops being the largest
+quadrilateral, and tuning thresholds does not help, because the premise itself
+is wrong.
+
+Growing asks a local question. Take two neighbouring corners; the next one along
+the row lies where the lattice says, and its position is predicted from the
+corners already found — by the parallelogram rule (three corners of a square fix
+the fourth exactly under any affine map, and a projection is affine to first
+order at the scale of one square). Snap to the nearest real corner, repeat.
+Clutter is simply never reached: it is attached to nothing in the lattice, and
+how much of it there is in the frame stops mattering.
+
+If growing overshoots the inner corners onto the edge T-junctions (they lie
+exactly on the continuation of the lattice), the grown grid is a row or two
+larger — the board's inner corners are then a cols×rows window inside it, and
+every such window is checked. On synthetic data with the full edge of 84 points
+this gives 20 candidate windows, of which the orientation check below picks the
+only right one.
+
+Result: a series of 8 photos tilted up to 43° is detected **completely**,
+including frames with clutter scattered around.
+
+**About planar-target ambiguity.** A planar target admits a second solution,
+mirrored about the line of sight. Picking the wrong one gives a camber error of
+twice the target's tilt — the classic silent failure of every system with planar
+markers. The program computes both solutions and compares:
+
+| Conditions | Primary | Alternative | Verdict |
+|---|---|---|---|
+| Target at 9 m, tilted 30° | 0.333 px | 0.339 px | **ambiguous** |
+| The same target at 1.2 m | 0.332 px | 5.974 px | unambiguous |
+
+Only perspective distortion tells the solutions apart, and it disappears when the
+target is small in the frame. So the program does not “pick the better one”; it
+says plainly: come closer or use a bigger target.
+
+**About the hardware.** Four passive targets on the wheels and a camera. A target
+is a printed chessboard of 9×6 squares of 30 mm on a rigid sheet (fits on A4).
+Square boards are rejected: their 90° symmetry could make camber be taken for
+toe. The mount to the rim is a home-made hook over the rim edges; the mounting
+accuracy, as shown above, does not matter.
+
+## Linking the four wheels
+
+Camber is measured wheel by wheel with one camera and needs no vehicle coordinate
+system. Toe and the thrust angle do: they are relations **between** wheels, so
+all four must be expressed in one fixed frame.
+
+The solution is a **floor reference target** in the frame together with the wheel
+target. Every frame then gives the wheel's pose not relative to the camera but
+relative to the floor:
+
+```
+T_ref→wheel = (T_cam→ref)⁻¹ · T_cam→wheel
+```
+
+The camera cancels out — it can be moved freely between frames and between
+wheels. And since the reference target lies on the floor, its plane is the road
+plane: the vertical comes straight from it, and the height of the wheel centre
+above it is the **measured**, not assumed, rolling radius.
+
+One floor target cannot be seen from all four wheels — the car itself is in the
+way. So there are several targets (for example front and rear), linked by a
+**linking frame** that shows two at once: their relative pose is one divided by
+the other, and the camera cancels again. The links form a graph whose traversal
+brings all targets, and with them all wheels, into one frame. The camera never
+has to see everything at once — which is what makes a full optical alignment
+possible with a single phone.
+
+Tested end to end on a rendered scene: a car, two floor targets, one linking
+frame, all wheel targets mounted crooked and differently (2.5° / 1.4° / 3.1° /
+0.8°):
+
+```
+toe          recovered with an error of up to 0.017°
+camber                                   up to 0.033°
+thrust angle 0.090° against a set 0.080°
+rolling radius measured as the wheel centre's height above the floor plane
+```
+
+The targets must differ in size — two identical ones are indistinguishable in a
+frame. The detector looks for them from the larger to the smaller, removing the
+corners found from the board: a smaller grid fits inside a larger one (8×5 is
+part of 9×6), so the reverse order could “find” the small target on a piece of
+the large one.
+
+In the interface this is “Measurement → Camera and targets → Full measurement”:
+the calibration file, the target parameters, the linking photos and 4–6 frames
+per wheel. The result is the usual report with the diagram, the table and the
+adjustment order, because an optical measurement yields exactly the same
+`align.Result` as a string measurement: the measuring method never reaches the
+report layer.

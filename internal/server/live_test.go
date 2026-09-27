@@ -38,16 +38,16 @@ func decode[T any](t *testing.T, rec *httptest.ResponseRecorder) T {
 }
 
 // TestSessionForCatalogCar: choosing a car with no figures of its own — the
-// ГАЗ-3110 — must bring its kingpin suspension and fall back to class guidance
+// ГАЗ-3102 — must bring its kingpin suspension and fall back to class guidance
 // for tolerances, labelled as such.
 func TestSessionForCatalogCar(t *testing.T) {
 	srv := testServer(t)
-	rec := sendJSON(t, srv, "/api/session", map[string]any{"spec_id": "gaz-3110"})
+	rec := sendJSON(t, srv, "/api/session", map[string]any{"spec_id": "gaz-3102"})
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status %d: %s", rec.Code, rec.Body.String())
 	}
 	v := decode[server.SessionView](t, rec)
-	if v.Vehicle == nil || v.Vehicle.ID != "gaz-3110" {
+	if v.Vehicle == nil || v.Vehicle.ID != "gaz-3102" {
 		t.Fatalf("vehicle not set: %+v", v.Vehicle)
 	}
 	if v.FrontSuspension.ID != "double_wishbone_kingpin" {
@@ -238,5 +238,29 @@ func TestForeignPagesAreRefused(t *testing.T) {
 		if got := do(c.method, c.host, c.origin); got != c.want {
 			t.Errorf("%s host=%s origin=%q: %d, want %d", c.method, c.host, c.origin, got, c.want)
 		}
+	}
+}
+
+// TestSessionForUnverifiedCar: the ГАЗ-3110 has figures of its own from an
+// open source. They are used — but marked unverified, with the warning and a
+// link to the page they came from.
+func TestSessionForUnverifiedCar(t *testing.T) {
+	srv := testServer(t)
+	rec := sendJSON(t, srv, "/api/session", map[string]any{"spec_id": "gaz-3110"})
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status %d: %s", rec.Code, rec.Body.String())
+	}
+	v := decode[server.SessionView](t, rec)
+	if v.Limits == nil || v.Limits.SourceKind != "unverified" || v.Limits.ID != "gaz-3110" {
+		t.Fatalf("limits should be the car's own unverified figures, got %+v", v.Limits)
+	}
+	if v.Vehicle.Verified || v.Vehicle.Disclaimer == "" {
+		t.Error("unverified figures must carry the warning")
+	}
+	if v.Vehicle.SourceURL == "" {
+		t.Error("the source page should be linked")
+	}
+	if p := v.Params["caster_FL"]; p.Spec == nil || p.Spec.Min.Deg() < 4 {
+		t.Errorf("GAZ-3110 caster should be the source's +4°30′…+6°, got %+v", p.Spec)
 	}
 }

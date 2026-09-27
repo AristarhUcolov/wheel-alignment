@@ -1,8 +1,12 @@
+<a id="ru"></a>
+
+**Русский** · [English](#eng)
+
 # Ресурсы Windows
 
-Значок, манифест и сведения о версии для `wheelalign.exe`. Уже собраны в
-`../rsrc_windows_amd64.syso`, который `go build` подхватывает сам — для
-обычной сборки здесь ничего делать не нужно.
+Значок, манифест и сведения о версии (на русском и английском) для
+`wheelalign.exe`. Уже собраны в `../rsrc_windows_amd64.syso`, который
+`go build` подхватывает сам — для обычной сборки здесь ничего делать не нужно.
 
 Пересобрать после изменений (нужны Python с Pillow и `windres` из MinGW):
 
@@ -14,3 +18,31 @@ windres -c 65001 -O coff -F pe-x86-64 -i app.rc -o ../rsrc_windows_amd64.syso
 
 Манифест объявляет поддержку высокого DPI (PerMonitorV2): без него окно на
 экранах с масштабом 125–200 % выглядит размытым.
+
+При выпуске новой версии поменяйте номер версии в `app.rc` (все шесть мест) и пересоберите.
+
+---
+
+<a id="eng"></a>
+
+[Русский](#ru) · **English**
+
+# Windows resources
+
+The icon, manifest and version information (in Russian and English) for
+`wheelalign.exe`. They are already compiled into `../rsrc_windows_amd64.syso`,
+which `go build` picks up by itself — nothing to do here for an ordinary build.
+
+To rebuild after changes (needs Python with Pillow and `windres` from MinGW):
+
+```sh
+cd cmd/wheelalign/winres
+python make_icon.py
+windres -c 65001 -O coff -F pe-x86-64 -i app.rc -o ../rsrc_windows_amd64.syso
+```
+
+The manifest declares high-DPI support (PerMonitorV2): without it the window
+looks blurry on screens scaled to 125–200 %.
+
+For a new release, change the version number in `app.rc` (all six places) and
+rebuild.

@@ -54,7 +54,7 @@ func TestVolgaIsFound(t *testing.T) {
 		t.Errorf("ГАЗ-3110 default front suspension is %q, want kingpin", s.FrontSuspension)
 	}
 	if _, ok := db.Limits(s); !ok {
-		t.Error("ГАЗ-3110 has nothing to compare against — it must fall back to class guidance")
+		t.Error("ГАЗ-3110 has nothing to compare against")
 	}
 }
 
