@@ -25,6 +25,11 @@ import (
 // Sanity returns advisory warnings about figures that are possible but
 // surprising. An empty result means nothing looked odd.
 func Sanity(s Spec) []string {
+	// A catalog entry has no figures by definition; Validate already refuses
+	// one that does. There is nothing here to be surprised by.
+	if s.Source.Kind == SourceCatalog {
+		return nil
+	}
 	var out []string
 
 	add := func(format string, args ...any) {

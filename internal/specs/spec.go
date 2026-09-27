@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/suspension"
 )
 
 // SourceKind says where a set of figures came from. The ordering is meaningful:
@@ -48,6 +49,13 @@ const (
 	// program can still help someone whose car is not in the database, and
 	// always presented as guidance rather than specification.
 	SourceClassGuidance SourceKind = "class_guidance"
+	// SourceCatalog: the vehicle's construction only — suspension layout,
+	// years, what can be adjusted — with no tolerances at all. It exists so
+	// that someone searching for their car finds it, gets advice that fits how
+	// it is built, and is asked to supply the figures from their manual,
+	// instead of hitting "not found". Measurements are compared against the
+	// class guidance named in GuidanceID, and labelled as such.
+	SourceCatalog SourceKind = "catalog"
 )
 
 // Trust ranks a source for display and for choosing between competing entries.
@@ -79,6 +87,8 @@ func (k SourceKind) RussianName() string {
 		return "Не проверено"
 	case SourceClassGuidance:
 		return "Ориентировочные значения для класса"
+	case SourceCatalog:
+		return "Только конструкция, допусков нет"
 	}
 	return "Источник неизвестен"
 }
@@ -101,7 +111,10 @@ func (s Source) Validate() error {
 	if s.Kind == "" {
 		return errors.New("источник не указан")
 	}
-	if s.Kind != SourceClassGuidance && strings.TrimSpace(s.Reference) == "" {
+	if s.Kind.Trust() == 0 && s.Kind != SourceClassGuidance && s.Kind != SourceCatalog {
+		return fmt.Errorf("неизвестный тип источника %q", s.Kind)
+	}
+	if s.Kind != SourceClassGuidance && s.Kind != SourceCatalog && strings.TrimSpace(s.Reference) == "" {
 		return fmt.Errorf("для источника %q обязательна ссылка на документ", s.Kind)
 	}
 	return nil
@@ -162,6 +175,51 @@ type Conditions struct {
 	AdditionalChecks string  `json:"checks,omitempty"`
 }
 
+// Class is the broad kind of vehicle. It picks sensible defaults (which class
+// guidance applies, whether rear wheels are likely doubled) and lets a search be
+// narrowed to trucks or buses.
+type Class string
+
+const (
+	ClassCar   Class = "car"
+	ClassSUV   Class = "suv"
+	ClassLCV   Class = "lcv"
+	ClassTruck Class = "truck"
+	ClassBus   Class = "bus"
+)
+
+// Classes lists every class in display order.
+var Classes = []Class{ClassCar, ClassSUV, ClassLCV, ClassTruck, ClassBus}
+
+// RussianName is the label shown in the interface.
+func (c Class) RussianName() string {
+	switch c {
+	case ClassCar:
+		return "Легковой"
+	case ClassSUV:
+		return "Внедорожник, кроссовер"
+	case ClassLCV:
+		return "Фургон, микроавтобус, лёгкий грузовик"
+	case ClassTruck:
+		return "Грузовой"
+	case ClassBus:
+		return "Автобус"
+	}
+	return "Не указан"
+}
+
+func (c Class) valid() bool {
+	if c == "" {
+		return true
+	}
+	for _, k := range Classes {
+		if k == c {
+			return true
+		}
+	}
+	return false
+}
+
 // Spec is a complete alignment specification for one vehicle variant.
 type Spec struct {
 	ID    string   `json:"id"`
@@ -170,6 +228,19 @@ type Spec struct {
 	Trim  string   `json:"trim,omitempty"`
 	Notes string   `json:"notes,omitempty"`
 	Tags  []string `json:"tags,omitempty"`
+
+	Class Class `json:"class,omitempty"`
+
+	// FrontSuspension and RearSuspension say how the car is built. They drive
+	// the adjustment advice — what can be turned, with what, and what must be
+	// inspected first — and they are the part of an entry that stays useful
+	// even when no tolerances are known.
+	FrontSuspension suspension.Type `json:"front_suspension,omitempty"`
+	RearSuspension  suspension.Type `json:"rear_suspension,omitempty"`
+
+	// GuidanceID names the class-guidance entry to compare against when this
+	// entry has no figures of its own (catalog entries).
+	GuidanceID string `json:"guidance_id,omitempty"`
 
 	YearFrom int `json:"year_from"`
 	YearTo   int `json:"year_to"` // 0 = still current
@@ -229,6 +300,20 @@ func (s Spec) RimDiameterMM() float64 {
 	return align.Inches(s.RimDiameterIn)
 }
 
+// HasFigures reports whether the entry carries any tolerance at all.
+func (s Spec) HasFigures() bool {
+	if s.FrontTotalToeMM != nil || s.RearTotalToeMM != nil || s.MaxThrustAngle != nil {
+		return true
+	}
+	for _, ax := range []AxleSpec{s.Front, s.Rear} {
+		if ax.Camber != nil || ax.Caster != nil || ax.SAI != nil || ax.TotalToe != nil ||
+			ax.IndividualToe != nil || ax.MaxCrossCamber != nil || ax.MaxCrossCaster != nil {
+			return true
+		}
+	}
+	return false
+}
+
 // Verified reports whether these figures have been checked against a
 // manufacturer or licensed source.
 func (s Spec) Verified() bool {
@@ -245,6 +330,11 @@ func (s Spec) Disclaimer() string {
 	case SourceCommunity:
 		return "Данные внесены сообществом и перепроверены по независимому источнику, но это не заводской документ. " +
 			"Перед регулировкой сверьтесь с руководством по ремонту вашего автомобиля."
+	case SourceCatalog:
+		return "Допусков для этой модели в базе пока нет — известна только конструкция подвески. " +
+			"Углы сравниваются с ориентиром по классу автомобилей, а это НЕ ЗАВОДСКИЕ ДАННЫЕ. " +
+			"Возьмите допуски из руководства по ремонту и внесите их кнопкой «Внести допуски» — " +
+			"программа запомнит их у вас, а прислав их в проект, вы поможете всем владельцам этой модели."
 	case SourceClassGuidance:
 		return "ЭТО НЕ ЗАВОДСКИЕ ДАННЫЕ вашего автомобиля. Это типичные значения для автомобилей такого класса — " +
 			"они помогут понять, насколько сильно ваши углы отличаются от разумных, но регулировать «в них» нельзя. " +
@@ -274,6 +364,25 @@ func (s Spec) Validate() error {
 	}
 	if err := s.Source.Validate(); err != nil {
 		errs = append(errs, err.Error())
+	}
+	if !s.Class.valid() {
+		errs = append(errs, fmt.Sprintf("неизвестный класс автомобиля %q", s.Class))
+	}
+	if err := suspension.Validate(s.FrontSuspension, suspension.AxleFront); err != nil {
+		errs = append(errs, "передняя подвеска: "+err.Error())
+	}
+	if err := suspension.Validate(s.RearSuspension, suspension.AxleRear); err != nil {
+		errs = append(errs, "задняя подвеска: "+err.Error())
+	}
+	if s.Source.Kind == SourceCatalog {
+		// A catalog entry that carried figures would present them with no
+		// provenance at all — exactly what the source system exists to stop.
+		if s.HasFigures() {
+			errs = append(errs, "запись-каталог не может содержать допусков: внесите их как отдельную запись с источником")
+		}
+		if s.FrontSuspension == "" && s.RearSuspension == "" {
+			errs = append(errs, "запись-каталог без типа подвески ничего не сообщает")
+		}
 	}
 	if (s.FrontTotalToeMM != nil || s.RearTotalToeMM != nil) && s.RimDiameterIn <= 0 {
 		errs = append(errs, "схождение задано в миллиметрах, но не указан диаметр обода — "+
