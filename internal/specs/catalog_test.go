@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/simulate"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 	"github.com/AristarhUcolov/wheel-alignment/internal/suspension"
 )
@@ -150,4 +152,36 @@ func ids(m []specs.Match) []string {
 		out[i] = x.Spec.ID
 	}
 	return out
+}
+
+// TestLookupAgreesWithCompare: the live screen grades through Lookup, the
+// printed report through Compare. If they ever disagreed about a tolerance, the
+// screen could say "in spec" about a value the printout calls out of spec.
+func TestLookupAgreesWithCompare(t *testing.T) {
+	db := load(t)
+	res, err := align.Compute(simulate.Nominal().WheelSet(), align.FrameOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, id := range []string{"guidance-fwd-mcpherson", "vaz-2101-2107-classic", "guidance-truck-bus-beam"} {
+		spec, ok := db.Get(id)
+		if !ok {
+			t.Fatalf("%s missing", id)
+		}
+		for _, p := range specs.Compare(res, &spec).Params {
+			l := specs.Lookup(&spec, p.Key)
+			if l.Label != p.Label || l.Axle != p.Axle || l.Adjustable != p.Adjustable || l.Method != p.Method {
+				t.Errorf("%s/%s: lookup %+v disagrees with report", id, p.Key, l)
+			}
+			switch {
+			case (l.Spec == nil) != (p.Spec == nil):
+				t.Errorf("%s/%s: lookup and report disagree on whether a tolerance exists", id, p.Key)
+			case l.Spec != nil && *l.Spec != *p.Spec:
+				t.Errorf("%s/%s: lookup %v, report %v", id, p.Key, *l.Spec, *p.Spec)
+			}
+		}
+	}
+	if l := specs.Lookup(nil, "camber_FL"); l.Spec != nil {
+		t.Error("a nil spec must yield no tolerance")
+	}
 }

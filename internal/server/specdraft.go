@@ -101,6 +101,32 @@ func (s *Server) checkSpec(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, resp)
 }
 
+// saveSpec stores an owner's own entry — figures from their own manual — in
+// their profile, where it is loaded on every start and ranks first in search.
+// The same checks as for a contribution apply: an entry that would not load
+// from the project's data directory is not saved here either.
+func (s *Server) saveSpec(w http.ResponseWriter, r *http.Request) {
+	var spec specs.Spec
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20)).Decode(&spec); err != nil {
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("не удалось разобрать данные: %w", err))
+		return
+	}
+	if err := s.db.Save(spec); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	saved, _ := s.db.Get(spec.ID)
+	writeJSON(w, http.StatusOK, s.summarise(saved))
+}
+
+func (s *Server) deleteSpec(w http.ResponseWriter, r *http.Request) {
+	if err := s.db.Delete(r.PathValue("id")); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
+}
+
 func resolvedFigures(s specs.Spec) []ResolvedFigure {
 	var out []ResolvedFigure
 	rim := s.RimDiameterMM()

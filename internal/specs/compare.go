@@ -66,7 +66,7 @@ func Compare(res align.Result, spec *Spec) Report {
 		r.SourceLabel = spec.Source.Kind.RussianName()
 		r.SourceRef = spec.Source.Reference
 		r.Disclaimer = spec.Disclaimer()
-		r.ConditionsRU = describeConditions(spec.Conditions)
+		r.ConditionsRU = DescribeConditions(spec.Conditions)
 	}
 
 	add := func(p ParamReport) {
@@ -296,7 +296,8 @@ func adviceFor(p ParamReport) string {
 	return s
 }
 
-func describeConditions(c Conditions) string {
+// DescribeConditions renders the measurement conditions as one line of text.
+func DescribeConditions(c Conditions) string {
 	var parts []string
 	for _, v := range []string{c.Load, c.TyrePressure, c.FuelState, c.RideHeightNote, c.SettleProcedure, c.AdditionalChecks} {
 		if v != "" {

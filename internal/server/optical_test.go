@@ -32,6 +32,7 @@ func testServer(t *testing.T) *server.Server {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(srv.Close)
 	return srv
 }
 

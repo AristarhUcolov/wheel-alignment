@@ -8,6 +8,7 @@
 package server
 
 import (
+	"context"
 	"embed"
 	"encoding/json"
 	"errors"
@@ -18,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/live"
 	"github.com/AristarhUcolov/wheel-alignment/internal/measure"
 	"github.com/AristarhUcolov/wheel-alignment/internal/simulate"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
@@ -30,30 +32,82 @@ var webFS embed.FS
 type Server struct {
 	db  *specs.DB
 	mux *http.ServeMux
+
+	hub  *live.Hub
+	sim  *live.Simulator
+	sess *session
+
+	stop context.CancelFunc
 }
 
-// New builds the server and its routes.
+// New builds the server and its routes, and starts the live hub. Call Close
+// when done.
 func New(db *specs.DB) (*Server, error) {
 	sub, err := fs.Sub(webFS, "web")
 	if err != nil {
 		return nil, err
 	}
-	s := &Server{db: db, mux: http.NewServeMux()}
+	hub := live.NewHub()
+	s := &Server{
+		db: db, mux: http.NewServeMux(),
+		hub: hub, sim: live.NewSimulator(hub),
+		// 15" is a neutral default until a vehicle is chosen; every
+		// millimetre figure on screen is labelled with the rim it assumes.
+		sess: &session{rimIn: 15},
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	s.stop = cancel
+	go hub.Run(ctx)
+	s.sess.mu.Lock()
+	s.applySessionLocked()
+	s.sess.mu.Unlock()
 
-	s.mux.Handle("GET /", http.FileServerFS(sub))
+	s.mux.Handle("GET /", noCache(http.FileServerFS(sub)))
 	s.mux.HandleFunc("GET /api/health", s.health)
 	s.mux.HandleFunc("GET /api/specs/search", s.searchSpecs)
 	s.mux.HandleFunc("GET /api/specs/{id}", s.getSpec)
+	s.mux.HandleFunc("POST /api/specs/check", s.checkSpec)
+	s.mux.HandleFunc("POST /api/specs/save", s.saveSpec)
+	s.mux.HandleFunc("DELETE /api/specs/{id}", s.deleteSpec)
+	s.mux.HandleFunc("GET /api/suspensions", s.suspensions)
 	s.mux.HandleFunc("POST /api/measure/manual", s.measureManual)
 	s.mux.HandleFunc("POST /api/optical/calibrate", s.calibrate)
 	s.mux.HandleFunc("POST /api/optical/camber", s.opticalCamber)
 	s.mux.HandleFunc("POST /api/optical/align", s.opticalAlign)
-	s.mux.HandleFunc("POST /api/specs/check", s.checkSpec)
 	s.mux.HandleFunc("GET /api/demo", s.demo)
+
+	s.mux.HandleFunc("GET /api/session", s.getSession)
+	s.mux.HandleFunc("POST /api/session", s.setSession)
+	s.mux.HandleFunc("GET /api/live/stream", s.liveStream)
+	s.mux.HandleFunc("GET /api/live/frame", s.liveFrame)
+	s.mux.HandleFunc("POST /api/live/manual", s.liveManual)
+	s.mux.HandleFunc("POST /api/live/sample", s.liveSample)
+	s.mux.HandleFunc("POST /api/live/clear", s.liveClear)
+	s.mux.HandleFunc("POST /api/live/snapshot", s.liveSnapshot)
+	s.mux.HandleFunc("POST /api/sim", s.simControl)
+	s.mux.HandleFunc("GET /api/report", s.report)
 	return s, nil
 }
 
+// Close stops the simulator and the live hub.
+func (s *Server) Close() {
+	s.sim.Stop()
+	s.stop()
+}
+
+// Hub exposes the live hub, so other input paths (the phone link) can feed it.
+func (s *Server) Hub() *live.Hub { return s.hub }
+
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) { s.mux.ServeHTTP(w, r) }
+
+// noCache stops the embedded window from holding on to an old copy of the
+// interface after the program is updated: the files are small and local.
+func noCache(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache")
+		h.ServeHTTP(w, r)
+	})
+}
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -86,20 +140,33 @@ type specSummary struct {
 	Verified    bool   `json:"verified"`
 	Disclaimer  string `json:"disclaimer,omitempty"`
 	Notes       string `json:"notes,omitempty"`
+	Class       string `json:"class,omitempty"`
+	ClassName   string `json:"class_name,omitempty"`
+	FrontSusp   string `json:"front_suspension,omitempty"`
+	RearSusp    string `json:"rear_suspension,omitempty"`
+	Local       bool   `json:"local,omitempty"`
+	HasFigures  bool   `json:"has_figures"`
 }
 
-func summarise(sp specs.Spec) specSummary {
-	return specSummary{
+func (s *Server) summarise(sp specs.Spec) specSummary {
+	out := specSummary{
 		ID: sp.ID, Title: sp.Title(), Make: sp.Make, Model: sp.Model,
 		SourceKind: string(sp.Source.Kind), SourceLabel: sp.Source.Kind.RussianName(),
 		Verified: sp.Verified(), Disclaimer: sp.Disclaimer(), Notes: sp.Notes,
+		Class: string(sp.Class), FrontSusp: string(sp.FrontSuspension), RearSusp: string(sp.RearSuspension),
+		Local: s.db.IsLocal(sp.ID), HasFigures: sp.HasFigures(),
 	}
+	if sp.Class != "" {
+		out.ClassName = sp.Class.RussianName()
+	}
+	return out
 }
 
 func (s *Server) searchSpecs(w http.ResponseWriter, r *http.Request) {
 	q := specs.Query{
 		Text:            r.URL.Query().Get("q"),
 		Make:            r.URL.Query().Get("make"),
+		Class:           specs.Class(r.URL.Query().Get("class")),
 		IncludeGuidance: r.URL.Query().Get("guidance") == "1",
 	}
 	if y := r.URL.Query().Get("year"); y != "" {
@@ -112,7 +179,7 @@ func (s *Server) searchSpecs(w http.ResponseWriter, r *http.Request) {
 		if i >= 50 {
 			break
 		}
-		out = append(out, summarise(m.Spec))
+		out = append(out, s.summarise(m.Spec))
 	}
 
 	// Always offer the class-based fallbacks alongside, clearly separated, so
@@ -121,7 +188,7 @@ func (s *Server) searchSpecs(w http.ResponseWriter, r *http.Request) {
 	if !q.IncludeGuidance {
 		for _, m := range s.db.Search(specs.Query{IncludeGuidance: true}) {
 			if m.Spec.Source.Kind == specs.SourceClassGuidance {
-				guidance = append(guidance, summarise(m.Spec))
+				guidance = append(guidance, s.summarise(m.Spec))
 			}
 		}
 	}
