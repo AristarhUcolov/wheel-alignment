@@ -421,3 +421,43 @@ func TestManualSessionFlagsUnsquaredBox(t *testing.T) {
 		t.Errorf("an unsquared string box should be flagged loudly, got %v", res.Warnings)
 	}
 }
+
+// TestSweepUnequalTurns: a phone gyroscope measures the turns as they were —
+// 17.3° out, 22.6° in — and the exact solution must use them as such, not
+// assume a symmetric sweep. Recovered to machine precision on both sides.
+func TestSweepUnequalTurns(t *testing.T) {
+	for _, p := range []align.Position{align.FL, align.FR} {
+		for _, caster := range []float64{1, 3.5, 7} {
+			for _, sai := range []float64{8, 13} {
+				w := simulate.WheelSpec{Caster: align.Deg(caster), SAI: align.Deg(sai), Camber: align.Deg(-0.4), Toe: align.Deg(0.1)}
+				v := simulate.Vehicle{Wheels: map[align.Position]simulate.WheelSpec{p: w}}
+				tOut, tIn := 17.3, 22.6
+				out := align.Camber(w.SpinAxisSteered(p, align.Deg(tOut)))
+				in := align.Camber(w.SpinAxisSteered(p, align.Deg(-tIn)))
+				_, _, straight := v.SweepReadings(p, align.Deg(20))
+				sol, err := measure.SweepReading{
+					CamberOut: out, CamberIn: in, CamberStraight: straight, HasStraight: true,
+					ToeStraight: align.Deg(0.1), SweepOut: align.Deg(tOut), SweepIn: align.Deg(tIn),
+				}.Solve(p)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if d := math.Abs(sol.Caster.Deg() - caster); d > 1e-6 {
+					t.Errorf("%s caster %.1f: got %.6f", p, caster, sol.Caster.Deg())
+				}
+				if sol.SAI == nil || math.Abs(sol.SAI.Deg()-sai) > 1e-6 {
+					t.Errorf("%s SAI %.1f: got %v", p, sai, sol.SAI)
+				}
+				// Pretending the same readings came from a symmetric 20° sweep
+				// is exactly the error this avoids.
+				wrong, _ := measure.SweepReading{
+					CamberOut: out, CamberIn: in, CamberStraight: straight, HasStraight: true,
+					ToeStraight: align.Deg(0.1), HalfSweep: align.Deg(20),
+				}.Solve(p)
+				if math.Abs(wrong.Caster.Deg()-caster) < 0.05 {
+					t.Logf("%s caster %.1f: symmetric assumption happened to be close (%.3f)", p, caster, wrong.Caster.Deg())
+				}
+			}
+		}
+	}
+}

@@ -58,6 +58,25 @@ type SweepReading struct {
 	// figure and gives the best signal-to-noise; 10° is used where steering
 	// travel or space is limited, at roughly triple the error.
 	HalfSweep align.Angle
+
+	// SweepOut and SweepIn, when both are set, give the two turns separately.
+	// A person reading a turntable scale can stop both at 20°; a phone's
+	// gyroscope measures whatever the wheel actually did — 19.4° out and
+	// 21.2° in — and there is no reason to throw that away by pretending the
+	// sweep was symmetric. The exact solution handles unequal turns with no
+	// loss of accuracy; only the fallback without a straight-ahead reading
+	// still needs them equal.
+	SweepOut align.Angle
+	SweepIn  align.Angle
+}
+
+// turns returns the outward and inward steering angles, as magnitudes.
+func (s SweepReading) turns() (out, in float64) {
+	if s.SweepOut != 0 && s.SweepIn != 0 {
+		return math.Abs(s.SweepOut.Rad()), math.Abs(s.SweepIn.Rad())
+	}
+	h := math.Abs(s.HalfSweep.Rad())
+	return h, h
 }
 
 // SweepSolution is what a sweep yields.
@@ -101,11 +120,13 @@ type SweepSolution struct {
 // 8° of caster and 14° of SAI — small on a 1970s car with 2° of caster, but
 // most cars built since 2000 sit in exactly the region where it matters.
 func (s SweepReading) Solve(p align.Position) (SweepSolution, error) {
-	sw := math.Abs(s.HalfSweep.Rad())
-	if sw < geom.Rad(5) {
-		return SweepSolution{}, fmt.Errorf("%w: %.1f°, need at least 5° each way (20° recommended)",
-			ErrSweepTooSmall, s.HalfSweep.Deg())
+	tOut, tIn := s.turns()
+	if tOut < geom.Rad(5) || tIn < geom.Rad(5) {
+		return SweepSolution{}, fmt.Errorf("%w: %.1f° / %.1f°, need at least 5° each way (20° recommended)",
+			ErrSweepTooSmall, geom.Deg(tOut), geom.Deg(tIn))
 	}
+	// The symmetric figure, for the fallback and the SAI warning.
+	sw := (tOut + tIn) / 2
 	side := p.SideSign()
 
 	// Work in a_z, where the relations are exact.
@@ -131,7 +152,30 @@ func (s SweepReading) Solve(p align.Position) (SweepSolution, error) {
 	gamma := s.CamberStraight.Rad()
 	tau := s.ToeStraight.Rad()
 	aCoef := -math.Sin(gamma)
-	cCoef := ((azOut+azIn)/2 - aCoef*math.Cos(sw)) / (1 - math.Cos(sw))
+
+	// With A known, each reading is one linear equation in B and C:
+	//
+	//	a_z(φ) − A·cos φ = B·sin φ + C·(1 − cos φ)
+	//
+	// at φ = +s·θ_out and φ = −s·θ_in (steering outboard is a rotation of
+	// sign s about the upward steering axis). Two readings, two unknowns, and
+	// the determinant s·[sin θ_out·(1 − cos θ_in) + sin θ_in·(1 − cos θ_out)]
+	// never vanishes for real turns. With θ_out = θ_in this reduces exactly to
+	// the symmetric formulas above.
+	var cCoef float64
+	{
+		p1, p2 := side*tOut, -side*tIn
+		r1 := azOut - aCoef*math.Cos(p1)
+		r2 := azIn - aCoef*math.Cos(p2)
+		a11, a12 := math.Sin(p1), 1-math.Cos(p1)
+		a21, a22 := math.Sin(p2), 1-math.Cos(p2)
+		det := a11*a22 - a12*a21
+		if math.Abs(det) < 1e-12 {
+			return SweepSolution{}, fmt.Errorf("%w: turns too small to separate", ErrSweepTooSmall)
+		}
+		bCoef = (r1*a22 - a12*r2) / det
+		cCoef = (a11*r2 - a21*r1) / det
+	}
 
 	// a₀ from the straight-ahead camber and toe, outboard-pointing.
 	ax := math.Cos(gamma) * math.Sin(tau)
