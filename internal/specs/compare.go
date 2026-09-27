@@ -1,10 +1,10 @@
 package specs
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // ParamReport is one measured value judged against its specification.
@@ -63,7 +63,7 @@ func Compare(res align.Result, spec *Spec) Report {
 		r.SpecID = spec.ID
 		r.SpecTitle = spec.Title()
 		r.SourceKind = string(spec.Source.Kind)
-		r.SourceLabel = spec.Source.Kind.RussianName()
+		r.SourceLabel = spec.Source.Kind.Label()
 		r.SourceRef = spec.Source.Reference
 		r.Disclaimer = spec.Disclaimer()
 		r.ConditionsRU = DescribeConditions(spec.Conditions)
@@ -95,14 +95,14 @@ func Compare(res align.Result, spec *Spec) Report {
 		for _, p := range []align.Position{axle.l, axle.rp} {
 			w := res.Wheels[p.String()]
 			add(ParamReport{
-				Key: "camber_" + p.String(), Label: "Развал, " + p.RussianName(), Axle: axle.name,
+				Key: "camber_" + p.String(), Label: i18n.F("Развал, %s", p.Label()), Axle: axle.name,
 				Measured: w.Camber, Spec: rangeOf(axle.spec, func(a *AxleSpec) *align.Range { return a.Camber }),
 				Adjustable: adjOf(axle.spec, func(a *AxleSpec) bool { return a.Adjustable.Camber }),
 				Method:     methodOf(axle.spec, func(a *AxleSpec) string { return a.Adjustable.CamberMethod }),
 			})
 		}
 		add(ParamReport{
-			Key: axle.name + "_cross_camber", Label: "Разница развала (лев − прав)", Axle: axle.name,
+			Key: axle.name + "_cross_camber", Label: i18n.T("Разница развала (лев − прав)"), Axle: axle.name,
 			Measured: axle.sum.CrossCamber, Spec: crossRange(axle.spec, true),
 		})
 
@@ -113,7 +113,7 @@ func Compare(res align.Result, spec *Spec) Report {
 					continue
 				}
 				add(ParamReport{
-					Key: "caster_" + p.String(), Label: "Кастер, " + p.RussianName(), Axle: axle.name,
+					Key: "caster_" + p.String(), Label: i18n.F("Кастер, %s", p.Label()), Axle: axle.name,
 					Measured: *w.Caster, Spec: rangeOf(axle.spec, func(a *AxleSpec) *align.Range { return a.Caster }),
 					Adjustable: adjOf(axle.spec, func(a *AxleSpec) bool { return a.Adjustable.Caster }),
 					Method:     methodOf(axle.spec, func(a *AxleSpec) string { return a.Adjustable.CasterMethod }),
@@ -121,7 +121,7 @@ func Compare(res align.Result, spec *Spec) Report {
 			}
 			if axle.sum.CrossCaster != nil {
 				add(ParamReport{
-					Key: axle.name + "_cross_caster", Label: "Разница кастера (лев − прав)", Axle: axle.name,
+					Key: axle.name + "_cross_caster", Label: i18n.T("Разница кастера (лев − прав)"), Axle: axle.name,
 					Measured: *axle.sum.CrossCaster, Spec: crossRange(axle.spec, false),
 				})
 			}
@@ -133,7 +133,7 @@ func Compare(res align.Result, spec *Spec) Report {
 					continue
 				}
 				add(ParamReport{
-					Key: "sai_" + p.String(), Label: "Поперечный наклон оси (SAI), " + p.RussianName(), Axle: axle.name,
+					Key: "sai_" + p.String(), Label: i18n.F("Поперечный наклон оси (SAI), %s", p.Label()), Axle: axle.name,
 					Measured: *w.SAI, Spec: rangeOf(axle.spec, func(a *AxleSpec) *align.Range { return a.SAI }),
 				})
 			}
@@ -144,7 +144,7 @@ func Compare(res align.Result, spec *Spec) Report {
 			w := res.Wheels[p.String()]
 			mm := w.ToeThrust.ToeMM(rim)
 			add(ParamReport{
-				Key: "toe_" + p.String(), Label: "Схождение, " + p.RussianName(), Axle: axle.name,
+				Key: "toe_" + p.String(), Label: i18n.F("Схождение, %s", p.Label()), Axle: axle.name,
 				Measured: w.ToeThrust, MeasuredMM: &mm,
 				Spec:       rangeOf(axle.spec, func(a *AxleSpec) *align.Range { return a.IndividualToe }),
 				Adjustable: adjOf(axle.spec, func(a *AxleSpec) bool { return a.Adjustable.Toe }),
@@ -153,7 +153,7 @@ func Compare(res align.Result, spec *Spec) Report {
 		}
 		totalMM := axle.sum.TotalToe.ToeMM(rim)
 		tp := ParamReport{
-			Key: axle.name + "_total_toe", Label: "Суммарное схождение оси", Axle: axle.name,
+			Key: axle.name + "_total_toe", Label: i18n.T("Суммарное схождение оси"), Axle: axle.name,
 			Measured: axle.sum.TotalToe, MeasuredMM: &totalMM,
 			Spec:       rangeOf(axle.spec, func(a *AxleSpec) *align.Range { return a.TotalToe }),
 			Adjustable: adjOf(axle.spec, func(a *AxleSpec) bool { return a.Adjustable.Toe }),
@@ -172,7 +172,7 @@ func Compare(res align.Result, spec *Spec) Report {
 		thrustSpec = &t
 	}
 	add(ParamReport{
-		Key: "thrust_angle", Label: "Угол тяги", Axle: "vehicle",
+		Key: "thrust_angle", Label: i18n.T("Угол тяги"), Axle: "vehicle",
 		Measured: res.ThrustAngle, Spec: thrustSpec,
 		Adjustable: adjOf(axleOf(spec, false), func(a *AxleSpec) bool { return a.Adjustable.Toe }),
 		Method:     methodOf(axleOf(spec, false), func(a *AxleSpec) string { return a.Adjustable.ToeMethod }),
@@ -205,10 +205,10 @@ func buildProcedure(r Report, spec *Spec) []Step {
 		}
 	}
 	if len(bad) == 0 {
-		return []Step{{Order: 1, Title: "Регулировка не требуется",
-			Detail: "Все измеренные углы в пределах допуска. Если автомобиль всё равно уводит — " +
+		return []Step{{Order: 1, Title: i18n.T("Регулировка не требуется"),
+			Detail: i18n.T("Все измеренные углы в пределах допуска. Если автомобиль всё равно уводит — " +
 				"проверьте давление в шинах, износ шин слева/справа, люфты в подвеске и рулевом, " +
-				"а также тормозные механизмы."}}
+				"а также тормозные механизмы.")}}
 	}
 
 	var steps []Step
@@ -218,48 +218,48 @@ func buildProcedure(r Report, spec *Spec) []Step {
 		steps = append(steps, Step{Order: n, Title: title, Detail: detail, Why: why})
 	}
 
-	step("Подготовка",
-		"Проверьте и выровняйте давление в шинах, устраните люфты в шаровых опорах, рулевых наконечниках, "+
+	step(i18n.T("Подготовка"),
+		i18n.T("Проверьте и выровняйте давление в шинах, устраните люфты в шаровых опорах, рулевых наконечниках, "+
 			"сайлентблоках и ступичных подшипниках. Загрузите автомобиль так, как требует спецификация. "+
-			"Прокатите машину 3–5 метров вперёд и дайте подвеске сесть.",
-		"Изношенная подвеска даёт разные углы в статике и в движении — регулировать её бесполезно, "+
-			"результат «уедет» на первой же кочке.")
+			"Прокатите машину 3–5 метров вперёд и дайте подвеске сесть."),
+		i18n.T("Изношенная подвеска даёт разные углы в статике и в движении — регулировать её бесполезно, "+
+			"результат «уедет» на первой же кочке."))
 
 	if hasAny(bad, "camber_RL", "camber_RR", "toe_RL", "toe_RR", "rear_total_toe", "thrust_angle") {
-		step("Задняя ось: сначала развал, затем схождение",
-			"Приведите в допуск развал задних колёс, затем схождение каждого колеса по отдельности. "+
-				"Добивайтесь того, чтобы угол тяги был близок к нулю.",
-			"Угол тяги задаётся задней осью. Пока он не нулевой, переднее схождение приходится «кривить» "+
-				"под него, и руль не встанет ровно.")
+		step(i18n.T("Задняя ось: сначала развал, затем схождение"),
+			i18n.T("Приведите в допуск развал задних колёс, затем схождение каждого колеса по отдельности. "+
+				"Добивайтесь того, чтобы угол тяги был близок к нулю."),
+			i18n.T("Угол тяги задаётся задней осью. Пока он не нулевой, переднее схождение приходится «кривить» "+
+				"под него, и руль не встанет ровно."))
 	}
 	if hasAny(bad, "caster_FL", "caster_FR", "front_cross_caster") {
-		step("Передняя ось: кастер",
-			"Отрегулируйте продольный наклон оси поворота. Разница между левым и правым бортом важнее, "+
-				"чем абсолютное значение: именно она заставляет машину тянуть в сторону.",
-			"Изменение кастера меняет и развал, и схождение, поэтому он идёт первым.")
+		step(i18n.T("Передняя ось: кастер"),
+			i18n.T("Отрегулируйте продольный наклон оси поворота. Разница между левым и правым бортом важнее, "+
+				"чем абсолютное значение: именно она заставляет машину тянуть в сторону."),
+			i18n.T("Изменение кастера меняет и развал, и схождение, поэтому он идёт первым."))
 	}
 	if hasAny(bad, "camber_FL", "camber_FR", "front_cross_camber") {
-		step("Передняя ось: развал",
-			"Выставьте развал передних колёс, добиваясь минимальной разницы между бортами.",
-			"Развал меняет схождение, поэтому схождение регулируется после него, а не до.")
+		step(i18n.T("Передняя ось: развал"),
+			i18n.T("Выставьте развал передних колёс, добиваясь минимальной разницы между бортами."),
+			i18n.T("Развал меняет схождение, поэтому схождение регулируется после него, а не до."))
 	}
 	if hasAny(bad, "toe_FL", "toe_FR", "front_total_toe") {
-		step("Передняя ось: схождение — в последнюю очередь",
-			"Зафиксируйте руль строго в положении «прямо» (по спицам и по метке), затем выставьте схождение "+
+		step(i18n.T("Передняя ось: схождение — в последнюю очередь"),
+			i18n.T("Зафиксируйте руль строго в положении «прямо» (по спицам и по метке), затем выставьте схождение "+
 				"КАЖДОГО колеса по отдельности, а не только суммарное. Обе тяги крутите на одинаковую величину "+
-				"в противоположные стороны, чтобы руль остался ровным.",
-			"Суммарное схождение можно получить бесконечным числом способов, и только один из них оставляет "+
-				"руль ровным. Именно поэтому «сделали схождение, а руль кривой» — самая частая жалоба.")
+				"в противоположные стороны, чтобы руль остался ровным."),
+			i18n.T("Суммарное схождение можно получить бесконечным числом способов, и только один из них оставляет "+
+				"руль ровным. Именно поэтому «сделали схождение, а руль кривой» — самая частая жалоба."))
 	}
-	step("Проверка",
-		"Прокатите автомобиль вперёд-назад, дайте подвеске сесть и перемерьте всё заново. "+
-			"Затяните контргайки рулевых тяг и повторите замер: затяжка часто сдвигает схождение.",
-		"Регулировка без контрольного замера — это не регулировка, а надежда.")
+	step(i18n.T("Проверка"),
+		i18n.T("Прокатите автомобиль вперёд-назад, дайте подвеске сесть и перемерьте всё заново. "+
+			"Затяните контргайки рулевых тяг и повторите замер: затяжка часто сдвигает схождение."),
+		i18n.T("Регулировка без контрольного замера — это не регулировка, а надежда."))
 
 	if spec == nil || !spec.Verified() {
-		step("Перед выездом",
-			"Сверьте полученные значения с руководством по ремонту вашего автомобиля. "+
-				"Данные в программе для этой модели не подтверждены заводским документом.",
+		step(i18n.T("Перед выездом"),
+			i18n.T("Сверьте полученные значения с руководством по ремонту вашего автомобиля. "+
+				"Данные в программе для этой модели не подтверждены заводским документом."),
 			"")
 	}
 	return steps
@@ -279,19 +279,19 @@ func adviceFor(p ParamReport) string {
 		return ""
 	}
 	dev := p.Deviation
-	dir := "уменьшить"
+	dir := i18n.T("уменьшить")
 	if dev < 0 {
-		dir = "увеличить"
+		dir = i18n.T("увеличить")
 	}
-	s := fmt.Sprintf("Нужно %s на %s (до диапазона %s … %s).",
+	s := i18n.F("Нужно %s на %s (до диапазона %s … %s).",
 		dir, dev.FormatMagnitude(),
 		p.Spec.Min.FormatDegMin(), p.Spec.Max.FormatDegMin())
 	switch {
 	case p.Method != "":
-		s += " Регулировка: " + p.Method
+		s += " " + i18n.F("Регулировка: %s", p.Method)
 	case !p.Adjustable:
-		s += " Штатной регулировки этого угла нет — потребуется ремонт, замена деформированной детали " +
-			"или установка регулировочного комплекта."
+		s += " " + i18n.T("Штатной регулировки этого угла нет — потребуется ремонт, замена деформированной детали "+
+			"или установка регулировочного комплекта.")
 	}
 	return s
 }
@@ -305,7 +305,7 @@ func DescribeConditions(c Conditions) string {
 		}
 	}
 	if c.RideHeightMM > 0 {
-		parts = append(parts, fmt.Sprintf("контрольная высота кузова %.0f мм", c.RideHeightMM))
+		parts = append(parts, i18n.F("контрольная высота кузова %.0f мм", c.RideHeightMM))
 	}
 	out := ""
 	for i, p := range parts {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // ReferenceMode selects what "vertical" means when camber is computed.
@@ -96,7 +97,7 @@ func BuildReference(ws WheelSet, opt FrameOptions) (Reference, error) {
 		up = opt.Gravity.Unit().Neg()
 		if up.Dot(seedUp) < 0 {
 			ref.Warnings = append(ref.Warnings,
-				"Вектор гравитации направлен противоположно расчётному «верху» — проверьте ориентацию датчика")
+				i18n.T("Вектор гравитации направлен противоположно расчётному «верху» — проверьте ориентацию датчика"))
 		}
 	} else {
 		// Refine: drop each wheel centre to its contact patch and refit. Two
@@ -120,7 +121,7 @@ func BuildReference(ws WheelSet, opt FrameOptions) (Reference, error) {
 			ref.RoadPlaneRMSMM = fit.RMS
 		}
 		if ref.RoadPlaneRMSMM > 8 {
-			ref.Warnings = append(ref.Warnings, fmt.Sprintf(
+			ref.Warnings = append(ref.Warnings, i18n.F(
 				"Точки контакта колёс не лежат в одной плоскости (СКО %.1f мм). "+
 					"Проверьте давление в шинах, просадку пружины и введённые радиусы качения.",
 				ref.RoadPlaneRMSMM))

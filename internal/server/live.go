@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/live"
 	"github.com/AristarhUcolov/wheel-alignment/internal/measure"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
@@ -95,6 +96,9 @@ type SessionView struct {
 	// whether and how it is adjusted on this car.
 	Params map[string]specs.ParamSpec `json:"params"`
 
+	// Lang is the interface language, so the page can pick its own texts.
+	Lang string `json:"lang"`
+
 	SimRunning bool `json:"sim_running"`
 	SimAuto    bool `json:"sim_auto"`
 	HasBefore  bool `json:"has_before"`
@@ -105,13 +109,13 @@ func (s *Server) vehicleView(sp specs.Spec) *VehicleView {
 	v := &VehicleView{
 		ID: sp.ID, Title: sp.Title(), Make: sp.Make, Model: sp.Model,
 		Class: string(sp.Class), SourceKind: string(sp.Source.Kind),
-		SourceLabel: sp.Source.Kind.RussianName(), SourceRef: sp.Source.Reference,
+		SourceLabel: sp.Source.Kind.Label(), SourceRef: sp.Source.Reference,
 		Verified: sp.Verified(), Disclaimer: sp.Disclaimer(), Notes: sp.Notes,
 		Local: s.db.IsLocal(sp.ID), HasFigures: sp.HasFigures(),
 		YearFrom: sp.YearFrom, YearTo: sp.YearTo,
 	}
 	if sp.Class != "" {
-		v.ClassName = sp.Class.RussianName()
+		v.ClassName = sp.Class.Label()
 	}
 	return v
 }
@@ -139,6 +143,7 @@ func (s *Server) applySessionLocked() SessionView {
 		RearSuspension:  suspension.MustGet(ss.rearSusp),
 		Params:          map[string]specs.ParamSpec{},
 		SimRunning:      s.sim.Running(), SimAuto: s.sim.Auto(),
+		Lang:      string(i18n.Current()),
 		HasBefore: ss.before != nil, HasAfter: ss.after != nil,
 	}
 	cfg := live.Config{
@@ -174,7 +179,7 @@ func (s *Server) getSession(w http.ResponseWriter, r *http.Request) {
 func (s *Server) setSession(w http.ResponseWriter, r *http.Request) {
 	var req SessionRequest
 	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<16)).Decode(&req); err != nil {
-		writeErr(w, http.StatusBadRequest, fmt.Errorf("не удалось прочитать запрос: %w", err))
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("%s: %w", i18n.T("не удалось прочитать запрос"), err))
 		return
 	}
 	s.sess.mu.Lock()
@@ -186,7 +191,7 @@ func (s *Server) setSession(w http.ResponseWriter, r *http.Request) {
 		if id != "" {
 			sp, ok := s.db.Get(id)
 			if !ok {
-				writeErr(w, http.StatusNotFound, errors.New("автомобиль не найден в базе"))
+				writeErr(w, http.StatusNotFound, errors.New(i18n.T("автомобиль не найден в базе")))
 				return
 			}
 			ss.frontSusp, ss.rearSusp = sp.FrontSuspension, sp.RearSuspension
@@ -216,7 +221,7 @@ func (s *Server) setSession(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.RimDiameterIn != nil {
 		if v := *req.RimDiameterIn; v < 8 || v > 30 {
-			writeErr(w, http.StatusBadRequest, errors.New("диаметр обода должен быть от 8 до 30 дюймов"))
+			writeErr(w, http.StatusBadRequest, errors.New(i18n.T("диаметр обода должен быть от 8 до 30 дюймов")))
 			return
 		}
 		ss.rimIn = *req.RimDiameterIn
@@ -236,7 +241,7 @@ func (s *Server) setSession(w http.ResponseWriter, r *http.Request) {
 func (s *Server) liveStream(w http.ResponseWriter, r *http.Request) {
 	fl, ok := w.(http.Flusher)
 	if !ok {
-		writeErr(w, http.StatusInternalServerError, errors.New("потоковая передача не поддерживается"))
+		writeErr(w, http.StatusInternalServerError, errors.New(i18n.T("потоковая передача не поддерживается")))
 		return
 	}
 	h := w.Header()
@@ -295,7 +300,7 @@ func parseWheel(s string) (align.Position, error) {
 			return p, nil
 		}
 	}
-	return 0, fmt.Errorf("неизвестное колесо %q (нужно FL, FR, RL или RR)", s)
+	return 0, errors.New(i18n.F("неизвестное колесо %q (нужно FL, FR, RL или RR)", s))
 }
 
 // manualSource is the source id for typed-in readings.
@@ -304,7 +309,7 @@ const manualSource = "manual"
 func (s *Server) liveManual(w http.ResponseWriter, r *http.Request) {
 	var req ManualLiveRequest
 	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<16)).Decode(&req); err != nil {
-		writeErr(w, http.StatusBadRequest, fmt.Errorf("не удалось прочитать замер: %w", err))
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("%s: %w", i18n.T("не удалось прочитать замер"), err))
 		return
 	}
 	pos, err := parseWheel(req.Wheel)
@@ -345,7 +350,7 @@ func (s *Server) liveManual(w http.ResponseWriter, r *http.Request) {
 		v := toe.Deg()
 		in.Toe = &v
 	}
-	s.hub.Touch(live.SourceInfo{ID: manualSource, Kind: "manual", Name: "Ручной ввод", Detail: "струна и угломер"})
+	s.hub.Touch(live.SourceInfo{ID: manualSource, Kind: "manual", Name: i18n.N("Ручной ввод"), Detail: i18n.N("струна и угломер")})
 	if in.Camber != nil || in.Toe != nil {
 		if err := s.hub.Push(in); err != nil {
 			writeErr(w, http.StatusBadRequest, err)
@@ -355,7 +360,7 @@ func (s *Server) liveManual(w http.ResponseWriter, r *http.Request) {
 
 	if req.Sweep != nil {
 		if !pos.IsFront() {
-			writeErr(w, http.StatusBadRequest, errors.New("кастер меряется только на передних колёсах"))
+			writeErr(w, http.StatusBadRequest, errors.New(i18n.T("кастер меряется только на передних колёсах")))
 			return
 		}
 		half := req.Sweep.HalfSweepDeg
@@ -426,7 +431,7 @@ func (s *Server) liveSample(w http.ResponseWriter, r *http.Request) {
 	for _, smp := range batch {
 		id := strings.TrimSpace(smp.Source)
 		if id == "" {
-			writeErr(w, http.StatusBadRequest, errors.New("поле source обязательно: по нему датчик виден в строке состояния"))
+			writeErr(w, http.StatusBadRequest, errors.New(i18n.T("поле source обязательно: по нему датчик виден в строке состояния")))
 			return
 		}
 		pos, err := parseWheel(smp.Wheel)
@@ -436,7 +441,7 @@ func (s *Server) liveSample(w http.ResponseWriter, r *http.Request) {
 		}
 		name := smp.Name
 		if name == "" {
-			name = "Датчик " + id
+			name = i18n.F("Датчик %s", id)
 		}
 		s.hub.Touch(live.SourceInfo{ID: "sensor:" + id, Kind: "sensor", Name: name, Wheel: pos.String()})
 		if err := s.hub.Push(live.Input{Wheel: pos, Camber: smp.Camber, Toe: smp.Toe, Source: "sensor:" + id}); err != nil {
@@ -512,7 +517,7 @@ func (s *Server) simControl(w http.ResponseWriter, r *http.Request) {
 		s.sim.SetAuto(false)
 	case "adjust":
 		if req.Delta == 0 || req.Delta > 2 || req.Delta < -2 {
-			writeErr(w, http.StatusBadRequest, errors.New("шаг регулировки должен быть от −2° до +2°"))
+			writeErr(w, http.StatusBadRequest, errors.New(i18n.T("шаг регулировки должен быть от −2° до +2°")))
 			return
 		}
 		if err := s.sim.Adjust(req.Key, req.Delta); err != nil {
@@ -520,7 +525,7 @@ func (s *Server) simControl(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	default:
-		writeErr(w, http.StatusBadRequest, fmt.Errorf("неизвестное действие %q", req.Action))
+		writeErr(w, http.StatusBadRequest, errors.New(i18n.F("неизвестное действие %q", req.Action)))
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]bool{"running": s.sim.Running(), "auto": s.sim.Auto()})
@@ -536,7 +541,7 @@ func (s *Server) liveSnapshot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if req.Label != "before" && req.Label != "after" {
-		writeErr(w, http.StatusBadRequest, errors.New("снимок бывает «before» или «after»"))
+		writeErr(w, http.StatusBadRequest, errors.New(i18n.T("снимок бывает «before» или «after»")))
 		return
 	}
 	res, err := s.hub.Result()

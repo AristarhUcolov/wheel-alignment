@@ -41,9 +41,10 @@
 package phone
 
 import (
-	"errors"
 	"math"
 	"time"
+
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // G is standard gravity, m/s².
@@ -115,11 +116,11 @@ func (c Calibration) Camber(s Sample) (camber float64, ok bool) {
 
 // Errors from the calibration procedures, phrased for the phone's screen.
 var (
-	ErrNotFlat    = errors.New("телефон лежит не ровно: положите его на ровный стол")
-	ErrNotFlipped = errors.New("похоже, телефон не перевернули: второе положение должно быть экраном вниз")
-	ErrBadGravity = errors.New("акселерометр показывает неправдоподобную силу тяжести — телефон двигался или датчик неисправен")
-	ErrNotUpright = errors.New("держите телефон вертикально, как в первый раз")
-	ErrBadMount   = errors.New("разница больше 5° — телефон прижат к планке неровно; прижмите плотнее и повторите")
+	ErrNotFlat    = i18n.Err("телефон лежит не ровно: положите его на ровный стол")
+	ErrNotFlipped = i18n.Err("похоже, телефон не перевернули: второе положение должно быть экраном вниз")
+	ErrBadGravity = i18n.Err("акселерометр показывает неправдоподобную силу тяжести — телефон двигался или датчик неисправен")
+	ErrNotUpright = i18n.Err("держите телефон вертикально, как в первый раз")
+	ErrBadMount   = i18n.Err("разница больше 5° — телефон прижат к планке неровно; прижмите плотнее и повторите")
 )
 
 // SolveFlat computes Sign and BiasZ from the screen-up and screen-down means.

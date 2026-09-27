@@ -2,9 +2,11 @@
 
 package main
 
-import "errors"
+import (
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
+)
 
-var errNoWindow = errors.New("отдельное окно есть только в сборке для Windows")
+var errNoWindow = i18n.Err("отдельное окно есть только в сборке для Windows")
 
 // runWindow has no native implementation outside Windows yet; the caller opens
 // the browser instead, which works everywhere.

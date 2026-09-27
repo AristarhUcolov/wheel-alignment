@@ -21,6 +21,7 @@ import (
 	"os"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // Point2 is a point on the image sensor, in pixels.
@@ -70,7 +71,7 @@ type Camera struct {
 	CalibrationNote  string  `json:"calibration_note,omitempty"`
 }
 
-var ErrUncalibrated = errors.New("vision: камера не откалибрована")
+var ErrUncalibrated = i18n.Err("камера не откалибрована")
 
 // GuessFromFOV builds an approximate camera from the image size and a
 // horizontal field of view in degrees, assuming a centred principal point and
@@ -86,8 +87,8 @@ func GuessFromFOV(width, height int, fovDeg float64) Camera {
 		Fx: f, Fy: f,
 		Cx: float64(width) / 2, Cy: float64(height) / 2,
 		Calibrated: false,
-		CalibrationNote: "Параметры камеры оценены по углу обзора, а не измерены. " +
-			"Ошибка будет систематической: усреднение по кадрам её не уберёт. Откалибруйте камеру.",
+		CalibrationNote: i18n.T("Параметры камеры оценены по углу обзора, а не измерены. " +
+			"Ошибка будет систематической: усреднение по кадрам её не уберёт. Откалибруйте камеру."),
 	}
 }
 
@@ -95,11 +96,11 @@ func GuessFromFOV(width, height int, fovDeg float64) Camera {
 func LoadCamera(path string) (Camera, error) {
 	b, err := os.ReadFile(path)
 	if err != nil {
-		return Camera{}, fmt.Errorf("не удалось прочитать калибровку камеры: %w", err)
+		return Camera{}, fmt.Errorf(i18n.T("не удалось прочитать калибровку камеры: %w"), err)
 	}
 	var c Camera
 	if err := json.Unmarshal(b, &c); err != nil {
-		return Camera{}, fmt.Errorf("файл калибровки повреждён: %w", err)
+		return Camera{}, fmt.Errorf(i18n.T("файл калибровки повреждён: %w"), err)
 	}
 	if err := c.Validate(); err != nil {
 		return Camera{}, err
@@ -120,13 +121,13 @@ func (c Camera) Save(path string) error {
 func (c Camera) Validate() error {
 	switch {
 	case c.Width <= 0 || c.Height <= 0:
-		return errors.New("vision: не задан размер кадра")
+		return errors.New(i18n.T("не задан размер кадра"))
 	case c.Fx <= 0 || c.Fy <= 0:
-		return errors.New("vision: фокусное расстояние должно быть положительным")
+		return errors.New(i18n.T("фокусное расстояние должно быть положительным"))
 	case math.Abs(c.Fx/c.Fy-1) > 0.5:
-		return errors.New("vision: fx и fy отличаются более чем в полтора раза — почти наверняка ошибка калибровки")
+		return errors.New(i18n.T("fx и fy отличаются более чем в полтора раза — почти наверняка ошибка калибровки"))
 	case c.Cx < 0 || c.Cx > float64(c.Width) || c.Cy < 0 || c.Cy > float64(c.Height):
-		return errors.New("vision: главная точка вне кадра")
+		return errors.New(i18n.T("главная точка вне кадра"))
 	}
 	return nil
 }
@@ -135,12 +136,12 @@ func (c Camera) Validate() error {
 func (c Camera) Warnings() []string {
 	var out []string
 	if !c.Calibrated {
-		out = append(out, "Камера не откалибрована — углы будут иметь систематическую ошибку. "+
-			"Проведите калибровку по шахматной доске.")
+		out = append(out, i18n.T("Камера не откалибрована — углы будут иметь систематическую ошибку. "+
+			"Проведите калибровку по шахматной доске."))
 	}
 	if c.Calibrated && c.CalibrationRMSPx > 1.0 {
-		out = append(out, fmt.Sprintf(
-			"Ошибка калибровки %.2f пикс — это много. Пересниммите калибровочную серию: "+
+		out = append(out, i18n.F(
+			"Ошибка калибровки %.2f пикс — это много. Переснимите калибровочную серию: "+
 				"доска должна занимать кадр целиком и попадать в углы кадра.", c.CalibrationRMSPx))
 	}
 	return out

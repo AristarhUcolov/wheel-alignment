@@ -19,7 +19,11 @@
 // the text says so and sends the reader to the manual.
 package suspension
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
+)
 
 // Type identifies a suspension design. The string values are stored in vehicle
 // data files, so they must never change once published.
@@ -90,16 +94,16 @@ type Info struct {
 // description suitable for "I do not know what my car has".
 func Get(t Type) (Info, bool) {
 	i, ok := catalogue[t]
-	return i, ok
+	return localized(i), ok
 }
 
 // MustGet is Get for types known to be valid, such as those that passed Valid.
 func MustGet(t Type) Info {
 	i, ok := catalogue[t]
 	if !ok {
-		return catalogue[Unknown]
+		i = catalogue[Unknown]
 	}
-	return i
+	return localized(i)
 }
 
 // Valid reports whether t is a known design (the empty type counts as known:
@@ -113,10 +117,10 @@ func Valid(t Type) bool {
 func Validate(t Type, axle Axle) error {
 	i, ok := catalogue[t]
 	if !ok {
-		return fmt.Errorf("неизвестный тип подвески %q", string(t))
+		return fmt.Errorf(i18n.T("неизвестный тип подвески %q"), string(t))
 	}
 	if t != Unknown && i.Axle != AxleBoth && i.Axle != axle {
-		return fmt.Errorf("тип подвески %q не бывает на %s оси", i.Name, axleGenitive(axle))
+		return fmt.Errorf(i18n.T("тип подвески %q не бывает на %s оси"), i18n.T(i.Name), axleGenitive(axle))
 	}
 	return nil
 }
@@ -127,7 +131,7 @@ func For(axle Axle) []Info {
 	for _, t := range order {
 		i := catalogue[t]
 		if i.Axle == AxleBoth || i.Axle == axle {
-			out = append(out, i)
+			out = append(out, localized(i))
 		}
 	}
 	return out
@@ -137,16 +141,65 @@ func For(axle Axle) []Info {
 func All() []Info {
 	out := make([]Info, 0, len(order)+1)
 	for _, t := range order {
-		out = append(out, catalogue[t])
+		out = append(out, localized(catalogue[t]))
 	}
-	return append(out, catalogue[Unknown])
+	return append(out, localized(catalogue[Unknown]))
+}
+
+// localized returns the description in the current language. The catalogue
+// is written in Russian; every string in it has an English version in the
+// i18n tables, which TestEveryDesignIsTranslated enforces.
+func localized(i Info) Info {
+	t := i18n.T
+	list := func(in []string) []string {
+		out := make([]string, len(in))
+		for k, v := range in {
+			out[k] = t(v)
+		}
+		return out
+	}
+	adj := func(a Adjust) Adjust {
+		if a.How != "" {
+			a.How = t(a.How)
+		}
+		if a.Tip != "" {
+			a.Tip = t(a.Tip)
+		}
+		return a
+	}
+	i.Name, i.Summary, i.Identify = t(i.Name), t(i.Summary), t(i.Identify)
+	i.Examples, i.PreChecks, i.Notes = list(i.Examples), list(i.PreChecks), list(i.Notes)
+	i.Camber, i.Caster, i.Toe = adj(i.Camber), adj(i.Caster), adj(i.Toe)
+	return i
+}
+
+// Strings lists every text in the catalogue, for the translation test.
+func Strings() []string {
+	var out []string
+	add := func(s ...string) {
+		for _, v := range s {
+			if v != "" {
+				out = append(out, v)
+			}
+		}
+	}
+	for _, i := range catalogue {
+		add(i.Name, i.Summary, i.Identify)
+		add(i.Examples...)
+		add(i.PreChecks...)
+		add(i.Notes...)
+		for _, a := range []Adjust{i.Camber, i.Caster, i.Toe} {
+			add(a.How, a.Tip)
+		}
+	}
+	return out
 }
 
 func axleGenitive(a Axle) string {
 	if a == AxleRear {
-		return "задней"
+		return i18n.T("задней")
 	}
-	return "передней"
+	return i18n.T("передней")
 }
 
 // order is the display order: commonest designs first within each axle.

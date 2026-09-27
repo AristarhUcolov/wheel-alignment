@@ -19,35 +19,37 @@
         <path d="M7 25 25 7" stroke="var(--green)" stroke-width="2.4" stroke-linecap="round"/>
       </svg>
       <div>
-        <b>Сход-развал</b>
-        <span>открытый стенд</span>
+        <b data-t>Сход-развал</b>
+        <span data-t>открытый стенд</span>
       </div>
     </div>
     <div class="top-vehicle" id="topVehicle">
-      <span class="muted">Автомобиль не выбран</span>
+      <span class="muted" data-t>Автомобиль не выбран</span>
     </div>
     <div class="top-right">
-      <div class="sources" id="topSources" title="Подключённые датчики"></div>
+      <div class="sources" id="topSources" data-t-title title="Подключённые датчики"></div>
+      <div class="langs" id="langs">
+        <button data-lang="ru" title="Русский">RU</button>
+        <button data-lang="en" title="English">EN</button>
+      </div>
       <div class="clock" id="clock">--:--</div>
     </div>
   </header>
 
   <nav class="side" id="side">
     <div class="side-steps">
-      <button data-screen="vehicle"><i>1</i><span>Автомобиль</span></button>
-      <button data-screen="prep"><i>2</i><span>Подготовка</span></button>
-      <button data-screen="measure"><i>3</i><span>Замер</span></button>
-      <button data-screen="live"><i>4</i><span>Регулировка</span></button>
-      <button data-screen="report"><i>5</i><span>Отчёт</span></button>
+      <button data-screen="vehicle"><i>1</i><span data-t>Автомобиль</span></button>
+      <button data-screen="prep"><i>2</i><span data-t>Подготовка</span></button>
+      <button data-screen="measure"><i>3</i><span data-t>Замер</span></button>
+      <button data-screen="live"><i>4</i><span data-t>Регулировка</span></button>
+      <button data-screen="report"><i>5</i><span data-t>Отчёт</span></button>
     </div>
     <div class="side-extra">
-      <button data-screen="guide"><i>?</i><span>Инструкция</span></button>
-      <button data-screen="contrib"><i>+</i><span>Внести допуски</span></button>
+      <button data-screen="guide"><i>?</i><span data-t>Инструкция</span></button>
+      <button data-screen="contrib"><i>+</i><span data-t>Внести допуски</span></button>
+      <button data-screen="support" class="support-btn"><i>♥</i><span data-t>Поддержать проект</span></button>
     </div>
-    <div class="side-foot">
-      Свободная программа, AGPL-3.0.<br>
-      Формулы открыты и проверены тестами.
-    </div>
+    <div class="side-foot" data-t>Свободная программа, AGPL-3.0. Формулы открыты и проверены тестами.</div>
   </nav>
 
   <main id="main">
@@ -58,13 +60,14 @@
     <section class="screen" id="screen-report"></section>
     <section class="screen" id="screen-guide"></section>
     <section class="screen" id="screen-contrib"></section>
+    <section class="screen" id="screen-support"></section>
   </main>
 
   <footer class="fkeys" id="fkeys"></footer>
 </div>
 
 <aside class="drawer" id="drawer" aria-hidden="true">
-  <button class="drawer-close" data-close-drawer aria-label="Закрыть">✕</button>
+  <button class="drawer-close" data-close-drawer aria-label="✕">✕</button>
   <div class="drawer-body" id="drawerBody"></div>
 </aside>
 

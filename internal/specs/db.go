@@ -11,6 +11,8 @@ import (
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 //go:embed data/*.json
@@ -43,7 +45,7 @@ func Load(extraDirs ...fs.FS) (*DB, error) {
 		return nil, err
 	}
 	for i, f := range extraDirs {
-		if err := db.addFS(f, fmt.Sprintf("дополнительный каталог %d", i+1), false); err != nil {
+		if err := db.addFS(f, i18n.F("дополнительный каталог %d", i+1), false); err != nil {
 			return nil, err
 		}
 	}
@@ -64,7 +66,7 @@ func LoadWithUser(userDir string, extraDirs ...fs.FS) (*DB, error) {
 		return db, nil
 	}
 	if err := os.MkdirAll(userDir, 0o755); err != nil {
-		return nil, fmt.Errorf("не удалось создать каталог пользовательских данных: %w", err)
+		return nil, fmt.Errorf(i18n.T("не удалось создать каталог пользовательских данных: %w"), err)
 	}
 	db.userDir = userDir
 	if err := db.addFS(os.DirFS(userDir), "ваши данные", true); err != nil {
@@ -84,7 +86,7 @@ func (d *DB) finish() {
 		}
 		g, ok := d.byID[s.GuidanceID]
 		if !ok || d.specs[g].Source.Kind != SourceClassGuidance {
-			d.LoadErrors = append(d.LoadErrors, fmt.Sprintf(
+			d.LoadErrors = append(d.LoadErrors, i18n.F(
 				"%s: guidance_id %q не указывает на ориентир по классу", s.ID, s.GuidanceID))
 			s.GuidanceID = ""
 		}
@@ -173,7 +175,7 @@ func (d *DB) Limits(s Spec) (Spec, bool) {
 
 // ErrNoUserDir is returned by Save when the program has nowhere to keep the
 // owner's entries.
-var ErrNoUserDir = errors.New("не задан каталог для пользовательских данных")
+var ErrNoUserDir = i18n.Err("не задан каталог для пользовательских данных")
 
 // Save validates an entry, writes it to the owner's directory and makes it
 // available immediately. The file has the same format as the built-in data,
@@ -186,7 +188,7 @@ func (d *DB) Save(s Spec) error {
 		return err
 	}
 	if s.Source.Kind == SourceClassGuidance {
-		return errors.New("ориентир по классу нельзя сохранить как данные автомобиля")
+		return errors.New(i18n.T("ориентир по классу нельзя сохранить как данные автомобиля"))
 	}
 	s.Resolve()
 
@@ -223,7 +225,7 @@ func (d *DB) Delete(id string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if !d.local[id] {
-		return errors.New("удалить можно только свои записи")
+		return errors.New(i18n.T("удалить можно только свои записи"))
 	}
 	err := os.Remove(filepath.Join(d.userDir, safeFileName(id)+".json"))
 	if err != nil && !errors.Is(err, fs.ErrNotExist) {
@@ -269,7 +271,7 @@ func (d *DB) Get(id string) (Spec, bool) {
 	if !ok {
 		return Spec{}, false
 	}
-	return d.specs[i], true
+	return d.specs[i].Localized(), true
 }
 
 // All returns every specification, ordered by make, model and year.
@@ -277,7 +279,9 @@ func (d *DB) All() []Spec {
 	d.mu.RLock()
 	defer d.mu.RUnlock()
 	out := make([]Spec, len(d.specs))
-	copy(out, d.specs)
+	for i, s := range d.specs {
+		out[i] = s.Localized()
+	}
 	return out
 }
 
@@ -351,8 +355,11 @@ func (d *DB) Search(q Query) []Match {
 		score := 0
 		if len(terms) > 0 {
 			fields := append([]string{s.Make, s.Model, s.Trim, s.Notes, s.ID}, s.Tags...)
+			if s.EN != nil {
+				fields = append(fields, s.EN.Make, s.EN.Model, s.EN.Trim)
+			}
 			if s.Class != "" {
-				fields = append(fields, s.Class.RussianName())
+				fields = append(fields, s.Class.Label())
 			}
 			hay := tokenize(strings.Join(fields, " "))
 			matched := 0
@@ -381,7 +388,7 @@ func (d *DB) Search(q Query) []Match {
 		if d.local[s.ID] {
 			score += 5
 		}
-		out = append(out, Match{Spec: s, Score: score})
+		out = append(out, Match{Spec: s.Localized(), Score: score})
 	}
 
 	sort.SliceStable(out, func(i, j int) bool {

@@ -1,11 +1,12 @@
 package phone
 
 import (
-	"fmt"
+	"errors"
 	"math"
 	"time"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/measure"
 )
 
@@ -118,18 +119,18 @@ func (d *Device) Start(cmd string) error {
 		}
 	case "runout":
 		if !d.Cal.Ready() {
-			return fmt.Errorf("сначала откалибруйте телефон")
+			return i18n.Err("сначала откалибруйте телефон")
 		}
 		d.Step = StepRunout1
 	case "caster":
 		if !d.Cal.Ready() {
-			return fmt.Errorf("сначала откалибруйте телефон")
+			return i18n.Err("сначала откалибруйте телефон")
 		}
 		if !d.HasWheel || !d.Wheel.IsFront() {
-			return fmt.Errorf("кастер меряется на передних колёсах — выберите переднее колесо")
+			return i18n.Err("кастер меряется на передних колёсах — выберите переднее колесо")
 		}
 		if !d.hasGyro {
-			return fmt.Errorf("в этом телефоне нет гироскопа — кастер меряйте угломером по шкале поворотных кругов")
+			return i18n.Err("в этом телефоне нет гироскопа — кастер меряйте угломером по шкале поворотных кругов")
 		}
 		d.Step = StepCasterZero
 		d.hasBias = false
@@ -139,7 +140,7 @@ func (d *Device) Start(cmd string) error {
 		d.hasRunout, d.runout = false, 0
 		d.Step = StepLive
 	default:
-		return fmt.Errorf("неизвестная команда %q", cmd)
+		return errors.New(i18n.F("неизвестная команда %q", cmd))
 	}
 	d.setPrompt()
 	return nil
@@ -406,7 +407,7 @@ func (d *Device) onStill(m Sample) (calChanged bool) {
 		d.runout, d.hasRunout = (d.holdC-c)/2, true
 		d.Err = ""
 		if math.Abs(d.runout) > maxRunoutDeg {
-			d.Err = fmt.Sprintf("биение диска %.1f° — диск погнут или на нём грязь; замеры этого колеса ненадёжны", math.Abs(d.runout))
+			d.Err = i18n.F("биение диска %.1f° — диск погнут или на нём грязь; замеры этого колеса ненадёжны", math.Abs(d.runout))
 		}
 		d.Step = StepLive
 		d.restart()
@@ -448,7 +449,7 @@ func (d *Device) onStill(m Sample) (calChanged bool) {
 			SweepOut: align.Deg(d.tOut), SweepIn: align.Deg(math.Abs(d.yaw)),
 		}.Solve(d.Wheel)
 		if err != nil {
-			d.Err = "не удалось посчитать кастер: " + err.Error()
+			d.Err = i18n.F("не удалось посчитать кастер: %s", err.Error())
 			d.Step = StepLive
 			d.restart()
 			return false
@@ -475,39 +476,39 @@ func (d *Device) onStill(m Sample) (calChanged bool) {
 func (d *Device) setPrompt() {
 	switch d.Step {
 	case StepFlatUp:
-		d.Prompt = "Калибровка телефона, шаг 1 из 2. Положите телефон на ровный стол ЭКРАНОМ ВВЕРХ и не трогайте."
+		d.Prompt = i18n.T("Калибровка телефона, шаг 1 из 2. Положите телефон на ровный стол ЭКРАНОМ ВВЕРХ и не трогайте.")
 	case StepFlatDown:
-		d.Prompt = "Шаг 2 из 2. Переверните телефон ЭКРАНОМ ВНИЗ на то же место и не трогайте."
+		d.Prompt = i18n.T("Шаг 2 из 2. Переверните телефон ЭКРАНОМ ВНИЗ на то же место и не трогайте.")
 	case StepMountUp:
-		d.Prompt = "Калибровка крепления, шаг 1 из 2. Прижмите телефон к планке на ободе экраном наружу, вертикально, и держите неподвижно."
+		d.Prompt = i18n.T("Калибровка крепления, шаг 1 из 2. Прижмите телефон к планке на ободе экраном наружу, вертикально, и держите неподвижно.")
 	case StepMountDown:
-		d.Prompt = "Шаг 2 из 2. Переверните телефон вверх ногами и прижмите к тому же месту планки."
+		d.Prompt = i18n.T("Шаг 2 из 2. Переверните телефон вверх ногами и прижмите к тому же месту планки.")
 	case StepRunout1:
-		d.Prompt = "Биение диска, шаг 1 из 2. Отметьте мелом место на шине сверху. Прижмите телефон к планке и держите."
+		d.Prompt = i18n.T("Биение диска, шаг 1 из 2. Отметьте мелом место на шине сверху. Прижмите телефон к планке и держите.")
 	case StepRunout2:
-		d.Prompt = "Шаг 2 из 2. Прокатите машину на пол-оборота колеса (метка внизу), приложите планку и телефон к тому же месту обода."
+		d.Prompt = i18n.T("Шаг 2 из 2. Прокатите машину на пол-оборота колеса (метка внизу), приложите планку и телефон к тому же месту обода.")
 	case StepCasterZero:
-		d.Prompt = "Кастер. Колёса прямо на поворотных кругах, педаль тормоза зафиксирована упором (колесо не должно проворачиваться), телефон на планке. Не трогайте руль — измеряю."
+		d.Prompt = i18n.T("Кастер. Колёса прямо на поворотных кругах, педаль тормоза зафиксирована упором (колесо не должно проворачиваться), телефон на планке. Не трогайте руль — измеряю.")
 	case StepCasterOut:
-		d.Prompt = fmt.Sprintf("Поверните колесо НАРУЖУ (от машины) примерно на 20° и остановитесь. Сейчас: %.1f°", math.Abs(d.yaw))
+		d.Prompt = i18n.F("Поверните колесо НАРУЖУ (от машины) примерно на 20° и остановитесь. Сейчас: %.1f°", math.Abs(d.yaw))
 	case StepCasterIn:
-		d.Prompt = fmt.Sprintf("Теперь поверните колесо ВНУТРЬ (к машине) примерно на 20° и остановитесь. Сейчас: %.1f°", d.yaw*-d.outSign)
+		d.Prompt = i18n.F("Теперь поверните колесо ВНУТРЬ (к машине) примерно на 20° и остановитесь. Сейчас: %.1f°", d.yaw*-d.outSign)
 	case StepCasterBack:
-		d.Prompt = "Кастер измерен. Верните колёса прямо."
+		d.Prompt = i18n.T("Кастер измерен. Верните колёса прямо.")
 	default:
 		switch {
 		case !d.HasWheel:
-			d.Prompt = "Выберите колесо, на котором стоит телефон."
+			d.Prompt = i18n.T("Выберите колесо, на котором стоит телефон.")
 		case !d.Cal.Flat:
-			d.Prompt = "Нужна калибровка телефона (один раз, около минуты): нажмите «Калибровка телефона»."
+			d.Prompt = i18n.T("Нужна калибровка телефона (один раз, около минуты): нажмите «Калибровка телефона».")
 		case !d.Cal.Mounted:
-			d.Prompt = "Нужна калибровка крепления (один раз для телефона и планки): нажмите «Калибровка крепления»."
+			d.Prompt = i18n.T("Нужна калибровка крепления (один раз для телефона и планки): нажмите «Калибровка крепления».")
 		case !d.camberOK:
-			d.Prompt = "Держите телефон вертикально, экраном наружу, прижатым к планке."
+			d.Prompt = i18n.T("Держите телефон вертикально, экраном наружу, прижатым к планке.")
 		case !d.stable:
-			d.Prompt = "Показания меняются…"
+			d.Prompt = i18n.T("Показания меняются…")
 		default:
-			d.Prompt = "Показания стабильны."
+			d.Prompt = i18n.T("Показания стабильны.")
 		}
 	}
 }

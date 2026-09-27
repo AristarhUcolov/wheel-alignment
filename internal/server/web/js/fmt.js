@@ -1,25 +1,28 @@
 // Форматирование углов и общие справочники интерфейса.
 // Вся математика — на стороне Go; здесь только показ.
 
+import { t } from './i18n.js';
+
+// Названия колёс — геттерами: язык выбирается после загрузки модуля.
 export const WHEELS = [
-  { key: 'FL', name: 'Переднее левое', short: 'ПЛ', front: true, left: true },
-  { key: 'FR', name: 'Переднее правое', short: 'ПП', front: true, left: false },
-  { key: 'RL', name: 'Заднее левое', short: 'ЗЛ', front: false, left: true },
-  { key: 'RR', name: 'Заднее правое', short: 'ЗП', front: false, left: false },
+  { key: 'FL', get name() { return t('Переднее левое'); }, front: true, left: true },
+  { key: 'FR', get name() { return t('Переднее правое'); }, front: true, left: false },
+  { key: 'RL', get name() { return t('Заднее левое'); }, front: false, left: true },
+  { key: 'RR', get name() { return t('Заднее правое'); }, front: false, left: false },
 ];
 
 // Короткие подписи параметров для табло. Полные подписи приходят с сервера.
-export const PARAM = {
-  camber: 'Развал',
-  toe: 'Схождение',
-  caster: 'Кастер',
-  sai: 'Попер. наклон оси',
-  front_total_toe: 'Схождение Σ',
-  rear_total_toe: 'Схождение Σ',
-  front_cross_camber: 'Развал Δ',
-  rear_cross_camber: 'Развал Δ',
-  front_cross_caster: 'Кастер Δ',
-  thrust_angle: 'Угол тяги',
+const PARAM = {
+  camber: () => t('Развал'),
+  toe: () => t('Схождение'),
+  caster: () => t('Кастер'),
+  sai: () => t('Попер. наклон оси'),
+  front_total_toe: () => t('Схождение Σ'),
+  rear_total_toe: () => t('Схождение Σ'),
+  front_cross_camber: () => t('Развал Δ'),
+  rear_cross_camber: () => t('Развал Δ'),
+  front_cross_caster: () => t('Кастер Δ'),
+  thrust_angle: () => t('Угол тяги'),
 };
 
 export function paramKind(key) {
@@ -35,7 +38,8 @@ export function paramWheel(key) {
 export const isToeKey = key => key.startsWith('toe_') || key.endsWith('_total_toe');
 
 export function shortLabel(key) {
-  return PARAM[paramKind(key)] || key;
+  const f = PARAM[paramKind(key)];
+  return f ? f() : key;
 }
 
 // Угол в виде +0°23′ — так печатают все сервисные мануалы.
@@ -60,8 +64,8 @@ export function fmtDeg(deg, digits = 2) {
 export function fmtMM(mm, digits = 1) {
   if (mm === null || mm === undefined || Number.isNaN(mm)) return '—';
   const v = Math.abs(mm).toFixed(digits);
-  if (Number(v) === 0) return `0.${'0'.repeat(digits)} мм`;
-  return (mm > 0 ? '+' : '−') + v + ' мм';
+  if (Number(v) === 0) return t('{v} мм', { v: `0.${'0'.repeat(digits)}` });
+  return t('{v} мм', { v: (mm > 0 ? '+' : '−') + v });
 }
 
 // Значение параметра в выбранных единицах. Миллиметры — только для
@@ -88,12 +92,14 @@ export function specValue(key, deg, units, rimMM) {
   return units === 'deg' ? fmtDeg(deg) : fmtDM(deg);
 }
 
-export const STATUS_RU = {
-  good: 'в допуске',
-  marginal: 'у границы допуска',
-  bad: 'вне допуска',
-  no_spec: 'допуск не задан',
-};
+export function statusText(s) {
+  return {
+    good: t('в допуске'),
+    marginal: t('у границы допуска'),
+    bad: t('вне допуска'),
+    no_spec: t('допуск не задан'),
+  }[s] || '';
+}
 
 export function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

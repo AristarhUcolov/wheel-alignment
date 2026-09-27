@@ -17,19 +17,20 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"runtime"
 	"syscall"
 	"time"
 
+	"github.com/AristarhUcolov/wheel-alignment/internal/desktop"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/phone"
 	"github.com/AristarhUcolov/wheel-alignment/internal/server"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 )
 
-const usage = `Сход-развал — открытый стенд.
+func usage() string {
+	return i18n.T(`Сход-развал — открытый стенд.
 
   wheelalign                       запустить программу
   wheelalign calibrate <каталог>   откалибровать камеру по снимкам мишени
@@ -46,20 +47,24 @@ const usage = `Сход-развал — открытый стенд.
   -rows   то же по вертикали (по умолчанию 6)
   -square размер клетки в миллиметрах, измеренный штангенциркулем (по умолчанию 30)
   -out    куда записать калибровку (по умолчанию camera.json в каталоге снимков)
-`
+`)
+}
 
 func main() {
+	// Подкоманды и справка печатают сообщения до того, как известен каталог
+	// данных из -data, поэтому язык для них — из каталога по умолчанию.
+	pickLang(userDataDir(""))
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "calibrate":
 			if err := runCalibrate(os.Args[2:]); err != nil {
-				fmt.Fprintln(os.Stderr, "Ошибка:", err)
+				fmt.Fprintln(os.Stderr, i18n.T("Ошибка:"), err)
 				os.Exit(1)
 			}
 			return
 		case "check-spec":
 			if err := runCheckSpec(os.Args[2:]); err != nil {
-				fmt.Fprintln(os.Stderr, "Ошибка:", err)
+				fmt.Fprintln(os.Stderr, i18n.T("Ошибка:"), err)
 				os.Exit(1)
 			}
 			return
@@ -70,7 +75,7 @@ func main() {
 	open := flag.Bool("open", true, "открыть окно или браузер")
 	browser := flag.Bool("browser", false, "открыть в браузере, а не в отдельном окне")
 	dataDir := flag.String("data", "", "каталог пользовательских данных")
-	flag.Usage = func() { fmt.Fprint(os.Stderr, usage) }
+	flag.Usage = func() { fmt.Fprint(os.Stderr, usage()) }
 	flag.Parse()
 
 	if err := run(*addr, *open, *browser, *dataDir); err != nil {
@@ -95,16 +100,31 @@ func userDataDir(flagDir string) string {
 	return "wheelalign-data"
 }
 
+// pickLang switches to the person's saved language, or on first start to the
+// language of the system, and returns the settings file it was read from.
+func pickLang(data string) string {
+	settingsPath := filepath.Join(data, "settings.json")
+	lang := desktop.LoadSettings(settingsPath).Lang
+	if lang == "" {
+		lang = desktop.SystemLang()
+	}
+	i18n.Set(i18n.Lang(lang))
+	return settingsPath
+}
+
 func run(addr string, open, forceBrowser bool, dataFlag string) error {
 	data := userDataDir(dataFlag)
 	if err := os.MkdirAll(data, 0o755); err != nil {
-		return fmt.Errorf("не удалось создать каталог данных %s: %w", data, err)
+		return fmt.Errorf(i18n.T("не удалось создать каталог данных %s: %w"), data, err)
 	}
 	setupLog(data)
 
+	// The language first, so that every message from here on is in it.
+	settingsPath := pickLang(data)
+
 	db, err := specs.LoadWithUser(filepath.Join(data, "vehicles"))
 	if err != nil {
-		return fmt.Errorf("не удалось загрузить базу автомобилей: %w", err)
+		return fmt.Errorf(i18n.T("не удалось загрузить базу автомобилей: %w"), err)
 	}
 	if msg := server.LoadErrorSummary(db); msg != "" {
 		log.Println(msg)
@@ -115,6 +135,7 @@ func run(addr string, open, forceBrowser bool, dataFlag string) error {
 		return err
 	}
 	defer srv.Close()
+	srv.SetSettingsFile(settingsPath)
 
 	// The phone link: a separate HTTPS listener on the local network, off
 	// until the person switches it on from the interface.
@@ -128,15 +149,15 @@ func run(addr string, open, forceBrowser bool, dataFlag string) error {
 		// any free port will do, the window is told where to look.
 		ln, err = net.Listen("tcp", "127.0.0.1:0")
 		if err != nil {
-			return fmt.Errorf("не удалось открыть порт для интерфейса: %w", err)
+			return fmt.Errorf(i18n.T("не удалось открыть порт для интерфейса: %w"), err)
 		}
 	}
 	url := "http://" + ln.Addr().String() + "/"
 
-	fmt.Printf("\n  Сход-развал — открытый стенд\n")
-	fmt.Printf("  Автомобилей в базе: %d\n", db.Count())
-	fmt.Printf("  Интерфейс: %s\n", url)
-	fmt.Printf("  Данные пользователя: %s\n\n", data)
+	fmt.Print("\n  ", i18n.T("Сход-развал — открытый стенд"), "\n")
+	fmt.Print("  ", i18n.F("Автомобилей в базе: %d", db.Count()), "\n")
+	fmt.Print("  ", i18n.F("Интерфейс: %s", url), "\n")
+	fmt.Print("  ", i18n.F("Данные пользователя: %s", data), "\n\n")
 	log.Printf("старт: %s, данные %s", url, data)
 
 	hs := &http.Server{Handler: server.Guard(srv), ReadHeaderTimeout: 10 * time.Second}
@@ -162,15 +183,17 @@ func run(addr string, open, forceBrowser bool, dataFlag string) error {
 		}
 		log.Printf("окно недоступно (%v), открываю браузер", werr)
 		if !errors.Is(werr, errNoWindow) {
-			notify("Окно программы не открылось: " + werr.Error() +
-				"\n\nИнтерфейс откроется в браузере. Если нужно отдельное окно, установите " +
-				"Microsoft Edge WebView2 Runtime с сайта Microsoft.")
+			notify(i18n.F("Окно программы не открылось: %s\n\nИнтерфейс откроется в браузере. "+
+				"Если нужно отдельное окно, установите Microsoft Edge WebView2 Runtime с сайта Microsoft.", werr.Error()))
 		}
 	}
 	if open {
-		go openBrowser(url)
+		go func() {
+			time.Sleep(300 * time.Millisecond)
+			_ = desktop.Open(url)
+		}()
 	}
-	fmt.Printf("  Остановить: Ctrl+C\n\n")
+	fmt.Print("  ", i18n.T("Остановить: Ctrl+C"), "\n\n")
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
@@ -178,7 +201,7 @@ func run(addr string, open, forceBrowser bool, dataFlag string) error {
 	case err := <-errc:
 		return err
 	case <-stop:
-		fmt.Println("\n  Останавливаюсь…")
+		fmt.Println("\n  " + i18n.T("Останавливаюсь…"))
 		shutdown()
 		return nil
 	}
@@ -197,21 +220,7 @@ func setupLog(data string) {
 
 func fatal(err error) {
 	log.Println("ошибка:", err)
-	fmt.Fprintln(os.Stderr, "Ошибка:", err)
-	notify("Ошибка: " + err.Error())
+	fmt.Fprintln(os.Stderr, i18n.T("Ошибка:"), err)
+	notify(i18n.F("Ошибка: %s", err.Error()))
 	os.Exit(1)
-}
-
-func openBrowser(url string) {
-	time.Sleep(300 * time.Millisecond)
-	var cmd *exec.Cmd
-	switch runtime.GOOS {
-	case "windows":
-		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
-	case "darwin":
-		cmd = exec.Command("open", url)
-	default:
-		cmd = exec.Command("xdg-open", url)
-	}
-	_ = cmd.Start()
 }

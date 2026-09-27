@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // FrameResult is one processed photograph of a wheel target.
@@ -84,13 +85,13 @@ func WheelSpinAxis(cam Camera, target Target, imgs []*Gray, opt DetectOptions) (
 
 	res.Used = len(poses)
 	if len(poses) < 3 {
-		return res, fmt.Errorf("%w: распознано только %d кадров из %d, а для оси нужно минимум 3 с поворотом колеса между ними",
+		return res, fmt.Errorf(i18n.T("%w: распознано только %d кадров из %d, а для оси нужно минимум 3 с поворотом колеса между ними"),
 			ErrTooFewViews, len(poses), len(imgs))
 	}
 
 	fit, err := geom.FitRotationAxis(poses)
 	if err != nil {
-		return res, fmt.Errorf("не удалось восстановить ось вращения: %w", err)
+		return res, fmt.Errorf(i18n.T("не удалось восстановить ось вращения: %w"), err)
 	}
 
 	axis := fit.Direction
@@ -113,17 +114,17 @@ func WheelSpinAxis(cam Camera, target Target, imgs []*Gray, opt DetectOptions) (
 func spinAxisWarnings(res SpinAxisResult, cam Camera) []string {
 	var out []string
 	if res.SweepDeg < 15 {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Колесо повёрнуто всего на %.0f° за всю серию — ось определена ненадёжно. "+
 				"Прокатите колесо так, чтобы между кадрами оно провернулось в сумме на 30–90°.", res.SweepDeg))
 	}
 	if res.RunoutDeg > 6 {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Мишень стоит на колесе с большим перекосом (%.0f°). Компенсация биения это учитывает, "+
 				"но такой перекос стоит уменьшить — иначе отдельные кадры сильно «гуляют».", res.RunoutDeg))
 	}
 	if res.AxisResidualMM > 5 {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Точка на оси «плавает» на %.1f мм — колесо вращалось не вокруг жёсткой оси. "+
 				"Проверьте ступичный подшипник и что колесо не качается на вывешенной подвеске.", res.AxisResidualMM))
 	}
@@ -133,7 +134,7 @@ func spinAxisWarnings(res SpinAxisResult, cam Camera) []string {
 			worstRMS = f.RMSPx
 		}
 		if f.Ambiguous {
-			out = append(out, fmt.Sprintf(
+			out = append(out, i18n.F(
 				"Кадр %d: поза мишени неоднозначна — снимайте под большим углом или ближе.", f.Index+1))
 		}
 	}

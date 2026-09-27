@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // Registration ties separately-photographed wheels into one coordinate system.
@@ -58,15 +59,15 @@ type RegisteredWheel struct {
 // fitted, so the camera is free to move.
 func RegisterWheel(cam Camera, wheelTarget, refTarget Target, imgs []*Gray, opt DetectOptions) (RegisteredWheel, error) {
 	if err := wheelTarget.Validate(); err != nil {
-		return RegisteredWheel{}, fmt.Errorf("мишень на колесе: %w", err)
+		return RegisteredWheel{}, fmt.Errorf(i18n.T("мишень на колесе: %w"), err)
 	}
 	if err := refTarget.Validate(); err != nil {
-		return RegisteredWheel{}, fmt.Errorf("напольная мишень: %w", err)
+		return RegisteredWheel{}, fmt.Errorf(i18n.T("напольная мишень: %w"), err)
 	}
 	if sameLayout(wheelTarget, refTarget) {
-		return RegisteredWheel{}, fmt.Errorf(
+		return RegisteredWheel{}, fmt.Errorf(i18n.T(
 			"мишень на колесе и напольная мишень одинаковые (%dx%d) — их невозможно различить в кадре. "+
-				"Напечатайте напольную другого размера, например %dx%d",
+				"Напечатайте напольную другого размера, например %dx%d"),
 			wheelTarget.Cols, wheelTarget.Rows, wheelTarget.Cols-2, wheelTarget.Rows)
 	}
 
@@ -81,11 +82,11 @@ func RegisterWheel(cam Camera, wheelTarget, refTarget Target, imgs []*Gray, opt 
 
 		switch {
 		case errs[0] != nil && errs[1] != nil:
-			fr.Error = "не найдены обе мишени: " + errs[0].Error()
+			fr.Error = i18n.F("не найдены обе мишени: %s", errs[0].Error())
 		case errs[0] != nil:
-			fr.Error = "не найдена мишень на колесе: " + errs[0].Error()
+			fr.Error = i18n.F("не найдена мишень на колесе: %s", errs[0].Error())
 		case errs[1] != nil:
-			fr.Error = "не найдена напольная мишень: " + errs[1].Error()
+			fr.Error = i18n.F("не найдена напольная мишень: %s", errs[1].Error())
 		}
 		if fr.Error != "" {
 			res.Frames = append(res.Frames, fr)
@@ -94,13 +95,13 @@ func RegisterWheel(cam Camera, wheelTarget, refTarget Target, imgs []*Gray, opt 
 
 		wheelPose, err := solveBoard(cam, wheelTarget, dets[0])
 		if err != nil {
-			fr.Error = "мишень на колесе: " + err.Error()
+			fr.Error = i18n.F("мишень на колесе: %s", err.Error())
 			res.Frames = append(res.Frames, fr)
 			continue
 		}
 		refPose, err := solveBoard(cam, refTarget, dets[1])
 		if err != nil {
-			fr.Error = "напольная мишень: " + err.Error()
+			fr.Error = i18n.F("напольная мишень: %s", err.Error())
 			res.Frames = append(res.Frames, fr)
 			continue
 		}
@@ -118,13 +119,13 @@ func RegisterWheel(cam Camera, wheelTarget, refTarget Target, imgs []*Gray, opt 
 
 	res.Used = len(poses)
 	if len(poses) < 3 {
-		return res, fmt.Errorf("%w: годных кадров %d из %d — нужно минимум 3, где видны обе мишени и колесо провёрнуто между ними",
+		return res, fmt.Errorf(i18n.T("%w: годных кадров %d из %d — нужно минимум 3, где видны обе мишени и колесо провёрнуто между ними"),
 			ErrTooFewViews, len(poses), len(imgs))
 	}
 
 	fit, err := geom.FitRotationAxis(poses)
 	if err != nil {
-		return res, fmt.Errorf("не удалось восстановить ось вращения колеса: %w", err)
+		return res, fmt.Errorf(i18n.T("не удалось восстановить ось вращения колеса: %w"), err)
 	}
 	res.Axis = fit.Direction
 	res.Center = fit.Center
@@ -157,22 +158,22 @@ func maxf(a, b float64) float64 {
 func registerWarnings(res RegisteredWheel, cam Camera) []string {
 	var out []string
 	if res.SweepDeg < 15 {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Колесо провёрнуто всего на %.0f° за серию — ось определена ненадёжно. Нужно 30–90°.", res.SweepDeg))
 	}
 	if res.RunoutDeg > 6 {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Мишень стоит на колесе с перекосом %.0f°. Компенсация биения это учтёт, но перекос лучше уменьшить.",
 			res.RunoutDeg))
 	}
 	if res.AxisResidualMM > 5 {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Точка на оси «плавает» на %.1f мм — колесо вращалось не вокруг жёсткой оси. "+
 				"Проверьте ступичный подшипник.", res.AxisResidualMM))
 	}
 	for _, f := range res.Frames {
 		if f.Ambiguous {
-			out = append(out, fmt.Sprintf(
+			out = append(out, i18n.F(
 				"Кадр %d: поза мишени неоднозначна — снимайте ближе или под большим углом.", f.Index+1))
 		}
 	}

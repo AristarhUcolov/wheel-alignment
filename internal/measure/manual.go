@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // ---------------------------------------------------------------------------
@@ -143,20 +144,20 @@ func (b StringBox) Check(tolMM float64) []string {
 	gotR := b.RightFrontMM - b.RightRearMM
 
 	if math.Abs(gotL-want) > tolMM {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Левая струна не параллельна оси автомобиля: спереди минус сзади = %.1f мм, должно быть %.1f мм. "+
 				"Сдвиньте передний конец левой струны на %.1f мм.",
 			gotL, want, want-gotL))
 	}
 	if math.Abs(gotR-want) > tolMM {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Правая струна не параллельна оси автомобиля: спереди минус сзади = %.1f мм, должно быть %.1f мм. "+
 				"Сдвиньте передний конец правой струны на %.1f мм.",
 			gotR, want, want-gotR))
 	}
 	if b.TrackFrontMM <= 0 || b.TrackRearMM <= 0 {
-		out = append(out, "Не заданы колеи осей — проверка параллельности струн выполнена как для равных колей, "+
-			"что верно далеко не для всех автомобилей. Возьмите колеи из данных автомобиля.")
+		out = append(out, i18n.T("Не заданы колеи осей — проверка параллельности струн выполнена как для равных колей, "+
+			"что верно далеко не для всех автомобилей. Возьмите колеи из данных автомобиля."))
 	}
 	return out
 }
@@ -236,10 +237,10 @@ func (s ManualSession) Result() (align.Result, error) {
 		}
 		if !w.Camber.Has180 {
 			q.Warnings = append(q.Warnings,
-				"Развал измерен без компенсации биения — прокатите машину на пол-оборота колеса и замерьте повторно")
+				i18n.T("Развал измерен без компенсации биения — прокатите машину на пол-оборота колеса и замерьте повторно"))
 		}
 		if rimErr.Deg() > 0.5 {
-			q.Warnings = append(q.Warnings, fmt.Sprintf(
+			q.Warnings = append(q.Warnings, i18n.F(
 				"Биение диска %s — диск погнут или на нём грязь; все замеры на этом колесе ненадёжны",
 				rimErr.FormatDegMin()))
 		}
@@ -283,8 +284,8 @@ func (s ManualSession) Result() (align.Result, error) {
 		}
 	} else {
 		res.Warnings = append(res.Warnings,
-			"Не введены параметры установки струн — невозможно проверить, параллельны ли они оси автомобиля. "+
-				"Это самая частая причина ошибки при замере схождения «на шнурке».")
+			i18n.T("Не введены параметры установки струн — невозможно проверить, параллельны ли они оси автомобиля. "+
+				"Это самая частая причина ошибки при замере схождения «на шнурке»."))
 	}
 	return res, nil
 }

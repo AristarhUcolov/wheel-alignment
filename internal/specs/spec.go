@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/suspension"
 )
 
@@ -74,23 +75,23 @@ func (k SourceKind) Trust() int {
 	}
 }
 
-// RussianName is the label shown next to every figure from this source.
-func (k SourceKind) RussianName() string {
+// Label is the name shown next to every figure from this source.
+func (k SourceKind) Label() string {
 	switch k {
 	case SourceFactory:
-		return "Заводское руководство"
+		return i18n.T("Заводское руководство")
 	case SourceLicensed:
-		return "Лицензионная база данных"
+		return i18n.T("Лицензионная база данных")
 	case SourceCommunity:
-		return "Сообщество (перепроверено)"
+		return i18n.T("Сообщество (перепроверено)")
 	case SourceUnverified:
-		return "Не проверено"
+		return i18n.T("Не проверено")
 	case SourceClassGuidance:
-		return "Ориентировочные значения для класса"
+		return i18n.T("Ориентировочные значения для класса")
 	case SourceCatalog:
-		return "Только конструкция, допусков нет"
+		return i18n.T("Только конструкция, допусков нет")
 	}
-	return "Источник неизвестен"
+	return i18n.T("Источник неизвестен")
 }
 
 // Source documents the provenance of one specification.
@@ -109,13 +110,13 @@ type Source struct {
 // Validate rejects a source that does not actually document anything.
 func (s Source) Validate() error {
 	if s.Kind == "" {
-		return errors.New("источник не указан")
+		return errors.New(i18n.T("источник не указан"))
 	}
 	if s.Kind.Trust() == 0 && s.Kind != SourceClassGuidance && s.Kind != SourceCatalog {
-		return fmt.Errorf("неизвестный тип источника %q", s.Kind)
+		return errors.New(i18n.F("неизвестный тип источника %q", s.Kind))
 	}
 	if s.Kind != SourceClassGuidance && s.Kind != SourceCatalog && strings.TrimSpace(s.Reference) == "" {
-		return fmt.Errorf("для источника %q обязательна ссылка на документ", s.Kind)
+		return errors.New(i18n.F("для источника %q обязательна ссылка на документ", s.Kind))
 	}
 	return nil
 }
@@ -191,21 +192,21 @@ const (
 // Classes lists every class in display order.
 var Classes = []Class{ClassCar, ClassSUV, ClassLCV, ClassTruck, ClassBus}
 
-// RussianName is the label shown in the interface.
-func (c Class) RussianName() string {
+// Label is the name shown in the interface.
+func (c Class) Label() string {
 	switch c {
 	case ClassCar:
-		return "Легковой"
+		return i18n.T("Легковой")
 	case ClassSUV:
-		return "Внедорожник, кроссовер"
+		return i18n.T("Внедорожник, кроссовер")
 	case ClassLCV:
-		return "Фургон, микроавтобус, лёгкий грузовик"
+		return i18n.T("Фургон, микроавтобус, лёгкий грузовик")
 	case ClassTruck:
-		return "Грузовой"
+		return i18n.T("Грузовой")
 	case ClassBus:
-		return "Автобус"
+		return i18n.T("Автобус")
 	}
-	return "Не указан"
+	return i18n.T("Не указан")
 }
 
 func (c Class) valid() bool {
@@ -263,6 +264,69 @@ type Spec struct {
 
 	Conditions Conditions `json:"conditions"`
 	Source     Source     `json:"source"`
+
+	// EN carries the English versions of the free text, for the English
+	// interface. Figures are never duplicated here — only words.
+	EN *SpecText `json:"en,omitempty"`
+}
+
+// SpecText is the English text of an entry. Empty fields fall back to the
+// Russian ones.
+type SpecText struct {
+	Make       string      `json:"make,omitempty"`
+	Model      string      `json:"model,omitempty"`
+	Trim       string      `json:"trim,omitempty"`
+	Notes      string      `json:"notes,omitempty"`
+	Reference  string      `json:"reference,omitempty"`
+	Conditions *Conditions `json:"conditions,omitempty"`
+	Front      *MethodText `json:"front,omitempty"`
+	Rear       *MethodText `json:"rear,omitempty"`
+}
+
+// MethodText is the English description of an axle's adjusters.
+type MethodText struct {
+	Camber string `json:"camber_method,omitempty"`
+	Caster string `json:"caster_method,omitempty"`
+	Toe    string `json:"toe_method,omitempty"`
+}
+
+// Localized returns the entry with its text in the current interface
+// language. Figures and ids are untouched.
+func (s Spec) Localized() Spec {
+	if i18n.Current() != i18n.EN || s.EN == nil {
+		return s
+	}
+	e := s.EN
+	pick := func(dst *string, v string) {
+		if v != "" {
+			*dst = v
+		}
+	}
+	pick(&s.Make, e.Make)
+	pick(&s.Model, e.Model)
+	pick(&s.Trim, e.Trim)
+	pick(&s.Notes, e.Notes)
+	pick(&s.Source.Reference, e.Reference)
+	if c := e.Conditions; c != nil {
+		pick(&s.Conditions.Load, c.Load)
+		pick(&s.Conditions.TyrePressure, c.TyrePressure)
+		pick(&s.Conditions.FuelState, c.FuelState)
+		pick(&s.Conditions.RideHeightNote, c.RideHeightNote)
+		pick(&s.Conditions.SettleProcedure, c.SettleProcedure)
+		pick(&s.Conditions.AdditionalChecks, c.AdditionalChecks)
+	}
+	for _, x := range []struct {
+		ax *AxleSpec
+		m  *MethodText
+	}{{&s.Front, e.Front}, {&s.Rear, e.Rear}} {
+		if x.m == nil {
+			continue
+		}
+		pick(&x.ax.Adjustable.CamberMethod, x.m.Camber)
+		pick(&x.ax.Adjustable.CasterMethod, x.m.Caster)
+		pick(&x.ax.Adjustable.ToeMethod, x.m.Toe)
+	}
+	return s
 }
 
 // MMRange is a tolerance quoted in millimetres of toe.
@@ -328,20 +392,20 @@ func (s Spec) Disclaimer() string {
 	case SourceFactory, SourceLicensed:
 		return ""
 	case SourceCommunity:
-		return "Данные внесены сообществом и перепроверены по независимому источнику, но это не заводской документ. " +
-			"Перед регулировкой сверьтесь с руководством по ремонту вашего автомобиля."
+		return i18n.T("Данные внесены сообществом и перепроверены по независимому источнику, но это не заводской документ. " +
+			"Перед регулировкой сверьтесь с руководством по ремонту вашего автомобиля.")
 	case SourceCatalog:
-		return "Допусков для этой модели в базе пока нет — известна только конструкция подвески. " +
+		return i18n.T("Допусков для этой модели в базе пока нет — известна только конструкция подвески. " +
 			"Углы сравниваются с ориентиром по классу автомобилей, а это НЕ ЗАВОДСКИЕ ДАННЫЕ. " +
 			"Возьмите допуски из руководства по ремонту и внесите их кнопкой «Внести допуски» — " +
-			"программа запомнит их у вас, а прислав их в проект, вы поможете всем владельцам этой модели."
+			"программа запомнит их у вас, а прислав их в проект, вы поможете всем владельцам этой модели.")
 	case SourceClassGuidance:
-		return "ЭТО НЕ ЗАВОДСКИЕ ДАННЫЕ вашего автомобиля. Это типичные значения для автомобилей такого класса — " +
+		return i18n.T("ЭТО НЕ ЗАВОДСКИЕ ДАННЫЕ вашего автомобиля. Это типичные значения для автомобилей такого класса — " +
 			"они помогут понять, насколько сильно ваши углы отличаются от разумных, но регулировать «в них» нельзя. " +
-			"Найдите заводские данные для вашей модели."
+			"Найдите заводские данные для вашей модели.")
 	default:
-		return "ВНИМАНИЕ: данные не проверены. Обязательно сверьтесь с руководством по ремонту вашего автомобиля " +
-			"перед тем, как что-либо регулировать."
+		return i18n.T("ВНИМАНИЕ: данные не проверены. Обязательно сверьтесь с руководством по ремонту вашего автомобиля " +
+			"перед тем, как что-либо регулировать.")
 	}
 }
 
@@ -351,56 +415,56 @@ func (s Spec) Disclaimer() string {
 func (s Spec) Validate() error {
 	var errs []string
 	if strings.TrimSpace(s.ID) == "" {
-		errs = append(errs, "не задан id")
+		errs = append(errs, i18n.T("не задан id"))
 	}
 	if strings.TrimSpace(s.Make) == "" || strings.TrimSpace(s.Model) == "" {
-		errs = append(errs, "не заданы марка и модель")
+		errs = append(errs, i18n.T("не заданы марка и модель"))
 	}
 	if s.YearFrom == 0 {
-		errs = append(errs, "не задан год начала выпуска")
+		errs = append(errs, i18n.T("не задан год начала выпуска"))
 	}
 	if s.YearTo != 0 && s.YearTo < s.YearFrom {
-		errs = append(errs, "год окончания выпуска раньше года начала")
+		errs = append(errs, i18n.T("год окончания выпуска раньше года начала"))
 	}
 	if err := s.Source.Validate(); err != nil {
 		errs = append(errs, err.Error())
 	}
 	if !s.Class.valid() {
-		errs = append(errs, fmt.Sprintf("неизвестный класс автомобиля %q", s.Class))
+		errs = append(errs, i18n.F("неизвестный класс автомобиля %q", s.Class))
 	}
 	if err := suspension.Validate(s.FrontSuspension, suspension.AxleFront); err != nil {
-		errs = append(errs, "передняя подвеска: "+err.Error())
+		errs = append(errs, i18n.F("передняя подвеска: %s", err.Error()))
 	}
 	if err := suspension.Validate(s.RearSuspension, suspension.AxleRear); err != nil {
-		errs = append(errs, "задняя подвеска: "+err.Error())
+		errs = append(errs, i18n.F("задняя подвеска: %s", err.Error()))
 	}
 	if s.Source.Kind == SourceCatalog {
 		// A catalog entry that carried figures would present them with no
 		// provenance at all — exactly what the source system exists to stop.
 		if s.HasFigures() {
-			errs = append(errs, "запись-каталог не может содержать допусков: внесите их как отдельную запись с источником")
+			errs = append(errs, i18n.T("запись-каталог не может содержать допусков: внесите их как отдельную запись с источником"))
 		}
 		if s.FrontSuspension == "" && s.RearSuspension == "" {
-			errs = append(errs, "запись-каталог без типа подвески ничего не сообщает")
+			errs = append(errs, i18n.T("запись-каталог без типа подвески ничего не сообщает"))
 		}
 	}
 	if (s.FrontTotalToeMM != nil || s.RearTotalToeMM != nil) && s.RimDiameterIn <= 0 {
-		errs = append(errs, "схождение задано в миллиметрах, но не указан диаметр обода — "+
-			"такие данные невозможно интерпретировать")
+		errs = append(errs, i18n.T("схождение задано в миллиметрах, но не указан диаметр обода — "+
+			"такие данные невозможно интерпретировать"))
 	}
-	for name, ax := range map[string]AxleSpec{"передняя ось": s.Front, "задняя ось": s.Rear} {
+	for name, ax := range map[string]AxleSpec{i18n.T("передняя ось"): s.Front, i18n.T("задняя ось"): s.Rear} {
 		for pname, r := range map[string]*align.Range{
-			"развал": ax.Camber, "кастер": ax.Caster, "SAI": ax.SAI,
-			"суммарное схождение": ax.TotalToe, "схождение колеса": ax.IndividualToe,
+			i18n.T("развал"): ax.Camber, i18n.T("кастер"): ax.Caster, "SAI": ax.SAI,
+			i18n.T("суммарное схождение"): ax.TotalToe, i18n.T("схождение колеса"): ax.IndividualToe,
 		} {
 			if r == nil {
 				continue
 			}
 			if r.Max < r.Min {
-				errs = append(errs, fmt.Sprintf("%s, %s: верхняя граница меньше нижней", name, pname))
+				errs = append(errs, i18n.F("%s, %s: верхняя граница меньше нижней", name, pname))
 			}
 			if r.Nominal < r.Min || r.Nominal > r.Max {
-				errs = append(errs, fmt.Sprintf("%s, %s: номинал вне допуска", name, pname))
+				errs = append(errs, i18n.F("%s, %s: номинал вне допуска", name, pname))
 			}
 		}
 	}

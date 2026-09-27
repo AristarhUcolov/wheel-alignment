@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#080d17">
-<title>Датчик — Сход-развал</title>
+<title data-t>Датчик — Сход-развал</title>
 <style>
   :root { --bg:#080d17; --panel:#111a2c; --line:#23324d; --text:#e8eef8; --muted:#93a3bb; --green:#2bd46a; --red:#ff4d4d; --amber:#ffb020; --blue:#4f8cff;
           --num: Bahnschrift, "Roboto Condensed", "DIN Alternate", "Arial Narrow", sans-serif; }
@@ -40,25 +40,25 @@
 </head>
 <body>
   <header>
-    <b id="title">Датчик сход-развала</b>
-    <span><span class="dot" id="dot"></span><span id="conn" class="muted">нет связи</span></span>
+    <b id="title" data-t>Датчик сход-развала</b>
+    <span><span class="dot" id="dot"></span><span id="conn" class="muted" data-t>нет связи</span></span>
   </header>
 
   <section id="pick" class="hide">
-    <p class="prompt">На каком колесе будет телефон?</p>
+    <p class="prompt" data-t>На каком колесе будет телефон?</p>
     <div class="grid2">
-      <button class="wheel" data-w="FL">Переднее<br>левое</button>
-      <button class="wheel" data-w="FR">Переднее<br>правое</button>
-      <button class="wheel" data-w="RL">Заднее<br>левое</button>
-      <button class="wheel" data-w="RR">Заднее<br>правое</button>
+      <button class="wheel" data-w="FL" data-t>Переднее левое</button>
+      <button class="wheel" data-w="FR" data-t>Переднее правое</button>
+      <button class="wheel" data-w="RL" data-t>Заднее левое</button>
+      <button class="wheel" data-w="RR" data-t>Заднее правое</button>
     </div>
-    <p class="muted" style="text-align:center;margin-top:10px">Левое и правое — если смотреть с места водителя.</p>
+    <p class="muted" style="text-align:center;margin-top:10px" data-t>Левое и правое — если смотреть с места водителя.</p>
   </section>
 
   <section id="start" class="hide">
     <div class="card">
-      <p class="prompt">Телефон будет передавать наклон колеса по Wi-Fi. Экран не погаснет, пока открыта эта страница.</p>
-      <button class="primary" id="go" style="width:100%;font-size:19px;padding:18px">Включить датчики</button>
+      <p class="prompt" data-t>Телефон будет передавать наклон колеса по Wi-Fi. Экран не погаснет, пока открыта эта страница.</p>
+      <button class="primary" id="go" style="width:100%;font-size:19px;padding:18px" data-t>Включить датчики</button>
       <p class="muted" id="startErr"></p>
     </div>
   </section>
@@ -71,10 +71,10 @@
       <div class="norm" id="norm"></div>
       <div class="steer hide" id="steer"></div>
       <div class="chips" style="margin-top:8px">
-        <span class="chip" id="cFlat">калибровка</span>
-        <span class="chip" id="cMount">крепление</span>
+        <span class="chip" id="cFlat" data-t>калибровка</span>
+        <span class="chip" id="cMount" data-t>крепление</span>
         <span class="chip" id="cRun">биение</span>
-        <span class="chip" id="cStable">стабильно</span>
+        <span class="chip" id="cStable" data-t>стабильно</span>
       </div>
     </div>
     <div class="card">
@@ -83,18 +83,68 @@
     </div>
     <div class="err hide" id="err"></div>
     <div class="grid2" id="actions">
-      <button data-cmd="flat">Калибровка телефона</button>
-      <button data-cmd="mount">Калибровка крепления</button>
-      <button data-cmd="runout">Биение диска</button>
-      <button data-cmd="caster" id="bCaster">Кастер</button>
-      <button data-cmd="cancel" id="bCancel" class="hide">Отмена</button>
-      <button id="bWheel">Другое колесо</button>
+      <button data-cmd="flat" data-t>Калибровка телефона</button>
+      <button data-cmd="mount" data-t>Калибровка крепления</button>
+      <button data-cmd="runout" data-t>Биение диска</button>
+      <button data-cmd="caster" id="bCaster" data-t>Кастер</button>
+      <button data-cmd="cancel" id="bCancel" class="hide" data-t>Отмена</button>
+      <button id="bWheel" data-t>Другое колесо</button>
     </div>
-    <p class="muted">Телефон прижимайте к ровной планке, лежащей на закраинах обода, экраном наружу. Не к шине.</p>
+    <p class="muted" data-t>Телефон прижимайте к ровной планке, лежащей на закраинах обода, экраном наружу. Не к шине.</p>
   </section>
 
 <script>
 'use strict';
+// Язык задаёт программа на компьютере: она подставляет его в <html lang> при
+// выдаче страницы и присылает в каждом ответе. Подсказки шагов приходят уже
+// переведёнными, здесь — только собственные надписи страницы.
+const EN = {
+  "Датчик — Сход-развал": "Sensor — Wheel alignment",
+  "Датчик сход-развала": "Alignment sensor",
+  "нет связи": "offline",
+  "на связи": "connected",
+  "На каком колесе будет телефон?": "Which wheel is the phone on?",
+  "Переднее левое": "Front left",
+  "Переднее правое": "Front right",
+  "Заднее левое": "Rear left",
+  "Заднее правое": "Rear right",
+  "Левое и правое — если смотреть с места водителя.": "Left and right as seen from the driver's seat.",
+  "Телефон будет передавать наклон колеса по Wi-Fi. Экран не погаснет, пока открыта эта страница.": "The phone will send the wheel's tilt over Wi-Fi. The screen stays on while this page is open.",
+  "Включить датчики": "Start sensors",
+  "калибровка": "calibration",
+  "крепление": "mount",
+  "биение": "runout",
+  "стабильно": "steady",
+  "Калибровка телефона": "Phone calibration",
+  "Калибровка крепления": "Mount calibration",
+  "Биение диска": "Rim runout",
+  "Кастер": "Caster",
+  "Отмена": "Cancel",
+  "Другое колесо": "Other wheel",
+  "Телефон прижимайте к ровной планке, лежащей на закраинах обода, экраном наружу. Не к шине.": "Press the phone, screen facing out, against a straight bar resting on the rim flanges. Not against the tyre.",
+  "ссылка устарела — отсканируйте код заново": "link expired — scan the code again",
+  "Развал": "Camber",
+  "колесо не выбрано": "no wheel selected",
+  "норма": "spec",
+  "поворот": "steer",
+  "Кастер {v} передан на компьютер. Верните колёса прямо.": "Caster {v} sent to the computer. Return the wheels to straight ahead.",
+  "Доступ к датчикам запрещён. Разрешите его в настройках Safari для этого сайта.": "Sensor access denied. Allow it in Safari's settings for this site.",
+  "Не удалось запросить доступ к датчикам:": "Could not request sensor access:",
+  "Датчики не отвечают. Откройте страницу в Chrome (Android) или Safari (iPhone).": "The sensors are not responding. Open the page in Chrome (Android) or Safari (iPhone).",
+  "Страница открыта не по защищённому адресу — браузер не даёт доступа к датчикам.": "The page is not open over a secure address — the browser blocks the sensors."
+};
+// end EN
+let lang = document.documentElement.lang === 'en' ? 'en' : 'ru';
+const tr = ru => (lang === 'en' && EN[ru]) || ru;
+function translateStatic() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-t]').forEach(el => {
+    if (el.dataset.tRu === undefined) el.dataset.tRu = el.textContent.trim();
+    el.textContent = tr(el.dataset.tRu);
+  });
+}
+translateStatic();
+
 const token = location.pathname.split('/')[2] || '';
 const $ = s => document.querySelector(s);
 const store = {
@@ -156,7 +206,7 @@ async function send(extra) {
   inflight = true;
   try {
     const r = await fetch(`/p/${token}/data`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    if (r.status === 404) { conn(false, 'ссылка устарела — отсканируйте код заново'); return; }
+    if (r.status === 404) { conn(false, tr('ссылка устарела — отсканируйте код заново')); return; }
     const st = await r.json();
     lastOK = Date.now();
     conn(true);
@@ -169,7 +219,7 @@ async function send(extra) {
 }
 function conn(ok, why) {
   $('#dot').classList.toggle('on', ok);
-  $('#conn').textContent = ok ? 'на связи' : (why || 'нет связи');
+  $('#conn').textContent = ok ? tr('на связи') : (why || tr('нет связи'));
 }
 
 // ── Показ ──────────────────────────────────────────────────────────
@@ -181,19 +231,20 @@ function dm(v) {
   return (neg && (d || m) ? '−' : '+') + d + '°' + String(m).padStart(2, '0') + '′';
 }
 function render(st) {
+  if (st.lang && st.lang !== lang) { lang = st.lang === 'en' ? 'en' : 'ru'; translateStatic(); }
   if (st.step !== lastStep) {
     if (lastStep && navigator.vibrate) navigator.vibrate(st.error ? [60, 60, 60] : 120);
     lastStep = st.step;
   }
-  $('#wheelName').textContent = st.wheel_name ? 'Развал · ' + st.wheel_name.toLowerCase() : 'колесо не выбрано';
+  $('#wheelName').textContent = st.wheel_name ? tr('Развал') + ' · ' + st.wheel_name.toLowerCase() : tr('колесо не выбрано');
   const c = $('#camber');
   c.textContent = dm(st.camber);
   c.className = 'big ' + (st.camber === null || st.camber === undefined ? 'none' : (st.status && st.status !== 'no_spec' ? st.status : ''));
   $('#camberDeg').textContent = st.camber === null || st.camber === undefined ? '' : (st.camber >= 0 ? '+' : '−') + Math.abs(st.camber).toFixed(2) + '°';
-  $('#norm').textContent = st.spec ? `норма ${dm(st.spec.min)} … ${dm(st.spec.max)}` : '';
+  $('#norm').textContent = st.spec ? tr('норма') + ` ${dm(st.spec.min)} … ${dm(st.spec.max)}` : '';
   const steer = $('#steer');
   steer.classList.toggle('hide', st.steer === undefined || st.steer === null);
-  if (st.steer !== undefined && st.steer !== null) steer.textContent = 'поворот ' + Math.abs(st.steer).toFixed(1) + '°';
+  if (st.steer !== undefined && st.steer !== null) steer.textContent = tr('поворот') + ' ' + Math.abs(st.steer).toFixed(1) + '°';
   $('#prompt').textContent = st.prompt || '';
   const err = $('#err');
   err.classList.toggle('hide', !st.error);
@@ -203,12 +254,12 @@ function render(st) {
   $('#cFlat').classList.toggle('ok', !!st.flat);
   $('#cMount').classList.toggle('ok', !!st.mounted);
   $('#cRun').classList.toggle('ok', st.runout !== undefined && st.runout !== null);
-  $('#cRun').textContent = st.runout !== undefined && st.runout !== null ? 'биение ' + Math.abs(st.runout).toFixed(2) + '°' : 'биение';
+  $('#cRun').textContent = st.runout !== undefined && st.runout !== null ? tr('биение') + ' ' + Math.abs(st.runout).toFixed(2) + '°' : tr('биение');
   $('#cStable').classList.toggle('ok', !!st.stable);
   $('#bCaster').classList.toggle('hide', !st.front);
   $('#bCancel').classList.toggle('hide', st.step === 'live');
   if (st.caster !== undefined && st.caster !== null && st.step === 'caster_back') {
-    $('#prompt').textContent = `Кастер ${dm(st.caster)} передан на компьютер. Верните колёса прямо.`;
+    $('#prompt').textContent = tr('Кастер {v} передан на компьютер. Верните колёса прямо.').replace('{v}', dm(st.caster));
   }
 }
 
@@ -237,17 +288,17 @@ $('#go').onclick = async () => {
   try {
     if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
       const p = await DeviceMotionEvent.requestPermission();
-      if (p !== 'granted') { $('#startErr').textContent = 'Доступ к датчикам запрещён. Разрешите его в настройках Safari для этого сайта.'; return; }
+      if (p !== 'granted') { $('#startErr').textContent = tr('Доступ к датчикам запрещён. Разрешите его в настройках Safari для этого сайта.'); return; }
     }
-  } catch (e) { $('#startErr').textContent = 'Не удалось запросить доступ к датчикам: ' + e.message; return; }
+  } catch (e) { $('#startErr').textContent = tr('Не удалось запросить доступ к датчикам:') + ' ' + e.message; return; }
   window.addEventListener('devicemotion', onMotion);
   running = true;
   keepAwake();
   show('main');
   setTimeout(() => {
     if (!gotMotion) {
-      const why = window.isSecureContext ? 'Датчики не отвечают. Откройте страницу в Chrome (Android) или Safari (iPhone).'
-                                         : 'Страница открыта не по защищённому адресу — браузер не даёт доступа к датчикам.';
+      const why = window.isSecureContext ? tr('Датчики не отвечают. Откройте страницу в Chrome (Android) или Safari (iPhone).')
+                                         : tr('Страница открыта не по защищённому адресу — браузер не даёт доступа к датчикам.');
       render({ step: 'live', prompt: why, error: why });
     }
   }, 2500);

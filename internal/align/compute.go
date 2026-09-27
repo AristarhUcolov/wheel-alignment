@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // WheelResult holds the angles for a single wheel, all in the vehicle frame.
@@ -153,7 +154,7 @@ func Assemble(raw map[Position]RawWheel, g Geometry, mode string) Result {
 		wr := WheelResult{
 			Pos:           p,
 			PosName:       p.String(),
-			Position:      p.RussianName(),
+			Position:      p.Label(),
 			Camber:        r.Camber,
 			ToeGeometric:  r.ToeGeometric,
 			Caster:        r.Caster,
@@ -351,17 +352,17 @@ func structuralWarnings(r Result) []string {
 	var out []string
 	if r.HasDimensions {
 		if math.Abs(r.WheelbaseDiffMM) > 10 {
-			out = append(out, "Колёсная база слева и справа отличается на "+fmtMM(r.WheelbaseDiffMM)+
-				" — вероятна деформация кузова или рычагов. Регулировка углов сама по себе увод не устранит.")
+			out = append(out, i18n.F("Колёсная база слева и справа отличается на %s — вероятна деформация кузова или рычагов. "+
+				"Регулировка углов сама по себе увод не устранит.", fmtMM(r.WheelbaseDiffMM)))
 		}
 		if math.Abs(r.Front.SetbackMM) > 12 {
-			out = append(out, "Сдвиг передних колёс (setback) "+fmtMM(r.Front.SetbackMM)+
-				" — проверьте геометрию подрамника и лонжеронов.")
+			out = append(out, i18n.F("Сдвиг передних колёс (setback) %s — проверьте геометрию подрамника и лонжеронов.",
+				fmtMM(r.Front.SetbackMM)))
 		}
 	}
 	if math.Abs(r.ThrustAngle.Deg()) > 0.5 {
-		out = append(out, "Большой угол тяги ("+r.ThrustAngle.FormatDegMin()+
-			"): автомобиль будет ехать «боком», а руль не встанет ровно, пока не отрегулирована задняя ось.")
+		out = append(out, i18n.F("Большой угол тяги (%s): автомобиль будет ехать «боком», а руль не встанет ровно, "+
+			"пока не отрегулирована задняя ось.", r.ThrustAngle.FormatDegMin()))
 	}
 	for _, p := range [2]Position{FL, FR} {
 		w := r.Wheels[p.String()]
@@ -370,8 +371,8 @@ func structuralWarnings(r Result) []string {
 			continue
 		}
 		if math.Abs((*w.IncludedAngle - *o.IncludedAngle).Deg()) > 1.0 {
-			out = append(out, "Включённый угол (SAI + развал) слева и справа отличается более чем на 1° — "+
-				"это признак погнутой стойки, поворотного кулака или рычага, а не ошибки регулировки.")
+			out = append(out, i18n.T("Включённый угол (SAI + развал) слева и справа отличается более чем на 1° — "+
+				"это признак погнутой стойки, поворотного кулака или рычага, а не ошибки регулировки."))
 			break
 		}
 	}
@@ -379,5 +380,5 @@ func structuralWarnings(r Result) []string {
 }
 
 func fmtMM(v float64) string {
-	return strconv.FormatFloat(math.Abs(v), 'f', 1, 64) + " мм"
+	return i18n.F("%s мм", strconv.FormatFloat(math.Abs(v), 'f', 1, 64))
 }

@@ -3,16 +3,17 @@
 package main
 
 import (
-	"errors"
 	"path/filepath"
 	"syscall"
 	"unsafe"
 
 	webview2 "github.com/jchv/go-webview2"
 	"golang.org/x/sys/windows"
+
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
-var errNoWindow = errors.New("движок WebView2 недоступен")
+var errNoWindow = i18n.Err("движок WebView2 недоступен")
 
 // runWindow shows the interface in a native window and blocks until the window
 // is closed. WebView2 ships with Windows 11 and every updated Windows 10, so on
@@ -26,7 +27,7 @@ func runWindow(url, data string) error {
 		// program — which may be in Program Files or on a read-only stick.
 		DataPath: filepath.Join(data, "webview"),
 		WindowOptions: webview2.WindowOptions{
-			Title:  "Сход-развал — открытый стенд",
+			Title:  i18n.T("Сход-развал — открытый стенд"),
 			Width:  1440,
 			Height: 900,
 			IconId: 1, // из rsrc_windows_amd64.syso
@@ -60,6 +61,6 @@ func maximize(hwnd unsafe.Pointer) {
 // console to print to.
 func notify(msg string) {
 	t, _ := syscall.UTF16PtrFromString(msg)
-	c, _ := syscall.UTF16PtrFromString("Сход-развал")
+	c, _ := syscall.UTF16PtrFromString(i18n.T("Сход-развал"))
 	_, _ = windows.MessageBox(0, t, c, windows.MB_OK|windows.MB_ICONINFORMATION)
 }

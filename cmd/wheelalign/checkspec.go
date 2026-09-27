@@ -64,7 +64,7 @@ func runCheckSpec(args []string) error {
 			warned++
 		}
 		fmt.Printf("  %s %s\n", mark, title)
-		fmt.Printf("      источник: %s", s.Source.Kind.RussianName())
+		fmt.Printf("      источник: %s", s.Source.Kind.Label())
 		if !s.Verified() {
 			fmt.Printf("  — будет показано с предупреждением")
 		}

@@ -1,9 +1,11 @@
 package vision
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // Linking several reference boards into one frame.
@@ -53,16 +55,16 @@ type LinkEdge struct {
 // a chain, cannot be placed and is reported as such rather than guessed at.
 func LinkReferences(cam Camera, refs []Target, imgs []*Gray, opt DetectOptions) (LinkResult, error) {
 	if len(refs) == 0 {
-		return LinkResult{}, fmt.Errorf("не задано ни одной напольной мишени")
+		return LinkResult{}, errors.New(i18n.T("не задано ни одной напольной мишени"))
 	}
 	for i, t := range refs {
 		if err := t.Validate(); err != nil {
-			return LinkResult{}, fmt.Errorf("напольная мишень %d: %w", i+1, err)
+			return LinkResult{}, fmt.Errorf(i18n.T("напольная мишень %d: %w"), i+1, err)
 		}
 		for j := i + 1; j < len(refs); j++ {
 			if sameLayout(t, refs[j]) {
-				return LinkResult{}, fmt.Errorf(
-					"напольные мишени %d и %d одинаковые (%dx%d) — их невозможно различить в кадре",
+				return LinkResult{}, fmt.Errorf(i18n.T(
+					"напольные мишени %d и %d одинаковые (%dx%d) — их невозможно различить в кадре"),
 					i+1, j+1, t.Cols, t.Rows)
 			}
 		}
@@ -90,7 +92,7 @@ func LinkReferences(cam Camera, refs []Target, imgs []*Gray, opt DetectOptions) 
 			p, err := solveBoard(cam, refs[i], dets[i])
 			if err != nil || p.Ambiguous {
 				if p.Ambiguous {
-					res.Warnings = append(res.Warnings, fmt.Sprintf(
+					res.Warnings = append(res.Warnings, i18n.F(
 						"Связующий снимок %d: поза мишени %dx%d неоднозначна, снимок не использован. "+
 							"Снимайте ближе или под большим углом.", fi+1, refs[i].Cols, refs[i].Rows))
 				}
@@ -99,7 +101,7 @@ func LinkReferences(cam Camera, refs []Target, imgs []*Gray, opt DetectOptions) 
 			poses[i] = p.Pose
 		}
 		if len(poses) < 2 {
-			res.Warnings = append(res.Warnings, fmt.Sprintf(
+			res.Warnings = append(res.Warnings, i18n.F(
 				"Связующий снимок %d: видно меньше двух напольных мишеней — он ничего не связывает.", fi+1))
 			continue
 		}
@@ -114,7 +116,7 @@ func LinkReferences(cam Camera, refs []Target, imgs []*Gray, opt DetectOptions) 
 		}
 		res.Edges = append(res.Edges, LinkEdge{
 			Frame:  fi,
-			Detail: fmt.Sprintf("видно мишеней: %d", len(poses)),
+			Detail: i18n.F("видно мишеней: %d", len(poses)),
 		})
 	}
 
@@ -141,9 +143,9 @@ func LinkReferences(cam Camera, refs []Target, imgs []*Gray, opt DetectOptions) 
 		}
 	}
 	if len(missing) > 0 {
-		return res, fmt.Errorf(
+		return res, fmt.Errorf(i18n.T(
 			"напольные мишени %v не удалось связать с остальными: нужен снимок, где такая мишень видна "+
-				"вместе с уже связанной", missing)
+				"вместе с уже связанной"), missing)
 	}
 	return res, nil
 }

@@ -1,10 +1,12 @@
 package measure
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/vision"
 )
 
@@ -34,10 +36,10 @@ func (s OpticalSession) Result() (align.Result, error) {
 	for _, p := range align.AllPositions {
 		w, ok := s.Wheels[p]
 		if !ok {
-			return align.Result{}, fmt.Errorf("%w: %s (%s)", align.ErrMissingWheel, p, p.RussianName())
+			return align.Result{}, fmt.Errorf("%w: %s (%s)", align.ErrMissingWheel, p, p.Label())
 		}
 		if w.Axis.Len() < 0.5 {
-			return align.Result{}, fmt.Errorf("%s: ось вращения не восстановлена", p)
+			return align.Result{}, errors.New(i18n.F("%s: ось вращения не восстановлена", p.Label()))
 		}
 	}
 
@@ -86,10 +88,10 @@ func (s OpticalSession) Result() (align.Result, error) {
 		})
 
 		if w.Center.Z < 100 || w.Center.Z > 500 {
-			warnings = append(warnings, fmt.Sprintf(
+			warnings = append(warnings, i18n.F(
 				"%s: центр колеса на высоте %.0f мм над плоскостью напольной мишени — это не похоже на радиус качения. "+
 					"Убедитесь, что напольная мишень лежит на полу лицом вверх и не приподнята.",
-				p.RussianName(), w.Center.Z))
+				p.Label(), w.Center.Z))
 		}
 	}
 

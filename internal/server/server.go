@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/live"
 	"github.com/AristarhUcolov/wheel-alignment/internal/measure"
 	"github.com/AristarhUcolov/wheel-alignment/internal/phone"
@@ -55,6 +56,8 @@ type Server struct {
 	sim   *live.Simulator
 	sess  *session
 	phone *phone.Link
+
+	settingsPath string
 
 	stop context.CancelFunc
 }
@@ -107,6 +110,9 @@ func New(db *specs.DB) (*Server, error) {
 	s.mux.HandleFunc("GET /api/report", s.report)
 	s.mux.HandleFunc("GET /api/phone", s.phoneInfo)
 	s.mux.HandleFunc("POST /api/phone", s.phoneSet)
+	s.mux.HandleFunc("POST /api/open", s.openURL)
+	s.mux.HandleFunc("GET /api/lang", s.getLang)
+	s.mux.HandleFunc("POST /api/lang", s.setLang)
 	return s, nil
 }
 
@@ -210,13 +216,13 @@ type specSummary struct {
 func (s *Server) summarise(sp specs.Spec) specSummary {
 	out := specSummary{
 		ID: sp.ID, Title: sp.Title(), Make: sp.Make, Model: sp.Model,
-		SourceKind: string(sp.Source.Kind), SourceLabel: sp.Source.Kind.RussianName(),
+		SourceKind: string(sp.Source.Kind), SourceLabel: sp.Source.Kind.Label(),
 		Verified: sp.Verified(), Disclaimer: sp.Disclaimer(), Notes: sp.Notes,
 		Class: string(sp.Class), FrontSusp: string(sp.FrontSuspension), RearSusp: string(sp.RearSuspension),
 		Local: s.db.IsLocal(sp.ID), HasFigures: sp.HasFigures(),
 	}
 	if sp.Class != "" {
-		out.ClassName = sp.Class.RussianName()
+		out.ClassName = sp.Class.Label()
 	}
 	return out
 }
@@ -257,7 +263,7 @@ func (s *Server) searchSpecs(w http.ResponseWriter, r *http.Request) {
 func (s *Server) getSpec(w http.ResponseWriter, r *http.Request) {
 	sp, ok := s.db.Get(r.PathValue("id"))
 	if !ok {
-		writeErr(w, http.StatusNotFound, errors.New("автомобиль не найден в базе"))
+		writeErr(w, http.StatusNotFound, errors.New(i18n.T("автомобиль не найден в базе")))
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
@@ -265,7 +271,7 @@ func (s *Server) getSpec(w http.ResponseWriter, r *http.Request) {
 		"title":      sp.Title(),
 		"verified":   sp.Verified(),
 		"disclaimer": sp.Disclaimer(),
-		"source":     sp.Source.Kind.RussianName(),
+		"source":     sp.Source.Kind.Label(),
 	})
 }
 
@@ -324,7 +330,7 @@ type MeasureResponse struct {
 func (s *Server) measureManual(w http.ResponseWriter, r *http.Request) {
 	var req ManualRequest
 	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20)).Decode(&req); err != nil {
-		writeErr(w, http.StatusBadRequest, fmt.Errorf("не удалось прочитать данные замера: %w", err))
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("%s: %w", i18n.T("не удалось прочитать данные замера"), err))
 		return
 	}
 
@@ -343,7 +349,7 @@ func (s *Server) measureManual(w http.ResponseWriter, r *http.Request) {
 	rimMM := align.Inches(req.RimDiameterIn)
 	if rimMM <= 0 {
 		writeErr(w, http.StatusBadRequest, errors.New(
-			"не указан диаметр обода: без него схождение в миллиметрах невозможно перевести в угол"))
+			i18n.T("не указан диаметр обода: без него схождение в миллиметрах невозможно перевести в угол")))
 		return
 	}
 
@@ -363,7 +369,7 @@ func (s *Server) measureManual(w http.ResponseWriter, r *http.Request) {
 	for _, p := range align.AllPositions {
 		in, ok := req.Wheels[p.String()]
 		if !ok {
-			writeErr(w, http.StatusBadRequest, fmt.Errorf("нет данных по колесу %s (%s)", p, p.RussianName()))
+			writeErr(w, http.StatusBadRequest, errors.New(i18n.F("нет данных по колесу %s", p.Label())))
 			return
 		}
 		side := measure.LineOutside
@@ -429,5 +435,5 @@ func LoadErrorSummary(db *specs.DB) string {
 	if len(db.LoadErrors) == 0 {
 		return ""
 	}
-	return "Проблемы в базе данных автомобилей:\n  - " + strings.Join(db.LoadErrors, "\n  - ")
+	return i18n.T("Проблемы в базе данных автомобилей:") + "\n  - " + strings.Join(db.LoadErrors, "\n  - ")
 }

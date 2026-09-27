@@ -229,6 +229,24 @@ ul.plain li { margin: 4px 0; }
 .toast.show { opacity: 1; transform: translateX(-50%); }
 .toast.bad { border-color: var(--red); }
 
+/* ── Язык и поддержка проекта ─────────────────────────────────────── */
+
+.langs { display: flex; border: 1px solid var(--line2); border-radius: 7px; overflow: hidden; }
+.langs button { border: none; background: none; color: var(--muted); padding: 4px 9px; cursor: pointer; font: 600 12px var(--num); }
+.langs button.on { background: var(--blue); color: #fff; }
+nav.side button.support-btn i { border-color: #6b2a3c; color: #ff6b8b; }
+nav.side button.support-btn.active i { background: #ff6b8b; border-color: #ff6b8b; color: #fff; }
+.support { max-width: 900px; }
+.donate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 18px 0 8px; }
+.donate {
+  display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; border-radius: 12px; text-decoration: none;
+  background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--brand); color: var(--text);
+}
+.donate:hover { border-color: var(--brand); background: var(--panel2); }
+.donate b { font-size: 18px; }
+.donate span { color: var(--muted); font-size: 13.5px; }
+.donate em { font-style: normal; color: var(--brand); font-size: 12.5px; margin-top: auto; }
+
 /* ── Выбор автомобиля ───────────────────────────────────────────────── */
 
 .search-row { display: flex; gap: 10px; }

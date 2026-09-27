@@ -8,6 +8,7 @@ import (
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/measure"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 	"github.com/AristarhUcolov/wheel-alignment/internal/vision"
@@ -45,7 +46,7 @@ type OpticalAlignResponse struct {
 // to one another, and the whole assembled into a normal alignment report.
 func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(maxUpload); err != nil {
-		writeErr(w, http.StatusBadRequest, fmt.Errorf("не удалось прочитать загруженные снимки: %w", err))
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("%s: %w", i18n.T("не удалось прочитать загруженные снимки"), err))
 		return
 	}
 	form := r.MultipartForm
@@ -57,7 +58,7 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 	}
 	wheelTarget, err := targetFromPrefix(form, "wheel_")
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, fmt.Errorf("мишень на колесе: %w", err))
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("%s: %w", i18n.T("мишень на колесе"), err))
 		return
 	}
 
@@ -70,14 +71,14 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 		}
 		t, err := targetFromPrefix(form, prefix)
 		if err != nil {
-			writeErr(w, http.StatusBadRequest, fmt.Errorf("напольная мишень %d: %w", i+1, err))
+			writeErr(w, http.StatusBadRequest, fmt.Errorf("%s: %w", i18n.F("напольная мишень %d", i+1), err))
 			return
 		}
 		refs = append(refs, t)
 	}
 	if len(refs) == 0 {
 		writeErr(w, http.StatusBadRequest, errors.New(
-			"не описана ни одна напольная мишень — без неё колёса невозможно свести в одну систему координат"))
+			i18n.T("не описана ни одна напольная мишень — без неё колёса невозможно свести в одну систему координат")))
 		return
 	}
 
@@ -88,8 +89,8 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 		linkFiles := form.File["images_link"]
 		if len(linkFiles) == 0 {
 			writeErr(w, http.StatusBadRequest, errors.New(
-				"напольных мишеней несколько, но нет связующих снимков — нужен хотя бы один кадр, "+
-					"где видно сразу две мишени"))
+				i18n.T("напольных мишеней несколько, но нет связующих снимков — нужен хотя бы один кадр, "+
+					"где видно сразу две мишени")))
 			return
 		}
 		sort.Slice(linkFiles, func(i, j int) bool { return linkFiles[i].Filename < linkFiles[j].Filename })
@@ -105,7 +106,7 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 		}
 		linkWarnings = link.Warnings
 		for _, f := range failed {
-			linkWarnings = append(linkWarnings, "Связующий снимок не прочитан — "+f)
+			linkWarnings = append(linkWarnings, i18n.F("Связующий снимок не прочитан — %s", f))
 		}
 	}
 
@@ -116,9 +117,9 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 	for _, p := range align.AllPositions {
 		files := form.File["images_"+p.String()]
 		if len(files) < 3 {
-			writeErr(w, http.StatusBadRequest, fmt.Errorf(
-				"%s (%s): нужно минимум 3 снимка с проворотом колеса между ними, загружено %d",
-				p, p.RussianName(), len(files)))
+			writeErr(w, http.StatusBadRequest, errors.New(i18n.F(
+				"%s: нужно минимум 3 снимка с проворотом колеса между ними, загружено %d",
+				p.Label(), len(files))))
 			return
 		}
 		sort.Slice(files, func(i, j int) bool { return files[i].Filename < files[j].Filename })
@@ -132,7 +133,7 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 		reg, err := vision.RegisterWheel(cam, wheelTarget, refs[refIdx], imgs, vision.DetectOptions{})
 		if err != nil {
 			writeJSON(w, http.StatusUnprocessableEntity, map[string]any{
-				"error":    fmt.Sprintf("%s (%s): %v", p, p.RussianName(), err),
+				"error":    fmt.Sprintf("%s: %v", p.Label(), err),
 				"position": p.String(),
 				"frames":   reg.Frames,
 				"used":     reg.Used,
@@ -142,18 +143,18 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 
 		root, ok := toRoot[refIdx]
 		if !ok {
-			writeErr(w, http.StatusUnprocessableEntity, fmt.Errorf(
-				"%s: напольная мишень %d не связана с остальными", p, refIdx+1))
+			writeErr(w, http.StatusUnprocessableEntity, errors.New(i18n.F(
+				"%s: напольная мишень %d не связана с остальными", p.Label(), refIdx+1)))
 			return
 		}
 		inRoot[p] = reg.InFrameOf(root)
 
 		warns := append([]string(nil), reg.Warnings...)
 		for _, f := range failed {
-			warns = append(warns, "Снимок не прочитан — "+f)
+			warns = append(warns, i18n.F("Снимок не прочитан — %s", f))
 		}
 		infos = append(infos, WheelOpticalInfo{
-			Position: p.String(), PositionRU: p.RussianName(),
+			Position: p.String(), PositionRU: p.Label(),
 			Used: reg.Used, Total: len(files),
 			RunoutDeg: round4(reg.RunoutDeg), SweepDeg: round4(reg.SweepDeg),
 			AxisResidualMM: round4(reg.AxisResidualMM),
@@ -189,7 +190,7 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 
 	// The measurement also goes to the live screen, so that adjusting can
 	// start from it and the before/after report can be taken from it.
-	s.pushResult(res, "optical", "Камера и мишени")
+	s.pushResult(res, "optical", i18n.N("Камера и мишени"))
 
 	writeJSON(w, http.StatusOK, OpticalAlignResponse{
 		Result:  res,

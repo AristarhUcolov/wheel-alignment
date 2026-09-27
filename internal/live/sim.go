@@ -1,13 +1,13 @@
 package live
 
 import (
-	"errors"
 	"math"
 	"math/rand"
 	"sync"
 	"time"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 )
 
@@ -81,8 +81,8 @@ func (s *Simulator) Start() {
 	s.running = true
 	s.stop = make(chan struct{})
 	s.done = make(chan struct{})
-	s.hub.Touch(SourceInfo{ID: SimSource, Kind: "sim", Name: "Демонстрационный автомобиль",
-		Detail: "все четыре колеса, кастер"})
+	s.hub.Touch(SourceInfo{ID: SimSource, Kind: "sim", Name: i18n.N("Демонстрационный автомобиль"),
+		Detail: i18n.N("все четыре колеса, кастер")})
 	go s.loop(s.stop, s.done)
 }
 
@@ -135,7 +135,7 @@ func (s *Simulator) Auto() bool {
 }
 
 // ErrNotAdjustable is returned for a key the simulator has no adjuster for.
-var ErrNotAdjustable = errors.New("live: этот параметр в демонстрации не регулируется")
+var ErrNotAdjustable = i18n.Err("этот параметр в демонстрации не регулируется")
 
 // Adjust turns a simulated adjuster: the target for key moves by delta
 // degrees, and the reading follows with a lag.

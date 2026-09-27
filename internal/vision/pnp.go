@@ -1,18 +1,18 @@
 package vision
 
 import (
-	"errors"
 	"fmt"
 	"math"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/numeric"
 )
 
 var (
-	ErrTooFewPoints   = errors.New("vision: для определения позы нужно не менее 4 точек")
-	ErrNotPlanar      = errors.New("vision: точки мишени должны лежать в одной плоскости (Z = 0)")
-	ErrDegeneratePose = errors.New("vision: точки вырождены — поза не определяется")
+	ErrTooFewPoints   = i18n.Err("для определения позы нужно не менее 4 точек")
+	ErrNotPlanar      = i18n.Err("точки мишени должны лежать в одной плоскости (Z = 0)")
+	ErrDegeneratePose = i18n.Err("точки вырождены — поза не определяется")
 )
 
 // Correspondence pairs a known point on the target with where it was seen.
@@ -78,7 +78,7 @@ type PnPResult struct {
 //     ambiguity is detected rather than silently resolved by luck.
 func SolvePnPPlanar(cam Camera, corr []Correspondence) (PnPResult, error) {
 	if len(corr) < 4 {
-		return PnPResult{}, fmt.Errorf("%w (дано %d)", ErrTooFewPoints, len(corr))
+		return PnPResult{}, fmt.Errorf(i18n.T("%w (дано %d)"), ErrTooFewPoints, len(corr))
 	}
 	for _, c := range corr {
 		if math.Abs(c.Model.Z) > 1e-6 {
@@ -134,7 +134,7 @@ func SolvePnPPlanar(cam Camera, corr []Correspondence) (PnPResult, error) {
 			// is being made by noise.
 			if altRMS < bestRMS*2 && res.AlternateTiltDeg > 3 {
 				res.Ambiguous = true
-				res.Warnings = append(res.Warnings, fmt.Sprintf(
+				res.Warnings = append(res.Warnings, i18n.F(
 					"Поза мишени определена неоднозначно: альтернативное решение отличается наклоном на %.1f° "+
 						"и почти так же хорошо ложится на снимок (%.3f против %.3f пикс). "+
 						"Ошибка в выборе даст ошибку развала примерно вдвое больше этого наклона. "+
@@ -147,7 +147,7 @@ func SolvePnPPlanar(cam Camera, corr []Correspondence) (PnPResult, error) {
 
 	res.Warnings = append(res.Warnings, cam.Warnings()...)
 	if res.RMSPx > 1.0 {
-		res.Warnings = append(res.Warnings, fmt.Sprintf(
+		res.Warnings = append(res.Warnings, i18n.F(
 			"Ошибка обратного проецирования %.2f пикс — это много. Проверьте калибровку камеры, "+
 				"реальные размеры мишени и качество распознавания углов.", res.RMSPx))
 	}

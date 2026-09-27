@@ -1,10 +1,10 @@
 package align
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // Position identifies one of the four measured wheels.
@@ -33,17 +33,17 @@ func (p Position) String() string {
 	return "??"
 }
 
-// RussianName is the label shown in the UI: «переднее левое» etc.
-func (p Position) RussianName() string {
+// Label is the name shown in the interface, in the current language.
+func (p Position) Label() string {
 	switch p {
 	case FL:
-		return "Переднее левое"
+		return i18n.T("Переднее левое")
 	case FR:
-		return "Переднее правое"
+		return i18n.T("Переднее правое")
 	case RL:
-		return "Заднее левое"
+		return i18n.T("Заднее левое")
 	case RR:
-		return "Заднее правое"
+		return i18n.T("Заднее правое")
 	}
 	return "?"
 }
@@ -122,8 +122,8 @@ type Quality struct {
 }
 
 var (
-	ErrMissingWheel = errors.New("align: measurement is missing a wheel")
-	ErrBadGeometry  = errors.New("align: wheel positions do not form a plausible vehicle")
+	ErrMissingWheel = i18n.Err("в замере не хватает колеса")
+	ErrBadGeometry  = i18n.Err("положение колёс не похоже на автомобиль")
 )
 
 // WheelSet is a complete four-wheel measurement.

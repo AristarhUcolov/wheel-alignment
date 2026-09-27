@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 )
 
@@ -62,7 +63,7 @@ func (s *Server) checkSpec(w http.ResponseWriter, r *http.Request) {
 	dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20))
 	if err := dec.Decode(&spec); err != nil {
 		writeJSON(w, http.StatusOK, SpecCheckResponse{
-			Errors: []string{"Не удалось разобрать данные: " + err.Error()},
+			Errors: []string{i18n.F("Не удалось разобрать данные: %s", err.Error())},
 		})
 		return
 	}
@@ -108,7 +109,7 @@ func (s *Server) checkSpec(w http.ResponseWriter, r *http.Request) {
 func (s *Server) saveSpec(w http.ResponseWriter, r *http.Request) {
 	var spec specs.Spec
 	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20)).Decode(&spec); err != nil {
-		writeErr(w, http.StatusBadRequest, fmt.Errorf("не удалось разобрать данные: %w", err))
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("%s: %w", i18n.T("не удалось разобрать данные"), err))
 		return
 	}
 	if err := s.db.Save(spec); err != nil {
@@ -136,18 +137,19 @@ func resolvedFigures(s specs.Spec) []ResolvedFigure {
 		spec specs.AxleSpec
 		mm   *specs.MMRange
 	}{
-		{"Передняя ось", s.Front, s.FrontTotalToeMM},
-		{"Задняя ось", s.Rear, s.RearTotalToeMM},
+		{i18n.T("Передняя ось"), s.Front, s.FrontTotalToeMM},
+		{i18n.T("Задняя ось"), s.Rear, s.RearTotalToeMM},
 	} {
 		for _, f := range []struct {
 			name string
 			r    *align.Range
+			toe  bool
 		}{
-			{"Развал", ax.spec.Camber},
-			{"Кастер", ax.spec.Caster},
-			{"SAI", ax.spec.SAI},
-			{"Суммарное схождение", ax.spec.TotalToe},
-			{"Схождение одного колеса", ax.spec.IndividualToe},
+			{i18n.T("Развал"), ax.spec.Camber, false},
+			{i18n.T("Кастер"), ax.spec.Caster, false},
+			{"SAI", ax.spec.SAI, false},
+			{i18n.T("Суммарное схождение"), ax.spec.TotalToe, true},
+			{i18n.T("Схождение одного колеса"), ax.spec.IndividualToe, true},
 		} {
 			if f.r == nil {
 				continue
@@ -157,8 +159,8 @@ func resolvedFigures(s specs.Spec) []ResolvedFigure {
 				Range: fmt.Sprintf("%s … %s", f.r.Min.FormatDegMin(), f.r.Max.FormatDegMin()),
 			}
 			// Toe is the figure people quote in millimetres, so show both.
-			if strings.Contains(f.name, "хождение") && rim > 0 {
-				fig.Detail = fmt.Sprintf("%.1f … %.1f мм на ободе %.0f\"",
+			if f.toe && rim > 0 {
+				fig.Detail = i18n.F("%.1f … %.1f мм на ободе %.0f\"",
 					f.r.Min.ToeMM(rim), f.r.Max.ToeMM(rim), s.RimDiameterIn)
 			}
 			out = append(out, fig)
@@ -166,9 +168,9 @@ func resolvedFigures(s specs.Spec) []ResolvedFigure {
 		if ax.mm != nil && rim > 0 {
 			ang := ax.mm.ToAngle(rim)
 			out = append(out, ResolvedFigure{
-				Axle: ax.name, Name: "Схождение задано в мм",
-				Range:  fmt.Sprintf("%.1f … %.1f мм", ax.mm.Min, ax.mm.Max),
-				Detail: fmt.Sprintf("это %s … %s на ободе %.0f\"", ang.Min.FormatDegMin(), ang.Max.FormatDegMin(), s.RimDiameterIn),
+				Axle: ax.name, Name: i18n.T("Схождение задано в мм"),
+				Range:  i18n.F("%.1f … %.1f мм", ax.mm.Min, ax.mm.Max),
+				Detail: i18n.F("это %s … %s на ободе %.0f\"", ang.Min.FormatDegMin(), ang.Max.FormatDegMin(), s.RimDiameterIn),
 			})
 		}
 	}

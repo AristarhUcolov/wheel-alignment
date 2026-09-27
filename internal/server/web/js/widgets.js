@@ -5,6 +5,7 @@
 
 import { fmtParam, specValue, fmtDM, shortLabel, paramKind, isToeKey } from './fmt.js';
 import { h } from './state.js';
+import { t } from './i18n.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -41,7 +42,7 @@ export class ToleranceBar {
         <text class="t0" y="10" font-size="11.5" fill="#2bd46a" font-family="Bahnschrift, sans-serif" text-anchor="middle"></text>
         <text class="t1" y="10" font-size="11.5" fill="#8ce9ad" font-family="Bahnschrift, sans-serif" text-anchor="middle"></text>
         <text class="t2" y="10" font-size="11.5" fill="#2bd46a" font-family="Bahnschrift, sans-serif" text-anchor="middle"></text>
-        <text class="nospec" x="150" y="26" font-size="11" fill="#6b7a93" text-anchor="middle">допуск не задан</text>
+        <text class="nospec" x="150" y="26" font-size="11" fill="#6b7a93" text-anchor="middle">${t('допуск не задан')}</text>
         <g class="ptr" style="transition: transform .18s linear">
           <line x1="0" y1="12" x2="0" y2="32" stroke="#fff" stroke-width="2.2"/>
           <path d="M0 31 L7.5 42 L-7.5 42 Z" fill="#fff" stroke="#02050b" stroke-width="1"/>
@@ -135,16 +136,16 @@ export class ValueBox {
     // Миллиметры рядом с угловым схождением — для тех, кто сверяется с
     // руководством, где схождение дано в мм.
     this.mmEl.textContent = (p && p.has && isToeKey(this.key) && units !== 'mm' && p.mm !== undefined && p.mm !== null)
-      ? `${p.mm > 0 ? '+' : p.mm < 0 ? '−' : ''}${Math.abs(p.mm).toFixed(1)} мм` : '';
+      ? t('{v} мм', { v: `${p.mm > 0 ? '+' : p.mm < 0 ? '−' : ''}${Math.abs(p.mm).toFixed(1)}` }) : '';
 
     let hint = '';
-    if (!p || !p.has) hint = 'нет показаний';
-    else if (p.stale) hint = 'датчик молчит';
-    else if (!p.spec) hint = 'допуск не задан';
-    else if (p.status === 'bad') hint = 'до допуска ' + fmt(-p.deviation).replace(/^\+/, '+');
-    else if (!p.stable) hint = 'показания меняются…';
-    else if (p.status === 'marginal') hint = 'у границы допуска';
-    else hint = 'в допуске';
+    if (!p || !p.has) hint = t('нет показаний');
+    else if (p.stale) hint = t('датчик молчит');
+    else if (!p.spec) hint = t('допуск не задан');
+    else if (p.status === 'bad') hint = t('до допуска {v}', { v: fmt(-p.deviation) });
+    else if (!p.stable) hint = t('показания меняются…');
+    else if (p.status === 'marginal') hint = t('у границы допуска');
+    else hint = t('в допуске');
     this.hintEl.textContent = hint;
   }
 }
@@ -181,7 +182,7 @@ export class CarView {
           <path d="M0 0 L10 5 L0 10 z" fill="#5b9bff"/>
         </marker>
       </defs>
-      <text x="280" y="28" text-anchor="middle" fill="#5d6d87" font-size="14" letter-spacing="2">ПЕРЁД</text>
+      <text x="280" y="28" text-anchor="middle" fill="#5d6d87" font-size="14" letter-spacing="2">${t('ПЕРЁД')}</text>
       <line x1="280" y1="40" x2="280" y2="745" stroke="#2d4163" stroke-dasharray="6 6"/>
       <path d="M190 78 Q280 52 370 78 L398 150 Q408 190 406 260 L404 640 Q402 700 372 716 Q280 734 188 716 Q158 700 156 640 L154 260 Q152 190 162 150 Z"
             fill="url(#body)" stroke="#34496f" stroke-width="2"/>
@@ -193,7 +194,7 @@ export class CarView {
       <g class="arcs"></g>
       <g class="wheels"></g>
       <g class="readouts"></g>
-      <text class="gain" x="280" y="772" text-anchor="middle" fill="#5d6d87" font-size="11">схождение на схеме увеличено в ${TOE_GAIN} раз</text>`;
+      <text class="gain" x="280" y="772" text-anchor="middle" fill="#5d6d87" font-size="11">${t('схождение на схеме увеличено в {n} раз', { n: TOE_GAIN })}</text>`;
 
     const wheels = s.querySelector('.wheels');
     for (const [k, [x, y]] of Object.entries(W)) {
@@ -333,8 +334,8 @@ class ArcGauge {
     return `M${x0.toFixed(1)} ${y0.toFixed(1)} A${this.r} ${this.r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`;
   }
   ang(v) {
-    const t = (v - this.lo) / (this.hi - this.lo) * 2 - 1; // −1…1
-    return this.dir * clamp(t, -1.08, 1.08) * this.span;
+    const k = (v - this.lo) / (this.hi - this.lo) * 2 - 1; // −1…1
+    return this.dir * clamp(k, -1.08, 1.08) * this.span;
   }
 
   update(p) {
@@ -390,7 +391,7 @@ export function camberPicto() {
 export function casterPicto() {
   const el = h(`
     <svg viewBox="0 0 240 110">
-      <text x="30" y="16" fill="#5d6d87" font-size="11">перёд ◀</text>
+      <text x="30" y="16" fill="#5d6d87" font-size="11">${t('перёд ◀')}</text>
       <circle cx="120" cy="60" r="42" fill="#0b0f16" stroke="#46597c" stroke-width="2"/>
       <circle cx="120" cy="60" r="16" fill="#3a4a66"/>
       <line x1="120" y1="4" x2="120" y2="108" stroke="#2d4163" stroke-dasharray="2 3"/>
@@ -408,7 +409,7 @@ export function casterPicto() {
 export function toePicto() {
   const el = h(`
     <svg viewBox="0 0 240 110">
-      <text x="120" y="12" fill="#5d6d87" font-size="11" text-anchor="middle">перёд ▲</text>
+      <text x="120" y="12" fill="#5d6d87" font-size="11" text-anchor="middle">${t('перёд ▲')}</text>
       <line x1="120" y1="18" x2="120" y2="108" stroke="#2d4163" stroke-dasharray="2 3"/>
       <rect x="62" y="58" width="116" height="8" rx="3" fill="#34496f"/>
       <g class="l" transform="translate(50 62)"><rect x="-12" y="-40" width="24" height="80" rx="6" fill="#0b0f16" stroke="#46597c" stroke-width="2"/><line x1="0" y1="-50" x2="0" y2="50" stroke="#ffb020" stroke-dasharray="3 3"/></g>

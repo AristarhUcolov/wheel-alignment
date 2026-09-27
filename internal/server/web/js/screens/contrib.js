@@ -2,6 +2,7 @@
 
 import { state, api, toast, updateSession, h, $, $$ } from '../state.js';
 import { esc, fmtDM } from '../fmt.js';
+import { t } from '../i18n.js';
 import { go } from '../app.js';
 
 let root, susp = null;
@@ -12,7 +13,7 @@ export function parseAngle(s) {
   if (s === null || s === undefined) return null;
   s = String(s).trim().replace(/[−–]/g, '-').replace(',', '.');
   if (!s) return null;
-  const m = s.match(/^([+-]?)\s*(\d+(?:\.\d+)?)\s*(?:°|º|град\.?|\s)\s*(\d+(?:\.\d+)?)?\s*['′’]?\s*$/);
+  const m = s.match(/^([+-]?)\s*(\d+(?:\.\d+)?)\s*(?:°|º|град\.?|deg\.?|\s)\s*(\d+(?:\.\d+)?)?\s*['′’]?\s*$/);
   if (m && m[3] !== undefined) {
     const v = parseFloat(m[2]) + parseFloat(m[3]) / 60;
     return m[1] === '-' ? -v : v;
@@ -24,11 +25,11 @@ export function parseAngle(s) {
   return NaN;
 }
 
-const AX = [
-  { k: 'camber', n: 'Развал', hint: '«+» — верх колеса наружу', axles: ['front', 'rear'] },
-  { k: 'caster', n: 'Кастер (продольный наклон оси/шкворня)', hint: '«+» — верх оси назад', axles: ['front'] },
-  { k: 'sai', n: 'Поперечный наклон оси/шкворня', hint: 'обычно 5–15°', axles: ['front'] },
-  { k: 'total_toe', n: 'Суммарное схождение, в градусах', hint: '«+» — колёса сходятся спереди', axles: ['front', 'rear'] },
+const AX = () => [
+  { k: 'camber', n: t('Развал'), hint: t('«+» — верх колеса наружу'), axles: ['front', 'rear'] },
+  { k: 'caster', n: t('Кастер (продольный наклон оси/шкворня)'), hint: t('«+» — верх оси назад'), axles: ['front'] },
+  { k: 'sai', n: t('Поперечный наклон оси/шкворня'), hint: t('обычно 5–15°'), axles: ['front'] },
+  { k: 'total_toe', n: t('Суммарное схождение, в градусах'), hint: t('«+» — колёса сходятся спереди'), axles: ['front', 'rear'] },
 ];
 
 export function mount(el) { root = el; }
@@ -39,7 +40,7 @@ export async function show() {
 }
 
 function sel(id, list, cur) {
-  return `<select id="${id}"><option value="">не указано</option>${list.filter(s => s.id).map(s => `<option value="${esc(s.id)}"${s.id === cur ? ' selected' : ''}>${esc(s.name)}</option>`).join('')}</select>`;
+  return `<select id="${id}"><option value="">${t('не указано')}</option>${list.filter(s => s.id).map(s => `<option value="${esc(s.id)}"${s.id === cur ? ' selected' : ''}>${esc(s.name)}</option>`).join('')}</select>`;
 }
 
 function render() {
@@ -54,87 +55,86 @@ function render() {
   };
   const range = (ax, k) => own && own[ax] && own[ax][k] ? own[ax][k] : null;
   const val = r => r ? fmtDM(r, { sign: true }).replace('′', "'") : '';
+  const axes = AX();
+  const classes = [['', t('не указан')], ['car', t('Легковой')], ['suv', t('Внедорожник')], ['lcv', t('Фургон, LCV')], ['truck', t('Грузовой')], ['bus', t('Автобус')]];
 
   root.innerHTML = `
     <div style="max-width:1080px">
-      <h1>Внести допуски из руководства</h1>
-      <div class="warn" style="margin:10px 0 16px"><b>Вносите только то, что видите в документе.</b> Выдуманный угол развала —
-        это не опечатка, а съеденная за сезон резина. Пустое поле лучше выдуманного: программа честно покажет «нет данных».</div>
+      <h1>${t('Внести допуски из руководства')}</h1>
+      <div class="warn" style="margin:10px 0 16px"><b>${t('Вносите только то, что видите в документе.')}</b> ${t('Выдуманный угол развала — это не опечатка, а съеденная за сезон резина. Пустое поле лучше выдуманного: программа честно покажет «нет данных».')}</div>
 
       <div class="panel">
-        <h3 style="margin-top:0">Автомобиль</h3>
+        <h3 style="margin-top:0">${t('Автомобиль')}</h3>
         <div class="cols3">
-          <label class="f">Марка<input type="text" id="cMake" value="${esc(pre.make)}" placeholder="ГАЗ"></label>
-          <label class="f">Модель<input type="text" id="cModel" value="${esc(pre.model)}" placeholder="3110 «Волга»"></label>
-          <label class="f">Модификация<input type="text" id="cTrim" placeholder="необязательно"></label>
-          <label class="f">Год начала выпуска<input type="number" id="cFrom" placeholder="1997" value="${pre.from}"></label>
-          <label class="f">Год окончания<input type="number" id="cTo" placeholder="пусто — выпускается" value="${pre.to}"></label>
-          <label class="f">Класс<select id="cClass">
-            ${[['', 'не указан'], ['car', 'Легковой'], ['suv', 'Внедорожник'], ['lcv', 'Фургон, LCV'], ['truck', 'Грузовой'], ['bus', 'Автобус']]
-              .map(([k, n]) => `<option value="${k}"${k === pre.cls ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
-          <label class="f">Передняя подвеска${sel('cFront', susp.front, pre.front)}</label>
-          <label class="f">Задняя подвеска${sel('cRear', susp.rear, pre.rear)}</label>
-          <label class="f">Диаметр обода, дюймы<input type="number" id="cRim" step="0.5" value="${pre.rim}">
-            <small>Обязателен, если схождение в миллиметрах: «3 мм» на 13″ и на 17″ — разные углы.</small></label>
+          <label class="f">${t('Марка')}<input type="text" id="cMake" value="${esc(pre.make)}" placeholder="${esc(t('ГАЗ'))}"></label>
+          <label class="f">${t('Модель')}<input type="text" id="cModel" value="${esc(pre.model)}" placeholder="${esc(t('3110 «Волга»'))}"></label>
+          <label class="f">${t('Модификация')}<input type="text" id="cTrim" placeholder="${esc(t('необязательно'))}"></label>
+          <label class="f">${t('Год начала выпуска')}<input type="number" id="cFrom" placeholder="1997" value="${pre.from}"></label>
+          <label class="f">${t('Год окончания')}<input type="number" id="cTo" placeholder="${esc(t('пусто — выпускается'))}" value="${pre.to}"></label>
+          <label class="f">${t('Класс')}<select id="cClass">
+            ${classes.map(([k, n]) => `<option value="${k}"${k === pre.cls ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+          <label class="f">${t('Передняя подвеска')}${sel('cFront', susp.front, pre.front)}</label>
+          <label class="f">${t('Задняя подвеска')}${sel('cRear', susp.rear, pre.rear)}</label>
+          <label class="f">${t('Диаметр обода, дюймы')}<input type="number" id="cRim" step="0.5" value="${pre.rim}">
+            <small>${t('Обязателен, если схождение в миллиметрах: «3 мм» на 13″ и на 17″ — разные углы.')}</small></label>
         </div>
       </div>
 
       <div class="panel">
-        <h3 style="margin-top:0">Углы</h3>
-        <p class="muted" style="font-size:13px">Вводите как в руководстве: <b>0°30'</b>, <b>-0 30</b> или десятичными градусами <b>0.5</b>.
-          Справа от поля видно, как программа поняла число.</p>
+        <h3 style="margin-top:0">${t('Углы')}</h3>
+        <p class="muted" style="font-size:13px">${t('Вводите как в руководстве: 0°30\', -0 30 или десятичными градусами 0.5. Справа от поля видно, как программа поняла число.')}</p>
         ${['front', 'rear'].map(ax => `
-          <h3>${ax === 'front' ? 'Передняя ось' : 'Задняя ось'}</h3>
+          <h3>${ax === 'front' ? t('Передняя ось') : t('Задняя ось')}</h3>
           <div class="cols2">
-            ${AX.filter(a => a.axles.includes(ax)).map(a => `
+            ${axes.filter(a => a.axles.includes(ax)).map(a => `
               <label class="f">${a.n} <small>${a.hint}</small>
                 <span class="row" style="gap:6px;align-items:center">
-                  <input type="text" data-ax="${ax}" data-k="${a.k}" data-b="min" placeholder="от" style="width:110px" value="${val(range(ax, a.k) && range(ax, a.k).min)}">
-                  <input type="text" data-ax="${ax}" data-k="${a.k}" data-b="max" placeholder="до" style="width:110px" value="${val(range(ax, a.k) && range(ax, a.k).max)}">
+                  <input type="text" data-ax="${ax}" data-k="${a.k}" data-b="min" placeholder="${esc(t('от'))}" style="width:110px" value="${val(range(ax, a.k) && range(ax, a.k).min)}">
+                  <input type="text" data-ax="${ax}" data-k="${a.k}" data-b="max" placeholder="${esc(t('до'))}" style="width:110px" value="${val(range(ax, a.k) && range(ax, a.k).max)}">
                   <span class="dim num" data-show="${ax}-${a.k}"></span>
                 </span></label>`).join('')}
-            <label class="f">Суммарное схождение в мм, если в документе так
-              <span class="row" style="gap:6px"><input type="number" step="0.1" data-mm="${ax}" data-b="min" placeholder="от, мм" style="width:110px">
-              <input type="number" step="0.1" data-mm="${ax}" data-b="max" placeholder="до, мм" style="width:110px"></span></label>
+            <label class="f">${t('Суммарное схождение в мм, если в документе так')}
+              <span class="row" style="gap:6px"><input type="number" step="0.1" data-mm="${ax}" data-b="min" placeholder="${esc(t('от, мм'))}" style="width:110px">
+              <input type="number" step="0.1" data-mm="${ax}" data-b="max" placeholder="${esc(t('до, мм'))}" style="width:110px"></span></label>
           </div>
           <div class="cols3" style="margin-top:8px">
             ${['camber', ...(ax === 'front' ? ['caster'] : []), 'toe'].map(k => `
-              <label class="chk"><input type="checkbox" data-adj="${ax}-${k}"><span>${{ camber: 'Развал', caster: 'Кастер', toe: 'Схождение' }[k]} регулируется</span></label>`).join('')}
+              <label class="chk"><input type="checkbox" data-adj="${ax}-${k}"><span>${{ camber: t('Развал регулируется'), caster: t('Кастер регулируется'), toe: t('Схождение регулируется') }[k]}</span></label>`).join('')}
           </div>
-          <label class="f" style="margin-top:6px">Чем регулируется (по руководству)<input type="text" data-method="${ax}" placeholder="например: регулировочные шайбы под осью нижнего рычага"></label>`).join('')}
+          <label class="f" style="margin-top:6px">${t('Чем регулируется (по руководству)')}<input type="text" data-method="${ax}" placeholder="${esc(t('например: регулировочные шайбы под осью нижнего рычага'))}"></label>`).join('')}
         <div class="cols3" style="margin-top:12px">
-          <label class="f">Разница развала лев./прав. не более<input type="text" id="cXCam" placeholder="0°30'"></label>
-          <label class="f">Разница кастера лев./прав. не более<input type="text" id="cXCas" placeholder="0°30'"></label>
-          <label class="f">Угол тяги не более<input type="text" id="cThr" placeholder="0°15'"></label>
+          <label class="f">${t('Разница развала лев./прав. не более')}<input type="text" id="cXCam" placeholder="0°30'"></label>
+          <label class="f">${t('Разница кастера лев./прав. не более')}<input type="text" id="cXCas" placeholder="0°30'"></label>
+          <label class="f">${t('Угол тяги не более')}<input type="text" id="cThr" placeholder="0°15'"></label>
         </div>
       </div>
 
       <div class="panel">
-        <h3 style="margin-top:0">Условия замера и источник</h3>
+        <h3 style="margin-top:0">${t('Условия замера и источник')}</h3>
         <div class="cols3">
-          <label class="f">Загрузка<input type="text" id="cLoad" placeholder="снаряжённая масса, полный бак"></label>
-          <label class="f">Давление в шинах<input type="text" id="cPress" placeholder="по норме, одинаково по бортам"></label>
-          <label class="f">Осадка подвески<input type="text" id="cSettle" placeholder="прокатить 3–5 м вперёд"></label>
-          <label class="f">Источник<select id="cKind">
-            <option value="factory">Заводское руководство</option><option value="licensed">Лицензионная база</option>
-            <option value="community">Сообщество, перепроверено</option><option value="unverified" selected>Не проверено</option></select></label>
-          <label class="f">Документ, издание, страница<input type="text" id="cRef" placeholder="Руководство по ремонту ГАЗ-3110, стр. 112">
-            <small>Для заводского источника обязательно.</small></label>
-          <label class="f">Как вас указать<input type="text" id="cWho" placeholder="необязательно"></label>
+          <label class="f">${t('Загрузка')}<input type="text" id="cLoad" placeholder="${esc(t('снаряжённая масса, полный бак'))}"></label>
+          <label class="f">${t('Давление в шинах')}<input type="text" id="cPress" placeholder="${esc(t('по норме, одинаково по бортам'))}"></label>
+          <label class="f">${t('Осадка подвески')}<input type="text" id="cSettle" placeholder="${esc(t('прокатить 3–5 м вперёд'))}"></label>
+          <label class="f">${t('Источник')}<select id="cKind">
+            <option value="factory">${t('Заводское руководство')}</option><option value="licensed">${t('Лицензионная база')}</option>
+            <option value="community">${t('Сообщество, перепроверено')}</option><option value="unverified" selected>${t('Не проверено')}</option></select></label>
+          <label class="f">${t('Документ, издание, страница')}<input type="text" id="cRef" placeholder="${esc(t('Руководство по ремонту ГАЗ-3110, стр. 112'))}">
+            <small>${t('Для заводского источника обязательно.')}</small></label>
+          <label class="f">${t('Как вас указать')}<input type="text" id="cWho" placeholder="${esc(t('необязательно'))}"></label>
         </div>
-        <label class="f" style="margin-top:10px">Примечания<input type="text" id="cNotes" placeholder="особенности конструкции, порядок регулировки"></label>
+        <label class="f" style="margin-top:10px">${t('Примечания')}<input type="text" id="cNotes" placeholder="${esc(t('особенности конструкции, порядок регулировки'))}"></label>
       </div>
 
       <div class="actions">
-        <button class="btn primary" id="cCheck">Проверить</button>
-        <button class="btn good" id="cSave">Сохранить у себя и выбрать</button>
-        <a class="btn hidden" id="cFile" download="vehicle.json">Скачать файл для проекта</a>
+        <button class="btn primary" id="cCheck">${t('Проверить')}</button>
+        <button class="btn good" id="cSave">${t('Сохранить у себя и выбрать')}</button>
+        <a class="btn hidden" id="cFile" download="vehicle.json">${t('Скачать файл для проекта')}</a>
       </div>
       <div id="cOut" style="margin-top:14px"></div>
     </div>`;
 
   $$('[data-k]', root).forEach(inp => inp.addEventListener('input', () => showParsed(inp.dataset.ax, inp.dataset.k)));
-  AX.forEach(a => a.axles.forEach(ax => showParsed(ax, a.k)));
+  axes.forEach(a => a.axles.forEach(ax => showParsed(ax, a.k)));
   if (own) {
     for (const ax of ['front', 'rear']) {
       const a = own[ax].adjustable || {};
@@ -151,7 +151,7 @@ function showParsed(ax, k) {
   const hi = parseAngle($(`[data-ax="${ax}"][data-k="${k}"][data-b="max"]`, root).value);
   const out = $(`[data-show="${ax}-${k}"]`, root);
   if (lo === null && hi === null) { out.textContent = ''; return; }
-  if (Number.isNaN(lo) || Number.isNaN(hi)) { out.innerHTML = '<span class="no">не понял число</span>'; return; }
+  if (Number.isNaN(lo) || Number.isNaN(hi)) { out.innerHTML = `<span class="no">${t('не понял число')}</span>`; return; }
   out.textContent = `= ${lo === null ? '?' : fmtDM(lo)} … ${hi === null ? '?' : fmtDM(hi)}`;
 }
 
@@ -167,7 +167,7 @@ function draft() {
 
   const axle = ax => {
     const out = { adjustable: {} };
-    for (const a of AX) {
+    for (const a of AX()) {
       if (!a.axles.includes(ax)) continue;
       const lo = parseAngle($(`[data-ax="${ax}"][data-k="${a.k}"][data-b="min"]`, root).value);
       const hi = parseAngle($(`[data-ax="${ax}"][data-k="${a.k}"][data-b="max"]`, root).value);
@@ -210,14 +210,14 @@ function draft() {
 async function check(andSave) {
   const out = $('#cOut', root);
   const spec = draft();
-  out.innerHTML = '<span class="spin"></span> Проверяю…';
+  out.innerHTML = `<span class="spin"></span> ${t('Проверяю…')}`;
   let d;
   try { d = await api('/api/specs/check', { method: 'POST', body: spec }); } catch (e) { out.innerHTML = `<div class="danger-box">${esc(e.message)}</div>`; return; }
-  const errs = (d.errors || []).length ? `<div class="danger-box"><b>Так запись не сохранится:</b><ul class="plain">${d.errors.map(e => `<li>${esc(e)}</li>`).join('')}</ul></div>` : '';
-  const warns = (d.warnings || []).length ? `<div class="warn" style="margin-top:10px"><b>Проверьте:</b><ul class="plain">${d.warnings.map(e => `<li>${esc(e)}</li>`).join('')}</ul></div>` : '';
-  const res = (d.resolved || []).length ? `<h3>Как программа поняла ваши цифры</h3><table class="params"><tbody>
+  const errs = (d.errors || []).length ? `<div class="danger-box"><b>${t('Так запись не сохранится:')}</b><ul class="plain">${d.errors.map(e => `<li>${esc(e)}</li>`).join('')}</ul></div>` : '';
+  const warns = (d.warnings || []).length ? `<div class="warn" style="margin-top:10px"><b>${t('Проверьте:')}</b><ul class="plain">${d.warnings.map(e => `<li>${esc(e)}</li>`).join('')}</ul></div>` : '';
+  const res = (d.resolved || []).length ? `<h3>${t('Как программа поняла ваши цифры')}</h3><table class="params"><tbody>
     ${d.resolved.map(x => `<tr><td>${esc(x.axle)}</td><td>${esc(x.name)}</td><td class="v">${esc(x.range)}</td><td class="muted">${esc(x.detail || '')}</td></tr>`).join('')}</tbody></table>` : '';
-  out.innerHTML = `${errs}${d.ok ? `<div class="ok-box">Запись корректна.${d.verified ? '' : ' Источник не заводской — программа будет показывать предупреждение.'}</div>` : ''}${warns}${res}`;
+  out.innerHTML = `${errs}${d.ok ? `<div class="ok-box">${t('Запись корректна.')}${d.verified ? '' : ' ' + t('Источник не заводской — программа будет показывать предупреждение.')}</div>` : ''}${warns}${res}`;
 
   const file = $('#cFile', root);
   if (d.ok && d.file) {
@@ -230,9 +230,8 @@ async function check(andSave) {
     try {
       await api('/api/specs/save', { method: 'POST', body: spec });
       await updateSession({ spec_id: spec.id });
-      toast('Сохранено у вас. Эта запись теперь находится поиском первой.');
-      out.insertAdjacentHTML('beforeend', `<div class="note" style="margin-top:10px">Хотите помочь всем владельцам этой модели? Скачайте файл
-        и пришлите его в проект (github.com/AristarhUcolov/wheel-alignment → Issues), указав, откуда цифры.</div>`);
+      toast(t('Сохранено у вас. Эта запись теперь находится поиском первой.'));
+      out.insertAdjacentHTML('beforeend', `<div class="note" style="margin-top:10px">${t('Хотите помочь всем владельцам этой модели? Скачайте файл и пришлите его в проект (github.com/AristarhUcolov/wheel-alignment → Issues), указав, откуда цифры.')}</div>`);
       setTimeout(() => go('vehicle'), 1200);
     } catch (e) { toast(e.message, true); }
   }

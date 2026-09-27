@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 	"github.com/AristarhUcolov/wheel-alignment/internal/suspension"
 )
@@ -173,7 +175,7 @@ const (
 )
 
 // ErrImplausible is returned for readings no road wheel can produce.
-var ErrImplausible = errors.New("live: implausible reading")
+var ErrImplausible = i18n.Err("неправдоподобное показание")
 
 // Push records a sensor reading.
 func (h *Hub) Push(in Input) error {
@@ -181,10 +183,10 @@ func (h *Hub) Push(in Input) error {
 		return fmt.Errorf("live: unknown wheel %d", in.Wheel)
 	}
 	if in.Camber != nil && !(math.Abs(*in.Camber) <= maxAbsCamber) {
-		return fmt.Errorf("%w: camber %.2f°", ErrImplausible, *in.Camber)
+		return fmt.Errorf("%w: %s", ErrImplausible, i18n.F("развал %.2f°", *in.Camber))
 	}
 	if in.Toe != nil && !(math.Abs(*in.Toe) <= maxAbsToe) {
-		return fmt.Errorf("%w: toe %.2f°", ErrImplausible, *in.Toe)
+		return fmt.Errorf("%w: %s", ErrImplausible, i18n.F("схождение %.2f°", *in.Toe))
 	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -205,10 +207,10 @@ func (h *Hub) Push(in Input) error {
 // PushSweep records a caster measurement on a steered wheel.
 func (h *Hub) PushSweep(in SweepInput) error {
 	if !in.Wheel.IsFront() {
-		return errors.New("live: caster is measured on steered (front) wheels only")
+		return i18n.Err("кастер меряется только на управляемых (передних) колёсах")
 	}
 	if !(math.Abs(in.Caster) <= maxAbsCaster) {
-		return fmt.Errorf("%w: caster %.2f°", ErrImplausible, in.Caster)
+		return fmt.Errorf("%w: %s", ErrImplausible, i18n.F("кастер %.2f°", in.Caster))
 	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
@@ -405,6 +407,9 @@ func (h *Hub) frameLocked() Frame {
 
 	for _, s := range h.sources {
 		c := *s
+		// Names are kept untranslated and translated here, so that they
+		// follow the language when it is switched.
+		c.Name, c.Detail = i18n.T(c.Name), i18n.T(c.Detail)
 		c.AgeS = round4(now.Sub(s.LastSeen).Seconds())
 		// Typed-in and photographed readings are one-shot: they do not go
 		// stale by falling silent, so their source never shows as offline.
@@ -434,11 +439,11 @@ func (h *Hub) Result() (align.Result, error) {
 	for _, p := range align.AllPositions {
 		c, t := &h.camber[p], &h.toe[p]
 		if !c.has || !t.has {
-			missing = append(missing, p.RussianName())
+			missing = append(missing, p.Label())
 			continue
 		}
 		if !c.stable(now, stableCamber) || !t.stable(now, stableToe) {
-			unsettled = append(unsettled, p.RussianName())
+			unsettled = append(unsettled, p.Label())
 		}
 		r := align.RawWheel{
 			Camber:        align.Deg(c.value),
@@ -457,7 +462,7 @@ func (h *Hub) Result() (align.Result, error) {
 		raw[p] = r
 	}
 	if len(missing) > 0 {
-		return align.Result{}, fmt.Errorf("нет замеров развала и схождения: %v", missing)
+		return align.Result{}, errors.New(i18n.F("нет замеров развала и схождения: %s", strings.Join(missing, ", ")))
 	}
 	g := align.Geometry{
 		Known:        h.cfg.TrackFrontMM > 0 && h.cfg.TrackRearMM > 0,
@@ -466,8 +471,8 @@ func (h *Hub) Result() (align.Result, error) {
 	}
 	res := align.Assemble(raw, g, "live")
 	if len(unsettled) > 0 {
-		res.Warnings = append([]string{fmt.Sprintf(
-			"Показания не успокоились на колёсах: %v. Снимок сделан, но перемерьте, когда стрелки встанут.", unsettled)},
+		res.Warnings = append([]string{i18n.F(
+			"Показания не успокоились на колёсах: %s. Снимок сделан, но перемерьте, когда стрелки встанут.", strings.Join(unsettled, ", "))},
 			res.Warnings...)
 	}
 	for _, p := range align.AllPositions {

@@ -8,6 +8,8 @@ import (
 	"io"
 	"math"
 	"os"
+
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // Gray is a single-channel image with intensities in [0, 1].
@@ -81,7 +83,7 @@ func FromImage(src image.Image) *Gray {
 func DecodeImage(r io.Reader) (*Gray, error) {
 	src, _, err := image.Decode(r)
 	if err != nil {
-		return nil, fmt.Errorf("не удалось разобрать изображение: %w", err)
+		return nil, fmt.Errorf(i18n.T("не удалось разобрать изображение: %w"), err)
 	}
 	return FromImage(src), nil
 }
@@ -90,7 +92,7 @@ func DecodeImage(r io.Reader) (*Gray, error) {
 func LoadImage(path string) (*Gray, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, fmt.Errorf("не удалось открыть снимок: %w", err)
+		return nil, fmt.Errorf(i18n.T("не удалось открыть снимок: %w"), err)
 	}
 	defer f.Close()
 	return DecodeImage(f)

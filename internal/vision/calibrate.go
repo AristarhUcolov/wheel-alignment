@@ -1,17 +1,17 @@
 package vision
 
 import (
-	"errors"
 	"fmt"
 	"math"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/numeric"
 )
 
 var (
-	ErrTooFewViews           = errors.New("vision: для калибровки нужно не менее 3 снимков мишени")
-	ErrDegenerateCalibration = errors.New("vision: снимки не определяют параметры камеры")
+	ErrTooFewViews           = i18n.Err("для калибровки нужно не менее 3 снимков мишени")
+	ErrDegenerateCalibration = i18n.Err("снимки не определяют параметры камеры")
 )
 
 // CalibrationView is one photograph of the calibration board, already detected.
@@ -88,7 +88,7 @@ func CalibrateCamera(target Target, views []CalibrationView, width, height int, 
 		return CalibrationResult{}, err
 	}
 	if len(views) < 3 {
-		return CalibrationResult{}, fmt.Errorf("%w (дано %d)", ErrTooFewViews, len(views))
+		return CalibrationResult{}, fmt.Errorf(i18n.T("%w (дано %d)"), ErrTooFewViews, len(views))
 	}
 	model := target.ModelPoints()
 	modelXY := make([]Point2, len(model))
@@ -97,7 +97,7 @@ func CalibrateCamera(target Target, views []CalibrationView, width, height int, 
 	}
 	for i, v := range views {
 		if len(v.Corners) != len(model) {
-			return CalibrationResult{}, fmt.Errorf("снимок %d: %d углов, а мишень требует %d",
+			return CalibrationResult{}, fmt.Errorf(i18n.T("снимок %d: %d углов, а мишень требует %d"),
 				i+1, len(v.Corners), len(model))
 		}
 	}
@@ -107,7 +107,7 @@ func CalibrateCamera(target Target, views []CalibrationView, width, height int, 
 	for i, v := range views {
 		h, err := homographyDLT(modelXY, v.Corners)
 		if err != nil {
-			return CalibrationResult{}, fmt.Errorf("снимок %d: %w", i+1, err)
+			return CalibrationResult{}, fmt.Errorf(i18n.T("снимок %d: %w"), i+1, err)
 		}
 		hs[i] = h
 	}
@@ -141,7 +141,7 @@ func CalibrateCamera(target Target, views []CalibrationView, width, height int, 
 		Fx: k.fx, Fy: k.fy, Cx: k.cx, Cy: k.cy,
 	}
 	if err := cam.Validate(); err != nil {
-		return CalibrationResult{}, fmt.Errorf("%w: линейное решение дало невозможные параметры (%v)",
+		return CalibrationResult{}, fmt.Errorf(i18n.T("%w: линейное решение дало невозможные параметры (%v)"),
 			ErrDegenerateCalibration, err)
 	}
 
@@ -150,7 +150,7 @@ func CalibrateCamera(target Target, views []CalibrationView, width, height int, 
 	for i, h := range hs {
 		p, err := poseFromHomographyK(h, cam)
 		if err != nil {
-			return CalibrationResult{}, fmt.Errorf("снимок %d: %w", i+1, err)
+			return CalibrationResult{}, fmt.Errorf(i18n.T("снимок %d: %w"), i+1, err)
 		}
 		poses[i] = p
 	}
@@ -162,7 +162,7 @@ func CalibrateCamera(target Target, views []CalibrationView, width, height int, 
 	}
 	cam.Calibrated = true
 	cam.CalibrationRMSPx = rms
-	cam.CalibrationNote = fmt.Sprintf("Калибровка по %d снимкам мишени %dx%d, клетка %.1f мм",
+	cam.CalibrationNote = i18n.F("Калибровка по %d снимкам мишени %dx%d, клетка %.1f мм",
 		len(views), target.Cols, target.Rows, target.SquareMM)
 
 	res := CalibrationResult{Camera: cam, RMSPx: rms, Poses: poses}
@@ -214,7 +214,7 @@ func intrinsicsFromB(b []float64) (intrinsics, error) {
 
 	den := B11*B22 - B12*B12
 	if math.Abs(den) < 1e-18 {
-		return intrinsics{}, fmt.Errorf("%w: вырожденная система", ErrDegenerateCalibration)
+		return intrinsics{}, fmt.Errorf(i18n.T("%w: вырожденная система"), ErrDegenerateCalibration)
 	}
 	cy := (B12*B13 - B11*B23) / den
 	lambda := B33 - (B13*B13+cy*(B12*B13-B11*B23))/B11
@@ -226,14 +226,14 @@ func intrinsicsFromB(b []float64) (intrinsics, error) {
 		cy = (B12*B13 - B11*B23) / den
 		lambda = B33 - (B13*B13+cy*(B12*B13-B11*B23))/B11
 		if lambda/B11 <= 0 {
-			return intrinsics{}, fmt.Errorf("%w: фокусное расстояние получилось мнимым — "+
-				"снимки, вероятно, слишком похожи друг на друга", ErrDegenerateCalibration)
+			return intrinsics{}, fmt.Errorf(i18n.T("%w: фокусное расстояние получилось мнимым — "+
+				"снимки, вероятно, слишком похожи друг на друга"), ErrDegenerateCalibration)
 		}
 	}
 	fx := math.Sqrt(lambda / B11)
 	fyArg := lambda * B11 / den
 	if fyArg <= 0 {
-		return intrinsics{}, fmt.Errorf("%w: фокусное расстояние по вертикали мнимое", ErrDegenerateCalibration)
+		return intrinsics{}, fmt.Errorf(i18n.T("%w: фокусное расстояние по вертикали мнимое"), ErrDegenerateCalibration)
 	}
 	fy := math.Sqrt(fyArg)
 	cx := -B13 * fx * fx / lambda
@@ -329,7 +329,7 @@ func refineCalibration(cam Camera, poses []geom.Pose, model []geom.Vec3, views [
 	}
 	c, ps := unpack(out.Params)
 	if err := c.Validate(); err != nil {
-		return cam, poses, 0, fmt.Errorf("%w: уточнение дало невозможные параметры (%v)", ErrDegenerateCalibration, err)
+		return cam, poses, 0, fmt.Errorf(i18n.T("%w: уточнение дало невозможные параметры (%v)"), ErrDegenerateCalibration, err)
 	}
 	return c, ps, out.RMS, nil
 }
@@ -369,30 +369,30 @@ func calibrationWarnings(r CalibrationResult, nViews int) []string {
 	var out []string
 
 	if nViews < 8 {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Всего %d снимков. Для устойчивой калибровки нужно 10–20 снимков мишени "+
 				"в разных положениях и под разными углами.", nViews))
 	}
 	if r.TiltSpreadDeg < 25 {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Мишень снята почти под одним углом (разброс наклона всего %.0f°). "+
 				"Фокусное расстояние и расстояние до мишени при этом неразличимы: наклоняйте доску "+
 				"в разные стороны на 30–45°, а не просто двигайте её по кадру.", r.TiltSpreadDeg))
 	}
 	if r.CoverageFraction < 0.5 {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Углы мишени покрыли лишь %.0f%% кадра. Дисторсия определяется только там, где есть данные, "+
 				"а сильнее всего она у краёв — именно там, где на замере окажутся колёса. "+
 				"Обязательно снимите мишень в каждом углу кадра.", r.CoverageFraction*100))
 	}
 	if r.RMSPx > 1.0 {
-		out = append(out, fmt.Sprintf(
+		out = append(out, i18n.F(
 			"Ошибка обратного проецирования %.2f пикс — слишком много. Проверьте, что мишень жёсткая и плоская, "+
 				"снимки резкие, а размер клетки измерен штангенциркулем по реальной распечатке.", r.RMSPx))
 	}
 	for i, v := range r.PerViewRMSPx {
 		if v > 3*math.Max(r.RMSPx, 0.05) && v > 1.0 {
-			out = append(out, fmt.Sprintf(
+			out = append(out, i18n.F(
 				"Снимок %d выбивается (%.2f пикс против общих %.2f) — вероятно, смазан или мишень на нём "+
 					"была изогнута. Исключите его и пересчитайте.", i+1, v, r.RMSPx))
 		}
@@ -413,12 +413,12 @@ func CalibrateFromImages(target Target, imgs []*Gray, labels []string, opt Calib
 	var skipped []string
 
 	for i, img := range imgs {
-		label := fmt.Sprintf("снимок %d", i+1)
+		label := i18n.F("снимок %d", i+1)
 		if i < len(labels) && labels[i] != "" {
 			label = labels[i]
 		}
 		if img.W != w || img.H != h {
-			skipped = append(skipped, fmt.Sprintf("%s: другой размер кадра (%dx%d вместо %dx%d)",
+			skipped = append(skipped, i18n.F("%s: другой размер кадра (%dx%d вместо %dx%d)",
 				label, img.W, img.H, w, h))
 			continue
 		}
@@ -431,7 +431,7 @@ func CalibrateFromImages(target Target, imgs []*Gray, labels []string, opt Calib
 	}
 
 	if len(views) < 3 {
-		return CalibrationResult{}, fmt.Errorf("%w: распознано только %d из %d снимков. %v",
+		return CalibrationResult{}, fmt.Errorf(i18n.T("%w: распознано только %d из %d снимков. %v"),
 			ErrTooFewViews, len(views), len(imgs), skipped)
 	}
 	res, err := CalibrateCamera(target, views, w, h, opt)
@@ -439,7 +439,7 @@ func CalibrateFromImages(target Target, imgs []*Gray, labels []string, opt Calib
 		return res, err
 	}
 	for _, s := range skipped {
-		res.Warnings = append(res.Warnings, "Снимок пропущен — "+s)
+		res.Warnings = append(res.Warnings, i18n.F("Снимок пропущен — %s", s))
 	}
 	return res, nil
 }

@@ -20,9 +20,10 @@ import (
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
-var ErrSweepTooSmall = errors.New("measure: steering sweep too small to resolve caster")
+var ErrSweepTooSmall = i18n.Err("поворот колеса слишком мал, чтобы определить кастер")
 
 // SweepReading is a two-point caster sweep, the method every workshop used
 // before 3D machines existed and the one a person can do at home with
@@ -122,8 +123,8 @@ type SweepSolution struct {
 func (s SweepReading) Solve(p align.Position) (SweepSolution, error) {
 	tOut, tIn := s.turns()
 	if tOut < geom.Rad(5) || tIn < geom.Rad(5) {
-		return SweepSolution{}, fmt.Errorf("%w: %.1f° / %.1f°, need at least 5° each way (20° recommended)",
-			ErrSweepTooSmall, geom.Deg(tOut), geom.Deg(tIn))
+		return SweepSolution{}, fmt.Errorf("%w: %s", ErrSweepTooSmall,
+			i18n.F("%.1f° / %.1f°, нужно не меньше 5° в каждую сторону (лучше 20°)", geom.Deg(tOut), geom.Deg(tIn)))
 	}
 	// The symmetric figure, for the fallback and the SAI warning.
 	sw := (tOut + tIn) / 2
@@ -143,9 +144,9 @@ func (s SweepReading) Solve(p align.Position) (SweepSolution, error) {
 		}
 		return SweepSolution{
 			Caster: align.Rad(math.Asin(-side * bCoef)),
-			Method: "two-point (приближённая формула)",
-			Warnings: []string{"Не введён развал в положении «прямо» — кастер посчитан по приближённой формуле, " +
-				"а поперечный наклон оси (SAI) не определён. Погрешность до ~0,3° на машинах с большим кастером."},
+			Method: i18n.T("по двум точкам (приближённая формула)"),
+			Warnings: []string{i18n.T("Не введён развал в положении «прямо» — кастер посчитан по приближённой формуле, " +
+				"а поперечный наклон оси (SAI) не определён. Погрешность до ~0,3° на машинах с большим кастером.")},
 		}, nil
 	}
 
@@ -191,8 +192,8 @@ func (s SweepReading) Solve(p align.Position) (SweepSolution, error) {
 		}
 		return SweepSolution{
 			Caster:   align.Rad(math.Asin(-side * bCoef)),
-			Method:   "two-point (приближённая формула, точное решение не сошлось)",
-			Warnings: []string{"Точное решение не сошлось — проверьте, не перепутаны ли замеры «наружу» и «внутрь»."},
+			Method:   i18n.T("по двум точкам (приближённая формула, точное решение не сошлось)"),
+			Warnings: []string{i18n.T("Точное решение не сошлось — проверьте, не перепутаны ли замеры «наружу» и «внутрь».")},
 		}, nil
 	}
 
@@ -203,14 +204,14 @@ func (s SweepReading) Solve(p align.Position) (SweepSolution, error) {
 	sol := SweepSolution{
 		Caster: caster,
 		SAI:    &sai,
-		Method: "two-point (точное решение)",
+		Method: i18n.T("по двум точкам (точное решение)"),
 	}
 	// SAI comes from the even part of the sweep, whose divisor is (1 − cos θ):
 	// 0.060 at a 20° sweep. Every camber error is amplified by 1/0.060 ≈ 17, so
 	// a 0.1° gauge is worth about 1.7° of SAI. The number is useful for
 	// comparing left against right — a bent strut shows up plainly — and not
 	// much else.
-	sol.Warnings = append(sol.Warnings, fmt.Sprintf(
+	sol.Warnings = append(sol.Warnings, i18n.F(
 		"SAI рассчитан из изменения развала при повороте: погрешность замеров усиливается примерно в %.0f раз "+
 			"(при повороте на %.0f°). Пользуйтесь им только для сравнения левого и правого борта — "+
 			"разница выдаёт погнутую деталь. Как точное значение не используйте.",
@@ -219,8 +220,8 @@ func (s SweepReading) Solve(p align.Position) (SweepSolution, error) {
 }
 
 func impossible(v float64) error {
-	return fmt.Errorf("measure: замеры дают невозможный кастер (коэффициент %.2f) — "+
-		"скорее всего, перепутаны положения «наружу» и «внутрь»", v)
+	return errors.New(i18n.F("замеры дают невозможный кастер (коэффициент %.2f) — "+
+		"скорее всего, перепутаны положения «наружу» и «внутрь»", v))
 }
 
 // solveAxis inverts the pair
@@ -309,7 +310,7 @@ func (s SweepReading) CasterClassic() (align.Angle, error) {
 func SteeringAxisFromSweep(spinAxes []geom.Vec3, upHint geom.Vec3) (geom.Vec3, error) {
 	k, err := geom.FitConeAxis(spinAxes, upHint)
 	if err != nil {
-		return geom.Vec3{}, fmt.Errorf("%w: need ≥3 steering positions spanning ≥10° of sweep", err)
+		return geom.Vec3{}, fmt.Errorf("%w: %s", err, i18n.T("нужно не меньше трёх положений колеса в пределах поворота от 10°"))
 	}
 	return k, nil
 }
@@ -330,7 +331,7 @@ func SteeringAxisLineFromPoses(poses []geom.Pose, upHint geom.Vec3) (dir, point 
 		return geom.Vec3{}, geom.Vec3{}, err
 	}
 	if fit.Sweep < geom.Rad(8) {
-		return geom.Vec3{}, geom.Vec3{}, fmt.Errorf("%w: only %.1f° of sweep observed", ErrSweepTooSmall, geom.Deg(fit.Sweep))
+		return geom.Vec3{}, geom.Vec3{}, fmt.Errorf("%w: %s", ErrSweepTooSmall, i18n.F("колесо повернули всего на %.1f°", geom.Deg(fit.Sweep)))
 	}
 	d := fit.Direction
 	if d.Dot(upHint) < 0 {

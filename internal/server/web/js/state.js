@@ -1,5 +1,7 @@
 // Общее состояние интерфейса и связь с программой.
 
+import { t } from './i18n.js';
+
 const listeners = new Map();
 
 export const state = {
@@ -50,13 +52,13 @@ export async function api(path, { method = 'GET', body, form } = {}) {
   try {
     r = await fetch(path, opt);
   } catch (e) {
-    throw new Error('Нет связи с программой: ' + e.message);
+    throw new Error(t('Нет связи с программой: {msg}', { msg: e.message }));
   }
   let data = null;
   const text = await r.text();
   try { data = text ? JSON.parse(text) : null; } catch { data = { error: text }; }
   if (!r.ok) {
-    const err = new Error((data && data.error) || `Ошибка ${r.status}`);
+    const err = new Error((data && data.error) || t('Ошибка {code}', { code: r.status }));
     err.data = data;
     err.status = r.status;
     throw err;

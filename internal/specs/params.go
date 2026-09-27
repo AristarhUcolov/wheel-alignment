@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // Parameter keys. They are shared by the printed report (Compare) and the live
@@ -64,7 +65,7 @@ func Lookup(s *Spec, key string) ParamSpec {
 
 	if pos, ok := wheelKey(KeyCamber); ok {
 		ax := axleOf(s, pos.IsFront())
-		p.Label, p.Axle = "Развал, "+pos.RussianName(), axleName(pos.IsFront())
+		p.Label, p.Axle = i18n.F("Развал, %s", pos.Label()), axleName(pos.IsFront())
 		p.Spec = rangeOf(ax, func(a *AxleSpec) *align.Range { return a.Camber })
 		p.Adjustable = adjOf(ax, func(a *AxleSpec) bool { return a.Adjustable.Camber })
 		p.Method = methodOf(ax, func(a *AxleSpec) string { return a.Adjustable.CamberMethod })
@@ -72,7 +73,7 @@ func Lookup(s *Spec, key string) ParamSpec {
 	}
 	if pos, ok := wheelKey(KeyCaster); ok {
 		ax := axleOf(s, pos.IsFront())
-		p.Label, p.Axle = "Кастер, "+pos.RussianName(), axleName(pos.IsFront())
+		p.Label, p.Axle = i18n.F("Кастер, %s", pos.Label()), axleName(pos.IsFront())
 		p.Spec = rangeOf(ax, func(a *AxleSpec) *align.Range { return a.Caster })
 		p.Adjustable = adjOf(ax, func(a *AxleSpec) bool { return a.Adjustable.Caster })
 		p.Method = methodOf(ax, func(a *AxleSpec) string { return a.Adjustable.CasterMethod })
@@ -80,13 +81,13 @@ func Lookup(s *Spec, key string) ParamSpec {
 	}
 	if pos, ok := wheelKey(KeySAI); ok {
 		ax := axleOf(s, pos.IsFront())
-		p.Label, p.Axle = "Поперечный наклон оси (SAI), "+pos.RussianName(), axleName(pos.IsFront())
+		p.Label, p.Axle = i18n.F("Поперечный наклон оси (SAI), %s", pos.Label()), axleName(pos.IsFront())
 		p.Spec = rangeOf(ax, func(a *AxleSpec) *align.Range { return a.SAI })
 		return p
 	}
 	if pos, ok := wheelKey(KeyToe); ok {
 		ax := axleOf(s, pos.IsFront())
-		p.Label, p.Axle = "Схождение, "+pos.RussianName(), axleName(pos.IsFront())
+		p.Label, p.Axle = i18n.F("Схождение, %s", pos.Label()), axleName(pos.IsFront())
 		p.Spec = rangeOf(ax, func(a *AxleSpec) *align.Range { return a.IndividualToe })
 		p.Adjustable = adjOf(ax, func(a *AxleSpec) bool { return a.Adjustable.Toe })
 		p.Method = methodOf(ax, func(a *AxleSpec) string { return a.Adjustable.ToeMethod })
@@ -97,7 +98,7 @@ func Lookup(s *Spec, key string) ParamSpec {
 	case KeyFrontTotalToe, KeyRearTotalToe:
 		front := key == KeyFrontTotalToe
 		ax := axleOf(s, front)
-		p.Label, p.Axle = "Суммарное схождение оси", axleName(front)
+		p.Label, p.Axle = i18n.T("Суммарное схождение оси"), axleName(front)
 		p.Spec = rangeOf(ax, func(a *AxleSpec) *align.Range { return a.TotalToe })
 		p.Adjustable = adjOf(ax, func(a *AxleSpec) bool { return a.Adjustable.Toe })
 		if s != nil {
@@ -105,13 +106,13 @@ func Lookup(s *Spec, key string) ParamSpec {
 		}
 	case KeyFrontCrossCamber, KeyRearCrossCamber:
 		front := key == KeyFrontCrossCamber
-		p.Label, p.Axle = "Разница развала (лев − прав)", axleName(front)
+		p.Label, p.Axle = i18n.T("Разница развала (лев − прав)"), axleName(front)
 		p.Spec = crossRange(axleOf(s, front), true)
 	case KeyFrontCrossCaster:
-		p.Label, p.Axle = "Разница кастера (лев − прав)", "front"
+		p.Label, p.Axle = i18n.T("Разница кастера (лев − прав)"), "front"
 		p.Spec = crossRange(axleOf(s, true), false)
 	case KeyThrustAngle:
-		p.Label, p.Axle = "Угол тяги", "vehicle"
+		p.Label, p.Axle = i18n.T("Угол тяги"), "vehicle"
 		if s != nil && s.MaxThrustAngle != nil {
 			t := align.RangeMinMax(-*s.MaxThrustAngle, *s.MaxThrustAngle)
 			p.Spec = &t

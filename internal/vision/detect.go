@@ -7,13 +7,14 @@ import (
 	"sort"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/numeric"
 )
 
 var (
-	ErrNoCorners   = errors.New("vision: на снимке не найдено углов шахматного узора")
-	ErrNoGrid      = errors.New("vision: найденные углы не складываются в сетку заданного размера")
-	ErrGridPartial = errors.New("vision: мишень видна не полностью")
+	ErrNoCorners   = i18n.Err("на снимке не найдено углов шахматного узора")
+	ErrNoGrid      = i18n.Err("найденные углы не складываются в сетку заданного размера")
+	ErrGridPartial = i18n.Err("мишень видна не полностью")
 )
 
 // DetectOptions tunes checkerboard detection.
@@ -129,7 +130,7 @@ func DetectCheckerboard(img *Gray, opt DetectOptions) (Detection, error) {
 	}
 	fitted, _, ok := fitBoard(work, corners, opt.Target)
 	if !ok {
-		return det, fmt.Errorf("%w: кандидатов %d, требуется сетка %dx%d",
+		return det, fmt.Errorf(i18n.T("%w: кандидатов %d, требуется сетка %dx%d"),
 			ErrNoGrid, len(corners), opt.Target.Cols, opt.Target.Rows)
 	}
 	fitted.CandidatesFound = len(corners)
@@ -146,7 +147,7 @@ func detectCorners(work *Gray, opt DetectOptions) ([]Point2, Detection, error) {
 	peaks := saddlePeaks(work, opt.NMSRadius, opt.MaxCandidates)
 	det.CandidatesFound = len(peaks)
 	if len(peaks) < 8 {
-		return nil, det, fmt.Errorf("%w: найдено всего %d углов. Проверьте резкость, освещение и что мишень в кадре",
+		return nil, det, fmt.Errorf(i18n.T("%w: найдено всего %d углов. Проверьте резкость, освещение и что мишень в кадре"),
 			ErrNoCorners, len(peaks))
 	}
 
@@ -160,7 +161,7 @@ func detectCorners(work *Gray, opt DetectOptions) ([]Point2, Detection, error) {
 	}
 	spacing := medianNearestNeighbour(strongest)
 	if spacing < 4 {
-		return nil, det, fmt.Errorf("%w: клетки мишени неразличимы (оценка шага %.1f пикс)", ErrNoCorners, spacing)
+		return nil, det, fmt.Errorf(i18n.T("%w: клетки мишени неразличимы (оценка шага %.1f пикс)"), ErrNoCorners, spacing)
 	}
 
 	corners := refineAll(work, peaks, opt.RefineWindow)
@@ -174,7 +175,7 @@ func detectCorners(work *Gray, opt DetectOptions) ([]Point2, Detection, error) {
 	corners = filterCrossings(work, corners, localScales(corners), 0.30)
 	corners = filterConnected(corners, localScales(corners), 1.35)
 	if len(corners) < 4 {
-		return nil, det, fmt.Errorf("%w: после отсева осталось %d настоящих пересечений клеток",
+		return nil, det, fmt.Errorf(i18n.T("%w: после отсева осталось %d настоящих пересечений клеток"),
 			ErrNoCorners, len(corners))
 	}
 	det.MeanSpacingPx = medianNearestNeighbour(corners)
@@ -203,13 +204,13 @@ func fitBoard(work *Gray, corners []Point2, target Target) (Detection, []Point2,
 	det.Corners = ordered
 	det.GridRMSPx, det.MeanSpacingPx = gridQuality(ordered, h, cols, rows)
 	if det.GridRMSPx > 1.0 {
-		det.Warnings = append(det.Warnings, fmt.Sprintf(
+		det.Warnings = append(det.Warnings, i18n.F(
 			"Углы ложатся на проективную сетку с разбросом %.2f пикс — это много. "+
 				"Возможна смазанность, отражения на мишени или изгиб листа: мишень должна быть жёсткой и плоской.",
 			det.GridRMSPx))
 	}
 	if det.MeanSpacingPx < 12 {
-		det.Warnings = append(det.Warnings, fmt.Sprintf(
+		det.Warnings = append(det.Warnings, i18n.F(
 			"Клетка мишени занимает всего %.0f пикс — субпиксельное уточнение на таком масштабе работает плохо. "+
 				"Подойдите ближе или возьмите мишень крупнее.", det.MeanSpacingPx))
 	}
@@ -274,7 +275,7 @@ func DetectBoards(img *Gray, targets []Target, opt DetectOptions) ([]Detection, 
 		}
 		det, used, ok := fitBoard(work, remaining, targets[idx])
 		if !ok {
-			errs[idx] = fmt.Errorf("%w: мишень %dx%d не найдена среди %d углов",
+			errs[idx] = fmt.Errorf(i18n.T("%w: мишень %dx%d не найдена среди %d углов"),
 				ErrNoGrid, targets[idx].Cols, targets[idx].Rows, len(remaining))
 			continue
 		}
@@ -852,13 +853,13 @@ func needsHalfTurn(img *Gray, h geom.Mat3, cols, rows int) (bool, error) {
 		}
 	}
 	if evenN == 0 || oddN == 0 {
-		return false, errors.New("не удалось прочитать цвета клеток — ориентация мишени определена только по геометрии " +
-			"и может быть повёрнута на 180°")
+		return false, errors.New(i18n.T("не удалось прочитать цвета клеток — ориентация мишени определена только по геометрии " +
+			"и может быть повёрнута на 180°"))
 	}
 	evenMean, oddMean := evenSum/float64(evenN), oddSum/float64(oddN)
 	if math.Abs(evenMean-oddMean) < 0.05 {
-		return false, fmt.Errorf("клетки мишени почти не различаются по яркости (%.3f и %.3f) — "+
-			"ориентация может быть определена с поворотом на 180°. Проверьте освещение и контраст мишени",
+		return false, fmt.Errorf(i18n.T("клетки мишени почти не различаются по яркости (%.3f и %.3f) — "+
+			"ориентация может быть определена с поворотом на 180°. Проверьте освещение и контраст мишени"),
 			evenMean, oddMean)
 	}
 	// Convention: squares with even (c+r) are the dark ones.

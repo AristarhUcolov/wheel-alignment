@@ -1,13 +1,13 @@
 package phone
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/tls"
 	"embed"
 	"encoding/base32"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/live"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 )
@@ -77,7 +78,7 @@ func (l *Link) Enable() error {
 	ips := lanIPs()
 	cert, err := certificate(filepath.Join(l.dir, "tls"), ips)
 	if err != nil {
-		return fmt.Errorf("не удалось создать сертификат: %w", err)
+		return fmt.Errorf("%s: %w", i18n.T("не удалось создать сертификат"), err)
 	}
 	var ln net.Listener
 	for port := 8701; port <= 8720; port++ {
@@ -88,7 +89,7 @@ func (l *Link) Enable() error {
 		}
 	}
 	if ln == nil {
-		return fmt.Errorf("не удалось открыть порт для телефонов: %w", err)
+		return fmt.Errorf("%s: %w", i18n.T("не удалось открыть порт для телефонов"), err)
 	}
 	l.token = newToken()
 	l.ips = ips
@@ -202,6 +203,9 @@ type PhoneState struct {
 	Caster    *float64     `json:"caster,omitempty"`
 	Runout    *float64     `json:"runout,omitempty"`
 	Gyro      bool         `json:"gyro"`
+	// Lang tells the page which language the program speaks, for its own
+	// buttons; the prompts above already come translated.
+	Lang string `json:"lang"`
 }
 
 type phoneRequest struct {
@@ -243,10 +247,13 @@ func (l *Link) SetToken(t string) {
 
 func (l *Link) page(w http.ResponseWriter, r *http.Request) {
 	if !l.authorised(r) {
-		http.Error(w, "Ссылка устарела: отсканируйте код на экране компьютера заново.", http.StatusNotFound)
+		http.Error(w, i18n.T("Ссылка устарела: отсканируйте код на экране компьютера заново."), http.StatusNotFound)
 		return
 	}
 	b, _ := pageFS.ReadFile("web/phone.html")
+	// Страница переводит свои надписи сама, но язык должна знать до первого
+	// ответа, иначе на миг покажется русский текст.
+	b = bytes.Replace(b, []byte(`<html lang="ru">`), []byte(`<html lang="`+string(i18n.Current())+`">`), 1)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store")
 	_, _ = w.Write(b)
@@ -254,7 +261,7 @@ func (l *Link) page(w http.ResponseWriter, r *http.Request) {
 
 func (l *Link) data(w http.ResponseWriter, r *http.Request) {
 	if !l.authorised(r) {
-		http.Error(w, "ключ устарел", http.StatusNotFound)
+		http.Error(w, i18n.T("ключ устарел"), http.StatusNotFound)
 		return
 	}
 	var req phoneRequest
@@ -264,7 +271,7 @@ func (l *Link) data(w http.ResponseWriter, r *http.Request) {
 	}
 	id := sanitizeID(req.Device)
 	if id == "" {
-		http.Error(w, "нет идентификатора телефона", http.StatusBadRequest)
+		http.Error(w, i18n.T("нет идентификатора телефона"), http.StatusBadRequest)
 		return
 	}
 	st, err := l.handle(id, req)
@@ -286,7 +293,7 @@ func (l *Link) handle(id string, req phoneRequest) (PhoneState, error) {
 	if n := strings.TrimSpace(req.Name); n != "" {
 		d.Name = truncate(n, 40)
 	} else if d.Name == "" {
-		d.Name = "Телефон " + strings.ToUpper(id[:min(4, len(id))])
+		d.Name = i18n.F("Телефон %s", strings.ToUpper(id[:min(4, len(id))]))
 	}
 
 	var cmdErr error
@@ -333,7 +340,11 @@ func (l *Link) handle(id string, req phoneRequest) (PhoneState, error) {
 	}
 	src := "phone:" + id
 	if hasWheel {
-		l.hub.Touch(live.SourceInfo{ID: src, Kind: "phone", Name: name, Wheel: wheel.String(), Detail: "развал" + map[bool]string{true: ", кастер", false: ""}[wheel.IsFront()]})
+		detail := i18n.N("развал")
+		if wheel.IsFront() {
+			detail = i18n.N("развал, кастер")
+		}
+		l.hub.Touch(live.SourceInfo{ID: src, Kind: "phone", Name: name, Wheel: wheel.String(), Detail: detail})
 		for _, c := range pushCamber {
 			c := c
 			_ = l.hub.Push(live.Input{Wheel: wheel, Camber: &c, Source: src})
@@ -361,9 +372,10 @@ func (l *Link) stateLocked(d *Device) PhoneState {
 	st := PhoneState{
 		Step: d.Step, Prompt: d.Prompt, Error: d.Err, Progress: round2(d.Progress),
 		Flat: d.Cal.Flat, Mounted: d.Cal.Mounted, Stable: d.stable, Gyro: d.hasGyro,
+		Lang: string(i18n.Current()),
 	}
 	if d.HasWheel {
-		st.Wheel, st.WheelName, st.Front = d.Wheel.String(), d.Wheel.RussianName(), d.Wheel.IsFront()
+		st.Wheel, st.WheelName, st.Front = d.Wheel.String(), d.Wheel.Label(), d.Wheel.IsFront()
 	}
 	if d.camberOK {
 		c := round2(d.camber)
@@ -415,7 +427,7 @@ func (l *Link) saveCals() {
 }
 
 // ErrDisabled is returned when the link is used while switched off.
-var ErrDisabled = errors.New("доступ для телефонов выключен")
+var ErrDisabled = i18n.Err("доступ для телефонов выключен")
 
 func sanitizeID(s string) string {
 	var b strings.Builder

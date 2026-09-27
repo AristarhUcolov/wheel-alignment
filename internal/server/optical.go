@@ -7,9 +7,11 @@ import (
 	"mime/multipart"
 	"net/http"
 	"sort"
+	"strings"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 	"github.com/AristarhUcolov/wheel-alignment/internal/vision"
 )
 
@@ -80,7 +82,7 @@ func decodeUploads(files []*multipart.FileHeader) ([]*vision.Gray, []string, []s
 // camera the operator can save and reuse.
 func (s *Server) calibrate(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(maxUpload); err != nil {
-		writeErr(w, http.StatusBadRequest, fmt.Errorf("не удалось прочитать загруженные снимки: %w", err))
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("%s: %w", i18n.T("не удалось прочитать загруженные снимки"), err))
 		return
 	}
 	target, err := targetFromForm(r.MultipartForm)
@@ -92,7 +94,7 @@ func (s *Server) calibrate(w http.ResponseWriter, r *http.Request) {
 	files := r.MultipartForm.File["images"]
 	if len(files) < 3 {
 		writeErr(w, http.StatusBadRequest, errors.New(
-			"нужно минимум 3 снимка мишени, а лучше 10–20 — под разными углами и по всему кадру"))
+			i18n.T("нужно минимум 3 снимка мишени, а лучше 10–20 — под разными углами и по всему кадру")))
 		return
 	}
 	// Deterministic order so the "snapshot N" labels match what the operator
@@ -101,7 +103,7 @@ func (s *Server) calibrate(w http.ResponseWriter, r *http.Request) {
 
 	imgs, labels, failed := decodeUploads(files)
 	if len(imgs) < 3 {
-		writeErr(w, http.StatusBadRequest, fmt.Errorf("удалось прочитать только %d снимков: %v", len(imgs), failed))
+		writeErr(w, http.StatusBadRequest, errors.New(i18n.F("удалось прочитать только %d снимков: %s", len(imgs), strings.Join(failed, "; "))))
 		return
 	}
 
@@ -111,7 +113,7 @@ func (s *Server) calibrate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, f := range failed {
-		res.Warnings = append(res.Warnings, "Файл не прочитан — "+f)
+		res.Warnings = append(res.Warnings, i18n.F("Файл не прочитан — %s", f))
 	}
 
 	writeJSON(w, http.StatusOK, map[string]any{
@@ -140,7 +142,7 @@ func calibrationGrade(res vision.CalibrationResult) string {
 // opticalCamber recovers one wheel's camber from photographs of it being turned.
 func (s *Server) opticalCamber(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(maxUpload); err != nil {
-		writeErr(w, http.StatusBadRequest, fmt.Errorf("не удалось прочитать загруженные снимки: %w", err))
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("%s: %w", i18n.T("не удалось прочитать загруженные снимки"), err))
 		return
 	}
 	form := r.MultipartForm
@@ -166,7 +168,7 @@ func (s *Server) opticalCamber(w http.ResponseWriter, r *http.Request) {
 	files := form.File["images"]
 	if len(files) < 3 {
 		writeErr(w, http.StatusBadRequest, errors.New(
-			"нужно минимум 3 снимка колеса, провёрнутого между кадрами"))
+			i18n.T("нужно минимум 3 снимка колеса, провёрнутого между кадрами")))
 		return
 	}
 	sort.Slice(files, func(i, j int) bool { return files[i].Filename < files[j].Filename })
@@ -195,17 +197,17 @@ func (s *Server) opticalCamber(w http.ResponseWriter, r *http.Request) {
 
 	warnings := append([]string(nil), res.Warnings...)
 	for _, f := range failed {
-		warnings = append(warnings, "Файл не прочитан — "+f)
+		warnings = append(warnings, i18n.F("Файл не прочитан — %s", f))
 	}
 	if levelAssumed {
-		warnings = append(warnings, "Развал посчитан в предположении, что камера стояла строго горизонтально "+
+		warnings = append(warnings, i18n.T("Развал посчитан в предположении, что камера стояла строго горизонтально "+
 			"(по уровню). Если камера была наклонена, развал сместится ровно на этот наклон — "+
-			"выставьте камеру по пузырьковому уровню или укажите её наклон.")
+			"выставьте камеру по пузырьковому уровню или укажите её наклон."))
 	}
 
 	writeJSON(w, http.StatusOK, map[string]any{
 		"position":         pos.String(),
-		"position_ru":      pos.RussianName(),
+		"position_ru":      pos.Label(),
 		"camber_deg":       round4(camber),
 		"camber_degmin":    align.Deg(camber).FormatDegMin(),
 		"runout_deg":       round4(res.RunoutDeg),
@@ -228,19 +230,19 @@ func cameraFromForm(f *multipart.Form) (vision.Camera, error) {
 		defer file.Close()
 		var c vision.Camera
 		if err := json.NewDecoder(file).Decode(&c); err != nil {
-			return vision.Camera{}, fmt.Errorf("файл калибровки повреждён: %w", err)
+			return vision.Camera{}, fmt.Errorf("%s: %w", i18n.T("файл калибровки повреждён"), err)
 		}
 		return c, c.Validate()
 	}
 	if v := formValue(f, "camera_json"); v != "" {
 		var c vision.Camera
 		if err := json.Unmarshal([]byte(v), &c); err != nil {
-			return vision.Camera{}, fmt.Errorf("калибровка камеры не разобрана: %w", err)
+			return vision.Camera{}, fmt.Errorf("%s: %w", i18n.T("калибровка камеры не разобрана"), err)
 		}
 		return c, c.Validate()
 	}
 	return vision.Camera{}, errors.New(
-		"не приложена калибровка камеры (camera.json). Сначала откалибруйте камеру: wheelalign calibrate")
+		i18n.T("не приложена калибровка камеры (camera.json). Сначала откалибруйте камеру: wheelalign calibrate"))
 }
 
 func positionFromForm(f *multipart.Form) (align.Position, error) {
@@ -254,7 +256,7 @@ func positionFromForm(f *multipart.Form) (align.Position, error) {
 	case "RR":
 		return align.RR, nil
 	default:
-		return align.FL, errors.New("не указано, какое это колесо (FL/FR/RL/RR)")
+		return align.FL, errors.New(i18n.T("не указано, какое это колесо (FL/FR/RL/RR)"))
 	}
 }
 

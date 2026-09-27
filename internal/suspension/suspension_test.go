@@ -3,6 +3,8 @@ package suspension
 import (
 	"strings"
 	"testing"
+
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // TestEveryDesignIsDescribed: an entry the interface would render half empty is
@@ -82,6 +84,16 @@ func TestForFiltersByAxle(t *testing.T) {
 	for _, i := range For(AxleRear) {
 		if i.Axle == AxleFront {
 			t.Errorf("%s offered as a rear suspension", i.Name)
+		}
+	}
+}
+
+// TestEveryDesignIsTranslated: someone reading the English interface under
+// their car must not meet a Russian paragraph.
+func TestEveryDesignIsTranslated(t *testing.T) {
+	for _, s := range Strings() {
+		if !i18n.Has(s) {
+			t.Errorf("no English for %q", s)
 		}
 	}
 }

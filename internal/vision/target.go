@@ -1,9 +1,11 @@
 package vision
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/AristarhUcolov/wheel-alignment/internal/geom"
+	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
 // Target describes a printed checkerboard clamped to a wheel.
@@ -36,13 +38,13 @@ type Target struct {
 func (t Target) Validate() error {
 	switch {
 	case t.Cols < 3 || t.Rows < 3:
-		return fmt.Errorf("vision: мишень %dx%d слишком мала — нужно минимум 3x3 внутренних угла", t.Cols, t.Rows)
+		return fmt.Errorf(i18n.T("мишень %dx%d слишком мала — нужно минимум 3x3 внутренних угла"), t.Cols, t.Rows)
 	case t.Cols == t.Rows:
 		// A square board has a 90° rotational symmetry that no detector can
 		// resolve, so the recovered pose can be a quarter-turn out. On a wheel
 		// that swaps camber with toe.
-		return fmt.Errorf("vision: мишень %dx%d квадратная — её ориентация неоднозначна с точностью до поворота на 90°, "+
-			"из-за чего развал можно принять за схождение. Используйте прямоугольную, например 9x6",
+		return fmt.Errorf(i18n.T("мишень %dx%d квадратная — её ориентация неоднозначна с точностью до поворота на 90°, "+
+			"из-за чего развал можно принять за схождение. Используйте прямоугольную, например 9x6"),
 			t.Cols, t.Rows)
 	case (t.Cols+t.Rows)%2 == 0:
 		// A checkerboard looks identical rotated 180°, and geometry alone can
@@ -52,11 +54,11 @@ func (t Target) Validate() error {
 		// sum the board is genuinely, irreducibly ambiguous, and a detector that
 		// silently guessed would flip the recovered pose at random between
 		// frames, destroying runout compensation.
-		return fmt.Errorf("vision: у мишени %dx%d сумма сторон чётная — такая доска выглядит одинаково "+
+		return fmt.Errorf(i18n.T("у мишени %dx%d сумма сторон чётная — такая доска выглядит одинаково "+
 			"при повороте на 180°, и ориентацию невозможно определить в принципе. "+
-			"Возьмите доску с нечётной суммой, например 9x6 или 7x6", t.Cols, t.Rows)
+			"Возьмите доску с нечётной суммой, например 9x6 или 7x6"), t.Cols, t.Rows)
 	case t.SquareMM <= 0:
-		return fmt.Errorf("vision: не задан размер клетки мишени")
+		return errors.New(i18n.T("не задан размер клетки мишени"))
 	}
 	return nil
 }
@@ -92,7 +94,7 @@ func (t Target) DiagonalMM() float64 {
 // which fits on one A4 sheet with a margin and is large enough to give useful
 // angular resolution at the two to three metres a camera stands from a wheel.
 func DefaultTarget() Target {
-	return Target{Name: "A4 9x6 / 30 мм", Cols: 9, Rows: 6, SquareMM: 30}
+	return Target{Name: i18n.T("A4 9x6 / 30 мм"), Cols: 9, Rows: 6, SquareMM: 30}
 }
 
 // Correspondences pairs this target's model points with detected image points.
@@ -100,7 +102,7 @@ func DefaultTarget() Target {
 func (t Target) Correspondences(detected []Point2) ([]Correspondence, error) {
 	model := t.ModelPoints()
 	if len(detected) != len(model) {
-		return nil, fmt.Errorf("vision: мишень имеет %d углов, а распознано %d", len(model), len(detected))
+		return nil, fmt.Errorf(i18n.T("мишень имеет %d углов, а распознано %d"), len(model), len(detected))
 	}
 	out := make([]Correspondence, len(model))
 	for i := range model {
