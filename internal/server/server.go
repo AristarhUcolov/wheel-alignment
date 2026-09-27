@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"mime"
 	"net/http"
 	"strconv"
 	"strings"
@@ -21,6 +22,7 @@ import (
 	"github.com/AristarhUcolov/wheel-alignment/internal/align"
 	"github.com/AristarhUcolov/wheel-alignment/internal/live"
 	"github.com/AristarhUcolov/wheel-alignment/internal/measure"
+	"github.com/AristarhUcolov/wheel-alignment/internal/phone"
 	"github.com/AristarhUcolov/wheel-alignment/internal/simulate"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 )
@@ -28,14 +30,30 @@ import (
 //go:embed web
 var webFS embed.FS
 
+func init() {
+	// On Windows the mime package takes types from the registry, and on some
+	// machines .js is registered as text/plain — which makes the browser
+	// refuse to run the interface's module scripts. Set them explicitly.
+	for ext, typ := range map[string]string{
+		".js":   "text/javascript; charset=utf-8",
+		".css":  "text/css; charset=utf-8",
+		".svg":  "image/svg+xml",
+		".html": "text/html; charset=utf-8",
+		".json": "application/json",
+	} {
+		_ = mime.AddExtensionType(ext, typ)
+	}
+}
+
 // Server wires the engine to HTTP.
 type Server struct {
 	db  *specs.DB
 	mux *http.ServeMux
 
-	hub  *live.Hub
-	sim  *live.Simulator
-	sess *session
+	hub   *live.Hub
+	sim   *live.Simulator
+	sess  *session
+	phone *phone.Link
 
 	stop context.CancelFunc
 }
@@ -86,6 +104,8 @@ func New(db *specs.DB) (*Server, error) {
 	s.mux.HandleFunc("POST /api/live/snapshot", s.liveSnapshot)
 	s.mux.HandleFunc("POST /api/sim", s.simControl)
 	s.mux.HandleFunc("GET /api/report", s.report)
+	s.mux.HandleFunc("GET /api/phone", s.phoneInfo)
+	s.mux.HandleFunc("POST /api/phone", s.phoneSet)
 	return s, nil
 }
 

@@ -71,6 +71,8 @@ type VehicleView struct {
 	Notes       string `json:"notes,omitempty"`
 	Local       bool   `json:"local,omitempty"`
 	HasFigures  bool   `json:"has_figures"`
+	YearFrom    int    `json:"year_from,omitempty"`
+	YearTo      int    `json:"year_to,omitempty"`
 }
 
 // SessionView is the whole session as the interface needs it.
@@ -106,6 +108,7 @@ func (s *Server) vehicleView(sp specs.Spec) *VehicleView {
 		SourceLabel: sp.Source.Kind.RussianName(), SourceRef: sp.Source.Reference,
 		Verified: sp.Verified(), Disclaimer: sp.Disclaimer(), Notes: sp.Notes,
 		Local: s.db.IsLocal(sp.ID), HasFigures: sp.HasFigures(),
+		YearFrom: sp.YearFrom, YearTo: sp.YearTo,
 	}
 	if sp.Class != "" {
 		v.ClassName = sp.Class.RussianName()
@@ -448,6 +451,28 @@ func (s *Server) liveSample(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true, "accepted": len(batch)})
+}
+
+// pushResult puts a complete one-shot measurement on the live screen: every
+// wheel's camber and geometric toe, and caster where it was measured.
+func (s *Server) pushResult(res align.Result, source, name string) {
+	s.hub.Touch(live.SourceInfo{ID: source, Kind: source, Name: name})
+	for _, p := range align.AllPositions {
+		w, ok := res.Wheels[p.String()]
+		if !ok {
+			continue
+		}
+		c, t := w.Camber.Deg(), w.ToeGeometric.Deg()
+		_ = s.hub.Push(live.Input{Wheel: p, Camber: &c, Toe: &t, Instant: true, Source: source})
+		if w.Caster != nil && p.IsFront() {
+			si := live.SweepInput{Wheel: p, Caster: w.Caster.Deg(), Source: source}
+			if w.SAI != nil {
+				v := w.SAI.Deg()
+				si.SAI = &v
+			}
+			_ = s.hub.PushSweep(si)
+		}
+	}
 }
 
 func (s *Server) liveClear(w http.ResponseWriter, r *http.Request) {

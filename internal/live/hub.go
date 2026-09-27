@@ -406,7 +406,9 @@ func (h *Hub) frameLocked() Frame {
 	for _, s := range h.sources {
 		c := *s
 		c.AgeS = round4(now.Sub(s.LastSeen).Seconds())
-		c.Online = now.Sub(s.LastSeen) <= staleAfter || s.Kind == "manual"
+		// Typed-in and photographed readings are one-shot: they do not go
+		// stale by falling silent, so their source never shows as offline.
+		c.Online = now.Sub(s.LastSeen) <= staleAfter || s.Kind == "manual" || s.Kind == "optical"
 		f.Sources = append(f.Sources, c)
 	}
 	sort.Slice(f.Sources, func(i, j int) bool { return f.Sources[i].ID < f.Sources[j].ID })

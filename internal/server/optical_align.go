@@ -165,9 +165,13 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 	var spec *specs.Spec
 	if id := formValue(form, "spec_id"); id != "" {
 		if sp, ok := s.db.Get(id); ok {
-			spec = &sp
 			if rimMM <= 0 {
 				rimMM = sp.RimDiameterMM()
+			}
+			// A catalog entry has no figures of its own; compare against
+			// the class guidance it names, as the live screen does.
+			if lim, ok := s.db.Limits(sp); ok {
+				spec = &lim
 			}
 		}
 	}
@@ -182,6 +186,10 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 	}
 	res.Warnings = append(linkWarnings, res.Warnings...)
 	res.Warnings = append(res.Warnings, cam.Warnings()...)
+
+	// The measurement also goes to the live screen, so that adjusting can
+	// start from it and the before/after report can be taken from it.
+	s.pushResult(res, "optical", "Камера и мишени")
 
 	writeJSON(w, http.StatusOK, OpticalAlignResponse{
 		Result:  res,

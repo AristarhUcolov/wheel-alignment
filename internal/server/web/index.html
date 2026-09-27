@@ -4,402 +4,72 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Сход-развал — открытый стенд</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+<div class="app">
 
-<header class="top">
-  <div class="brand">
-    <svg viewBox="0 0 32 32" class="logo" aria-hidden="true">
-      <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2"/>
-      <path d="M16 3 v26 M3 16 h26" stroke="currentColor" stroke-width="1" opacity=".35"/>
-      <path d="M9 9 L23 23" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
-    </svg>
-    <div>
-      <h1>Сход-развал</h1>
-      <p>Открытый стенд регулировки углов установки колёс</p>
-    </div>
-  </div>
-  <div class="top-actions">
-    <button id="btn-contrib" class="ghost">Добавить автомобиль</button>
-    <button id="btn-optical" class="ghost">Оптика <em class="beta">β</em></button>
-    <button id="btn-demo" class="ghost">Демо-режим</button>
-    <button id="btn-help" class="ghost">Как измерять</button>
-  </div>
-</header>
-
-<nav class="steps" id="stepnav">
-  <button data-step="car" class="active"><span>1</span> Автомобиль</button>
-  <button data-step="measure"><span>2</span> Замеры</button>
-  <button data-step="result"><span>3</span> Результат</button>
-</nav>
-
-<main>
-
-<!-- ══════════════ Шаг 1: автомобиль ══════════════ -->
-<section id="step-car" class="step active">
-  <div class="panel">
-    <h2>Найдите свой автомобиль</h2>
-    <p class="lede">Введите марку и модель — по-русски или латиницей. Если вашей машины нет в базе,
-       ниже есть ориентировочные диапазоны по классу: они не заменят заводские данные,
-       но покажут, насколько ваши углы далеки от разумных.</p>
-
-    <div class="searchrow">
-      <input id="q" type="search" placeholder="например: ВАЗ 2101, Lada Samara, жигули" autocomplete="off">
-      <input id="year" type="number" placeholder="Год" min="1900" max="2030" class="year">
-    </div>
-
-    <div id="results" class="cards"></div>
-
-    <details id="guidance-block" class="guidance">
-      <summary>Моей машины нет в базе — что делать?</summary>
-      <p>Возьмите ориентир по классу — программа посчитает все углы и покажет, что именно
-         выбивается. Дальше найдите заводские данные (руководство по ремонту, сервисный мануал,
-         клубный форум) и внесите их: инструкция в файле <code>docs/CONTRIBUTING-SPECS.md</code>.
-         Одна проверенная запись помогает тысячам владельцев.</p>
-      <div id="guidance" class="cards"></div>
-    </details>
-  </div>
-</section>
-
-<!-- ══════════════ Шаг 2: замеры ══════════════ -->
-<section id="step-measure" class="step">
-  <div class="panel">
-    <div id="chosen" class="chosen"></div>
-
-    <h2>Параметры установки</h2>
-    <div class="grid3">
-      <label>Диаметр обода, дюймы
-        <input id="rim" type="number" step="0.5" value="15">
-        <small>По нему миллиметры схождения переводятся в градусы. Ошибка здесь ломает всё.</small>
-      </label>
-      <label>Колея передней оси, мм
-        <input id="trackF" type="number" step="1" placeholder="1520">
-        <small>Из данных автомобиля. Нужна для проверки струн.</small>
-      </label>
-      <label>Колея задней оси, мм
-        <input id="trackR" type="number" step="1" placeholder="1510">
-        <small>Если колеи разные — «одинаковые отступы» струн будут ошибкой.</small>
-      </label>
-    </div>
-
-    <details class="box-check">
-      <summary>Проверка установки струн <em>(настоятельно рекомендуется)</em></summary>
-      <p class="lede">Измерьте расстояние от струны до центра ступицы на каждом колесе.
-         Программа проверит, действительно ли струны параллельны оси автомобиля —
-         это самая частая причина неверного схождения «на шнурке».</p>
-      <div class="grid4">
-        <label>Левая, перед<input id="boxLF" type="number" step="0.5"></label>
-        <label>Левая, зад<input id="boxLR" type="number" step="0.5"></label>
-        <label>Правая, перед<input id="boxRF" type="number" step="0.5"></label>
-        <label>Правая, зад<input id="boxRR" type="number" step="0.5"></label>
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" class="logo" aria-hidden="true">
+        <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2.2"/>
+        <circle cx="16" cy="16" r="4" fill="currentColor"/>
+        <path d="M16 3v6M16 23v6M3 16h6M23 16h6" stroke="currentColor" stroke-width="2"/>
+        <path d="M7 25 25 7" stroke="var(--green)" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <b>Сход-развал</b>
+        <span>открытый стенд</span>
       </div>
-      <div id="boxhint" class="hint"></div>
-    </details>
-
-    <h2>Замеры по колёсам</h2>
-    <p class="lede">Развал — угломером на диске, положительный когда верх колеса наклонён наружу.
-       Схождение — расстояние от струны до обода спереди и сзади колеса, на высоте ступицы.</p>
-
-    <div id="wheels" class="wheelgrid"></div>
-
-    <div class="actions">
-      <button id="btn-calc" class="primary">Рассчитать углы</button>
-      <button id="btn-fill" class="ghost">Заполнить примером</button>
     </div>
-    <div id="measure-error" class="error"></div>
-  </div>
-</section>
-
-<!-- ══════════════ Шаг 3: результат ══════════════ -->
-<section id="step-result" class="step">
-  <div id="result-body"></div>
-</section>
-
-</main>
-
-<div id="contrib" class="modal">
-  <div class="modal-inner wide">
-    <button class="close" data-close>✕</button>
-    <h2>Добавить автомобиль в базу</h2>
-
-    <div class="disclaimer">
-      <b>Вносите только то, что видите в документе.</b> Выдуманный угол развала — это не опечатка,
-      а съеденная за сезон резина и машина, которая плохо ведёт себя в экстренной ситуации.
-      Не уверены в источнике — оставьте «не проверено»: программа покажет предупреждение, и это честно.
-      Пустое поле лучше выдуманного.
+    <div class="top-vehicle" id="topVehicle">
+      <span class="muted">Автомобиль не выбран</span>
     </div>
-
-    <div class="grid3">
-      <label>Марка <input id="cMake" placeholder="ВАЗ (Lada)"></label>
-      <label>Модель <input id="cModel" placeholder="2101–2107 «Классика»"></label>
-      <label>Модификация <input id="cTrim" placeholder="необязательно"></label>
-      <label>Год начала выпуска <input id="cFrom" type="number" placeholder="1970"></label>
-      <label>Год окончания <input id="cTo" type="number" placeholder="0 — выпускается"></label>
-      <label>Диаметр обода, дюймы
-        <input id="cRim" type="number" step="0.5" placeholder="13">
-        <small>Обязателен, если схождение в миллиметрах.</small>
-      </label>
+    <div class="top-right">
+      <div class="sources" id="topSources" title="Подключённые датчики"></div>
+      <div class="clock" id="clock">--:--</div>
     </div>
+  </header>
 
-    <h3 class="opt-h3">Углы</h3>
-    <p class="lede">Заполняйте только то, что есть в документе. Градусы и минуты вводите как
-      десятичные градусы: <b>0°30' = 0.5</b>, <b>3°15' = 3.25</b> (минуты делите на 60).
-      Знаки: развал «+» — верх колеса наружу; кастер «+» — верх оси поворота назад;
-      схождение «+» — колёса сходятся спереди.</p>
-
-    <div id="axles"></div>
-
-    <h3 class="opt-h3">Условия замера</h3>
-    <div class="grid3">
-      <label>Загрузка <input id="cLoad" placeholder="снаряжённая масса, полный бак"></label>
-      <label>Давление в шинах <input id="cPress" placeholder="по табличке завода"></label>
-      <label>Осадка подвески <input id="cSettle" placeholder="прокатить 3–5 м вперёд"></label>
+  <nav class="side" id="side">
+    <div class="side-steps">
+      <button data-screen="vehicle"><i>1</i><span>Автомобиль</span></button>
+      <button data-screen="prep"><i>2</i><span>Подготовка</span></button>
+      <button data-screen="measure"><i>3</i><span>Замер</span></button>
+      <button data-screen="live"><i>4</i><span>Регулировка</span></button>
+      <button data-screen="report"><i>5</i><span>Отчёт</span></button>
     </div>
-
-    <h3 class="opt-h3">Откуда данные</h3>
-    <div class="grid3">
-      <label>Тип источника
-        <select id="cSrcKind">
-          <option value="factory">Заводское руководство</option>
-          <option value="licensed">Лицензионная база</option>
-          <option value="community">Сообщество, перепроверено</option>
-          <option value="unverified" selected>Не проверено</option>
-        </select>
-      </label>
-      <label>Документ, издание, страница
-        <input id="cSrcRef" placeholder="Руководство по ремонту ВАЗ-2101…2107, стр. 42">
-        <small>Для заводского и лицензионного источника обязательно.</small>
-      </label>
-      <label>Как вас указать <input id="cSrcWho" placeholder="необязательно"></label>
+    <div class="side-extra">
+      <button data-screen="guide"><i>?</i><span>Инструкция</span></button>
+      <button data-screen="contrib"><i>+</i><span>Внести допуски</span></button>
     </div>
-
-    <label>Примечания
-      <input id="cNotes" placeholder="чем регулируется, особенности конструкции">
-    </label>
-
-    <div class="actions">
-      <button id="btn-contrib-check" class="primary">Проверить</button>
+    <div class="side-foot">
+      Свободная программа, AGPL-3.0.<br>
+      Формулы открыты и проверены тестами.
     </div>
-    <div id="contribResult"></div>
-  </div>
+  </nav>
+
+  <main id="main">
+    <section class="screen" id="screen-vehicle"></section>
+    <section class="screen" id="screen-prep"></section>
+    <section class="screen" id="screen-measure"></section>
+    <section class="screen" id="screen-live"></section>
+    <section class="screen" id="screen-report"></section>
+    <section class="screen" id="screen-guide"></section>
+    <section class="screen" id="screen-contrib"></section>
+  </main>
+
+  <footer class="fkeys" id="fkeys"></footer>
 </div>
 
-<div id="optical" class="modal">
-  <div class="modal-inner wide">
-    <button class="close" data-close>✕</button>
-    <h2>Оптический режим <em class="beta">бета</em></h2>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <button class="drawer-close" data-close-drawer aria-label="Закрыть">✕</button>
+  <div class="drawer-body" id="drawerBody"></div>
+</aside>
 
-    <div class="disclaimer soft">
-      Мишень можно закрепить на диске <b>как угодно криво</b> — программа находит ось вращения самого
-      колеса, и перекос крепления полностью уходит. Развал меряется по одному колесу.
-      Для <b>схождения и угла тяги</b> нужна ещё напольная реперная мишень в кадре: она связывает все
-      четыре колеса в одну систему координат — это вкладка «Полный замер».
-    </div>
+<div class="toast" id="toast" role="status"></div>
 
-    <div class="opt-tabs">
-      <button class="opt-tab active" data-opt="calib">1. Калибровка камеры</button>
-      <button class="opt-tab" data-opt="camber">2. Развал по фото</button>
-      <button class="opt-tab" data-opt="full">3. Полный замер</button>
-    </div>
-
-    <!-- ── Калибровка ── -->
-    <div id="opt-calib" class="opt-pane active">
-      <p class="lede">Калибровка нужна один раз для каждой камеры. Снимите шахматную мишень
-        10–20 раз под разными углами и по всем углам кадра, затем загрузите все снимки сюда.
-        Программа посчитает параметры камеры и сохранит их в файл, который понадобится при замере.</p>
-
-      <div class="grid3">
-        <label>Углов по горизонтали
-          <input id="calibCols" type="number" value="9" min="3">
-          <small>Внутренних углов, не клеток. Доска 10×7 клеток = 9×6 углов.</small>
-        </label>
-        <label>Углов по вертикали
-          <input id="calibRows" type="number" value="6" min="3">
-          <small>Сумма сторон должна быть нечётной (9+6=15). Иначе ориентация неоднозначна.</small>
-        </label>
-        <label>Размер клетки, мм
-          <input id="calibSquare" type="number" value="30" step="0.1">
-          <small>Измерьте штангенциркулем по реальной распечатке — принтеры масштабируют.</small>
-        </label>
-      </div>
-
-      <label class="filedrop">
-        <input id="calibFiles" type="file" accept="image/png,image/jpeg" multiple hidden>
-        <span>Выберите снимки мишени (можно сразу все)</span>
-      </label>
-      <div id="calibCount" class="hint"></div>
-
-      <div class="actions">
-        <button id="btn-calib-run" class="primary" disabled>Откалибровать</button>
-      </div>
-      <div id="calibProgress" class="hint"></div>
-      <div id="calibResult"></div>
-    </div>
-
-    <!-- ── Развал ── -->
-    <div id="opt-camber" class="opt-pane">
-      <p class="lede">Вывесите колесо, закрепите на диске мишень (как угодно — перекос программа
-        учтёт), поставьте камеру <b>строго по уровню</b> сбоку от колеса. Сделайте 4–6 снимков,
-        проворачивая колесо на 10–20° между кадрами. Загрузите снимки — программа найдёт ось
-        вращения колеса и посчитает развал.</p>
-
-      <div class="grid3">
-        <label>Какое колесо
-          <select id="camberPos">
-            <option value="FL">Переднее левое</option>
-            <option value="FR">Переднее правое</option>
-            <option value="RL">Заднее левое</option>
-            <option value="RR">Заднее правое</option>
-          </select>
-        </label>
-        <label>Файл калибровки камеры
-          <input id="camberCamera" type="file" accept="application/json,.json">
-          <small>camera.json, полученный на вкладке «Калибровка».</small>
-        </label>
-        <label class="chk">
-          <input id="camberLevel" type="checkbox" checked>
-          <span>Камера стояла строго по уровню</span>
-          <small>Если нет — развал сместится ровно на наклон камеры.</small>
-        </label>
-      </div>
-
-      <label class="filedrop">
-        <input id="camberFiles" type="file" accept="image/png,image/jpeg" multiple hidden>
-        <span>Выберите снимки колеса (4–6 штук)</span>
-      </label>
-      <div id="camberCount" class="hint"></div>
-
-      <div class="actions">
-        <button id="btn-camber-run" class="primary" disabled>Измерить развал</button>
-      </div>
-      <div id="camberProgress" class="hint"></div>
-      <div id="camberResult"></div>
-    </div>
-
-    <!-- ── Полный замер ── -->
-    <div id="opt-full" class="opt-pane">
-      <p class="lede">Полный сход-развал по фотографиям: схождение, развал, угол тяги. В каждый кадр
-        вместе с мишенью на колесе должна попадать <b>напольная реперная мишень</b> — она и связывает
-        колёса в одну систему координат. Плоскость напольной мишени служит плоскостью дороги, поэтому
-        камеру можно держать как угодно и переносить между колёсами.</p>
-
-      <div class="grid3">
-        <label>Файл калибровки камеры
-          <input id="fullCamera" type="file" accept="application/json,.json">
-        </label>
-        <label>Диаметр обода, дюймы
-          <input id="fullRim" type="number" step="0.5" value="16">
-          <small>Для схождения в миллиметрах.</small>
-        </label>
-        <label>Мишень на колесе
-          <span class="tgrow">
-            <input id="wCols" type="number" value="8" min="3" title="углов по горизонтали">
-            <input id="wRows" type="number" value="5" min="3" title="углов по вертикали">
-            <input id="wSq" type="number" value="32" step="0.1" title="клетка, мм">
-          </span>
-          <small>Углы по горизонтали / по вертикали / клетка в мм.</small>
-        </label>
-      </div>
-
-      <h3 class="opt-h3">Напольные мишени</h3>
-      <p class="lede">Одну мишень не видно от всех четырёх колёс — мешает сам автомобиль. Поэтому их
-        две: одна перед машиной, другая позади. Мишени должны <b>различаться размером</b> — две
-        одинаковые в кадре неразличимы. Клетку берите крупной (80–100 мм): лежащая на полу мишень
-        всегда видна под острым углом.</p>
-      <div class="grid3">
-        <label>Передняя напольная
-          <span class="tgrow">
-            <input id="r0Cols" type="number" value="7" min="3">
-            <input id="r0Rows" type="number" value="6" min="3">
-            <input id="r0Sq" type="number" value="100" step="0.1">
-          </span>
-        </label>
-        <label>Задняя напольная
-          <span class="tgrow">
-            <input id="r1Cols" type="number" value="6" min="3">
-            <input id="r1Rows" type="number" value="5" min="3">
-            <input id="r1Sq" type="number" value="100" step="0.1">
-          </span>
-          <small>Оставьте пустыми поля, если мишень одна.</small>
-        </label>
-        <label class="chk">
-          <input id="oneRef" type="checkbox">
-          <span>Использую одну напольную мишень</span>
-          <small>Тогда связующие снимки не нужны.</small>
-        </label>
-      </div>
-
-      <div id="linkRow">
-        <label class="filedrop">
-          <input id="fullLink" type="file" accept="image/png,image/jpeg" multiple hidden>
-          <span>Связующие снимки — кадры, где видно <b>обе</b> напольные мишени сразу</span>
-        </label>
-        <div id="fullLinkCount" class="hint"></div>
-        <p class="warn">Снимайте связующий кадр с поднятых рук: две мишени, лежащие на полу, с высоты
-          роста видны почти с торца и не распознаются.</p>
-      </div>
-
-      <h3 class="opt-h3">Снимки колёс</h3>
-      <p class="lede">По 4–6 кадров на колесо, проворачивая колесо на 10–20° между кадрами.
-        В каждом кадре — мишень на колесе и напольная мишень.</p>
-      <div id="fullWheels" class="wheelgrid"></div>
-
-      <div class="actions">
-        <button id="btn-full-run" class="primary" disabled>Рассчитать сход-развал</button>
-      </div>
-      <div id="fullProgress" class="hint"></div>
-      <div id="fullResult"></div>
-    </div>
-
-    <p class="warn" style="margin-top:1.5rem">
-      Как собрать мишень и провести калибровку — подробно в <code>docs/PROCEDURE.md</code>.
-      Мишень должна быть на жёстком плоском листе (не мятая бумага), печать — чёткая.
-    </p>
-  </div>
-</div>
-
-<div id="help" class="modal">
-  <div class="modal-inner">
-    <button class="close" data-close>✕</button>
-    <h2>Как это измерить в гараже</h2>
-    <ol class="howto">
-      <li><b>Подготовка.</b> Выровняйте давление в шинах. Проверьте люфты: шаровые опоры,
-          рулевые наконечники, сайлентблоки, подшипники ступиц. Изношенную подвеску регулировать
-          бессмысленно — результат уйдёт на первой кочке. Загрузите машину так, как требует
-          спецификация, и поставьте на ровную площадку.</li>
-      <li><b>Ровная площадка.</b> Нужна не «горизонтальная», а <i>плоская</i>: все четыре колеса
-          в одной плоскости. Проверяется гидроуровнем или длинным правѝлом. Перекос площадки
-          на 3 мм под одним колесом — это уже около 0,1° ошибки.</li>
-      <li><b>Струны.</b> Натяните две струны вдоль бортов на высоте ступиц, параллельно оси
-          автомобиля. Проверку параллельности сделает программа — просто введите четыре отступа.
-          Струна должна быть тонкой и хорошо натянутой: провисание в 1 мм — это ошибка в замере.</li>
-      <li><b>Развал.</b> Магнитный угломер или пузырьковый уровень на обод (не на резину!).
-          Замерьте, прокатите машину на пол-оборота колеса, замерьте то же место снова и
-          введите оба значения — программа усреднит и покажет биение диска.</li>
-      <li><b>Схождение.</b> Расстояние от струны до обода спереди и сзади колеса, строго на
-          высоте центра ступицы и на одинаковом удалении от центра. Выше или ниже — развал
-          «подмешается» в схождение.</li>
-      <li><b>Кастер (по желанию).</b> Нужны поворотные круги — подойдут два листа жести с
-          солидолом между ними. Замерьте развал при повороте колеса на 20° наружу и на 20°
-          внутрь. Программа посчитает кастер точным решением, а не приближённой формулой «×1,5».</li>
-      <li><b>Регулировка — строго в порядке:</b> задняя ось → кастер → развал → схождение.
-          Каждый предыдущий угол сдвигает следующие. Схождение — всегда последним, и обе тяги
-          крутить одинаково, иначе руль встанет криво.</li>
-      <li><b>Контрольный замер.</b> Прокатите вперёд-назад, дайте подвеске сесть, затяните
-          контргайки и перемерьте. Затяжка контргайки часто сдвигает схождение.</li>
-    </ol>
-    <p class="warn"><b>Безопасность.</b> Работайте только на надёжных опорах, никогда под домкратом.
-       Тормоза, рулевое и подвеска — узлы, от которых зависит жизнь. Если после регулировки
-       машина ведёт себя странно — остановитесь и проверьте всё заново.</p>
-  </div>
-</div>
-
-<footer>
-  <p>Свободная программа. Формулы, допущения и порядок действий открыты и проверяемы —
-     см. <code>docs/</code> и тесты в <code>internal/</code>.</p>
-</footer>
-
-<script src="/app.js"></script>
+<script type="module" src="/js/app.js"></script>
 </body>
 </html>

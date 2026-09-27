@@ -1,8 +1,10 @@
 // Command wheelalign runs the open wheel-alignment stand.
 //
-// One binary, no installer, no internet: it serves its own interface on
-// localhost and reads its vehicle database from inside itself. Start it, open
-// the address it prints, and work offline in the garage.
+// One program, no installer, no internet. On Windows it opens in its own window
+// (the WebView2 engine built into Windows 10 and 11); elsewhere, or if that
+// engine is missing, it opens the interface in the web browser. The data a
+// person enters — their own tolerances, phone calibrations — lives in their
+// profile directory and survives updates of the program.
 package main
 
 import (
@@ -10,28 +12,34 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
+	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"syscall"
 	"time"
 
+	"github.com/AristarhUcolov/wheel-alignment/internal/phone"
 	"github.com/AristarhUcolov/wheel-alignment/internal/server"
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 )
 
 const usage = `Сход-развал — открытый стенд.
 
-  wheelalign                       запустить стенд (веб-интерфейс)
+  wheelalign                       запустить программу
   wheelalign calibrate <каталог>   откалибровать камеру по снимкам мишени
   wheelalign check-spec <файл>     проверить данные по автомобилю перед отправкой
 
-Ключи запуска стенда:
-  -addr   адрес, на котором слушать (по умолчанию 127.0.0.1:8700)
-  -open   открывать браузер (по умолчанию да)
+Ключи запуска:
+  -browser  открыть в браузере, а не в отдельном окне
+  -addr     адрес интерфейса (по умолчанию 127.0.0.1:8700, при занятости — любой свободный)
+  -open     открывать окно или браузер (по умолчанию да; -open=false — только сервер)
+  -data     каталог пользовательских данных (по умолчанию — в профиле пользователя)
 
 Ключи калибровки:
   -cols   число внутренних углов мишени по горизонтали (по умолчанию 9)
@@ -58,57 +66,111 @@ func main() {
 		}
 	}
 
-	addr := flag.String("addr", "127.0.0.1:8700", "адрес, на котором слушать")
-	open := flag.Bool("open", true, "открыть браузер при запуске")
+	addr := flag.String("addr", "127.0.0.1:8700", "адрес интерфейса")
+	open := flag.Bool("open", true, "открыть окно или браузер")
+	browser := flag.Bool("browser", false, "открыть в браузере, а не в отдельном окне")
+	dataDir := flag.String("data", "", "каталог пользовательских данных")
 	flag.Usage = func() { fmt.Fprint(os.Stderr, usage) }
 	flag.Parse()
 
-	if err := run(*addr, *open); err != nil {
-		fmt.Fprintln(os.Stderr, "Ошибка:", err)
-		os.Exit(1)
+	if err := run(*addr, *open, *browser, *dataDir); err != nil {
+		fatal(err)
 	}
 }
 
-func run(addr string, open bool) error {
-	db, err := specs.Load()
+// userDataDir is where the owner's own data lives: %APPDATA%\wheelalign on
+// Windows, ~/.config/wheelalign on Linux, ~/Library/Application Support on
+// macOS. Falling back to a directory next to the program keeps a copy on a USB
+// stick self-contained.
+func userDataDir(flagDir string) string {
+	if flagDir != "" {
+		return flagDir
+	}
+	if d, err := os.UserConfigDir(); err == nil {
+		return filepath.Join(d, "wheelalign")
+	}
+	if exe, err := os.Executable(); err == nil {
+		return filepath.Join(filepath.Dir(exe), "wheelalign-data")
+	}
+	return "wheelalign-data"
+}
+
+func run(addr string, open, forceBrowser bool, dataFlag string) error {
+	data := userDataDir(dataFlag)
+	if err := os.MkdirAll(data, 0o755); err != nil {
+		return fmt.Errorf("не удалось создать каталог данных %s: %w", data, err)
+	}
+	setupLog(data)
+
+	db, err := specs.LoadWithUser(filepath.Join(data, "vehicles"))
 	if err != nil {
 		return fmt.Errorf("не удалось загрузить базу автомобилей: %w", err)
 	}
 	if msg := server.LoadErrorSummary(db); msg != "" {
-		fmt.Fprintln(os.Stderr, msg)
+		log.Println(msg)
 	}
 
 	srv, err := server.New(db)
 	if err != nil {
 		return err
 	}
+	defer srv.Close()
+
+	// The phone link: a separate HTTPS listener on the local network, off
+	// until the person switches it on from the interface.
+	link := phone.NewLink(srv.Hub(), data)
+	srv.SetPhone(link)
+	defer link.Close()
 
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
-		return fmt.Errorf("не удалось занять адрес %s: %w", addr, err)
+		// Another copy of the program, or something else, holds the port:
+		// any free port will do, the window is told where to look.
+		ln, err = net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			return fmt.Errorf("не удалось открыть порт для интерфейса: %w", err)
+		}
 	}
-	url := "http://" + ln.Addr().String()
+	url := "http://" + ln.Addr().String() + "/"
 
 	fmt.Printf("\n  Сход-развал — открытый стенд\n")
 	fmt.Printf("  Автомобилей в базе: %d\n", db.Count())
-	fmt.Printf("  Откройте в браузере: %s\n", url)
-	fmt.Printf("  Остановить: Ctrl+C\n\n")
+	fmt.Printf("  Интерфейс: %s\n", url)
+	fmt.Printf("  Данные пользователя: %s\n\n", data)
+	log.Printf("старт: %s, данные %s", url, data)
 
-	hs := &http.Server{
-		Handler:           srv,
-		ReadHeaderTimeout: 10 * time.Second,
-	}
-
+	hs := &http.Server{Handler: srv, ReadHeaderTimeout: 10 * time.Second}
 	errc := make(chan error, 1)
 	go func() {
 		if err := hs.Serve(ln); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errc <- err
 		}
 	}()
+	shutdown := func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		_ = hs.Shutdown(ctx)
+	}
 
+	if open && !forceBrowser {
+		// The window owns the main thread until it is closed; closing it
+		// ends the program.
+		werr := runWindow(url, data)
+		if werr == nil {
+			shutdown()
+			return nil
+		}
+		log.Printf("окно недоступно (%v), открываю браузер", werr)
+		if !errors.Is(werr, errNoWindow) {
+			notify("Окно программы не открылось: " + werr.Error() +
+				"\n\nИнтерфейс откроется в браузере. Если нужно отдельное окно, установите " +
+				"Microsoft Edge WebView2 Runtime с сайта Microsoft.")
+		}
+	}
 	if open {
 		go openBrowser(url)
 	}
+	fmt.Printf("  Остановить: Ctrl+C\n\n")
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
@@ -117,10 +179,27 @@ func run(addr string, open bool) error {
 		return err
 	case <-stop:
 		fmt.Println("\n  Останавливаюсь…")
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		return hs.Shutdown(ctx)
+		shutdown()
+		return nil
 	}
+}
+
+// setupLog writes the log to the data directory as well: a program started
+// from a shortcut has no console, and "it did not start" needs a trace.
+func setupLog(data string) {
+	f, err := os.OpenFile(filepath.Join(data, "wheelalign.log"), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+	if err != nil {
+		return
+	}
+	log.SetOutput(io.MultiWriter(f, os.Stderr))
+	log.SetFlags(log.LstdFlags)
+}
+
+func fatal(err error) {
+	log.Println("ошибка:", err)
+	fmt.Fprintln(os.Stderr, "Ошибка:", err)
+	notify("Ошибка: " + err.Error())
+	os.Exit(1)
 }
 
 func openBrowser(url string) {
