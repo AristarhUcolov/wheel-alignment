@@ -42,8 +42,8 @@ export function openExternal(url) {
   api('/api/open', { method: 'POST', body: { url } }).catch(() => window.open(url, '_blank', 'noopener'));
 }
 document.addEventListener('click', e => {
-  const a = e.target.closest('a[href^="https://"]');
-  if (!a) return;
+  const a = e.target.closest('a[href^="https://"], a[href^="http://"]');
+  if (!a || a.host === location.host) return;
   e.preventDefault();
   openExternal(a.href);
 });

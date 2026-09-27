@@ -1,0 +1,250 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "mercedes-w123",
+      "make": "Mercedes-Benz",
+      "model": "W123 (200–300D)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "benz",
+        "w123",
+        "123"
+      ],
+      "year_from": 1976,
+      "year_to": 1986,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади независимая на косых рычагах. Ориентира по классу для такой компоновки в базе нет — углы будут показаны без допуска, пока вы не внесёте данные из руководства.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "W123 (200–300D)",
+        "notes": "Double wishbones on ball joints at the front, independent semi-trailing arms at the rear. The database has no class guidance for this layout — angles are shown without tolerances until you enter figures from a manual.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-w201",
+      "make": "Mercedes-Benz",
+      "model": "190 (W201)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "benz",
+        "w201",
+        "190"
+      ],
+      "year_from": 1982,
+      "year_to": 1993,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди стойки с отдельной пружиной и нижним рычагом (по схеме близко к Макферсону), сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "190 (W201)",
+        "notes": "Struts with a separate spring and a lower wishbone at the front (close to MacPherson), multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-w124",
+      "make": "Mercedes-Benz",
+      "model": "E-Class (W124)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "benz",
+        "w124",
+        "124",
+        "e-class"
+      ],
+      "year_from": 1984,
+      "year_to": 1997,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди стойки с отдельной пружиной и нижним рычагом (по схеме близко к Макферсону), сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "E-Class (W124)",
+        "notes": "Struts with a separate spring and a lower wishbone at the front (close to MacPherson), multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-w202",
+      "make": "Mercedes-Benz",
+      "model": "C-Class (W202)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "benz",
+        "w202",
+        "c-class"
+      ],
+      "year_from": 1993,
+      "year_to": 2000,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "multilink",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "C-Class (W202)",
+        "notes": "Double wishbones on ball joints at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-w210",
+      "make": "Mercedes-Benz",
+      "model": "E-Class (W210)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "benz",
+        "w210",
+        "e-class",
+        "глазастый"
+      ],
+      "year_from": 1995,
+      "year_to": 2002,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "multilink",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "E-Class (W210)",
+        "notes": "Double wishbones on ball joints at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-sprinter-t1n",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter (W901–W905)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "sprinter",
+        "спринтер",
+        "t1n"
+      ],
+      "year_from": 1995,
+      "year_to": 2006,
+      "class": "lcv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди независимая, стойки типа Макферсон (у Sprinter и Crafter — с поперечной рессорой), сзади неразрезной мост на рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "Sprinter (W901–W905)",
+        "notes": "Independent front with MacPherson-type struts (a transverse leaf spring on the Sprinter and Crafter), rigid rear axle on leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-actros",
+      "make": "Mercedes-Benz",
+      "model": "Actros",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "actros",
+        "актрос",
+        "тягач",
+        "грузовик"
+      ],
+      "year_from": 1996,
+      "year_to": 0,
+      "class": "truck",
+      "front_suspension": "beam_kingpin",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях; задний мост — на рессорах или пневмобаллонах, в зависимости от исполнения (выберите свой тип). Развал и поперечный наклон шкворня не регулируются, схождение — поперечной рулевой тягой.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "Actros",
+        "notes": "Kingpin front beam; the rear axle is on leaf springs or air bags depending on the version (choose yours). Camber and kingpin inclination are not adjustable, toe is set by the cross tie rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-sprinter-w906",
+      "make": "Mercedes-Benz",
+      "model": "Sprinter (W906)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "sprinter",
+        "спринтер",
+        "w906"
+      ],
+      "year_from": 2006,
+      "year_to": 2018,
+      "class": "lcv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди независимая, стойки типа Макферсон (у Sprinter и Crafter — с поперечной рессорой), сзади неразрезной мост на рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "Sprinter (W906)",
+        "notes": "Independent front with MacPherson-type struts (a transverse leaf spring on the Sprinter and Crafter), rigid rear axle on leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

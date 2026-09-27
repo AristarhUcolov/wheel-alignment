@@ -67,6 +67,7 @@ type VehicleView struct {
 	SourceKind  string `json:"source_kind"`
 	SourceLabel string `json:"source_label"`
 	SourceRef   string `json:"source_reference,omitempty"`
+	SourceURL   string `json:"source_url,omitempty"`
 	Verified    bool   `json:"verified"`
 	Disclaimer  string `json:"disclaimer,omitempty"`
 	Notes       string `json:"notes,omitempty"`
@@ -116,6 +117,9 @@ func (s *Server) vehicleView(sp specs.Spec) *VehicleView {
 	}
 	if sp.Class != "" {
 		v.ClassName = sp.Class.Label()
+	}
+	if s.db.IsSourceURL(sp.Source.URL) {
+		v.SourceURL = sp.Source.URL
 	}
 	return v
 }

@@ -1,0 +1,79 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "daewoo-nexia",
+      "make": "Daewoo",
+      "model": "Nexia",
+      "tags": [
+        "daewoo",
+        "дэу",
+        "деу",
+        "nexia",
+        "нексия"
+      ],
+      "year_from": 1995,
+      "year_to": 2016,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Daewoo",
+        "model": "Nexia",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "daewoo-lanos",
+      "make": "Daewoo",
+      "model": "Lanos (Chevrolet Lanos, ЗАЗ Sens)",
+      "tags": [
+        "daewoo",
+        "дэу",
+        "lanos",
+        "ланос",
+        "chevrolet",
+        "заз",
+        "zaz",
+        "sens",
+        "сенс"
+      ],
+      "year_from": 1997,
+      "year_to": 2009,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. На ЗАЗ выпускался и после 2009 года.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Daewoo",
+        "model": "Lanos (Chevrolet Lanos, ZAZ Sens)",
+        "notes": "MacPherson struts at the front, twist beam at the rear. ZAZ kept building it after 2009.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

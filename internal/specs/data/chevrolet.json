@@ -1,0 +1,246 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "chevrolet-lacetti",
+      "make": "Chevrolet",
+      "model": "Lacetti (J200)",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "lacetti",
+        "лачетти",
+        "daewoo",
+        "gentra",
+        "джентра"
+      ],
+      "year_from": 2004,
+      "year_to": 2013,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Lacetti (J200)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "chevrolet-aveo-t250",
+      "make": "Chevrolet",
+      "model": "Aveo (T250)",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "aveo",
+        "авео"
+      ],
+      "year_from": 2006,
+      "year_to": 2011,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Aveo (T250)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "chevrolet-cruze-j300",
+      "make": "Chevrolet",
+      "model": "Cruze (J300)",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "cruze",
+        "круз"
+      ],
+      "year_from": 2009,
+      "year_to": 2016,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Cruze (J300)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "chevrolet-express",
+      "make": "Chevrolet",
+      "model": "Express / GMC Savana",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "express",
+        "экспресс",
+        "gmc",
+        "savana",
+        "фургон"
+      ],
+      "year_from": 1996,
+      "year_to": 0,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Express / GMC Savana",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "chevrolet-silverado-gmt800",
+      "make": "Chevrolet",
+      "model": "Silverado 1500 (GMT800)",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "silverado",
+        "сильверадо",
+        "gmc",
+        "sierra",
+        "пикап"
+      ],
+      "year_from": 1999,
+      "year_to": 2006,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах. Спереди торсионы (у 2WD и 4WD); кастер и развал — эксцентриками на осях верхнего рычага.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Silverado 1500 (GMT800)",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs. Torsion bars at the front (2WD and 4WD); caster and camber by cams on the upper arm shafts.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "chevrolet-niva-2123",
+      "make": "Chevrolet",
+      "model": "Niva (ВАЗ-2123)",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "нива",
+        "niva",
+        "2123",
+        "шнива"
+      ],
+      "year_from": 2002,
+      "year_to": 2020,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_links",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на пружинах и тягах. Развал не внесён: в источнике он записан как «-0°30′ ± 30′», и по тексту нельзя уверенно сказать, минус это или тире-разделитель. Если у вас есть руководство — внесите развал кнопкой «Внести допуски».",
+      "source": {
+        "kind": "unverified",
+        "reference": "autoruk.ru, «Как проверить и регулировать углы установки передних колес ВАЗ-2123» — пересказ руководства по ремонту. Постранично с заводским изданием не сверено.",
+        "url": "https://autoruk.ru/niva-chevrolet/rulevoe/kak-proverit-i-regulirovat-ugly-ustanovki-perednikh-koles-vaz-2123",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-27"
+      },
+      "rim_diameter_in": 15,
+      "front_total_toe_mm": {
+        "min": -1.0,
+        "max": 1.0
+      },
+      "front": {
+        "caster": {
+          "min": 3.1667,
+          "nominal": 3.6667,
+          "max": 4.1667
+        },
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "шайбы на болтах оси верхнего рычага: снять или добавить одинаковое количество на обоих болтах",
+          "caster_method": "те же шайбы: переставить с одного болта на другой",
+          "toe_method": "муфты боковых тяг: ослабить хомуты и повернуть обе муфты на одинаковую величину в противоположные стороны"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false,
+          "camber_method": "не регулируется",
+          "toe_method": "не регулируется"
+        }
+      },
+      "conditions": {
+        "load": "статическая нагрузка 2250 Н (225 кгс): по 75 кг на передних сиденьях и 75 кг по центру заднего",
+        "pressure": "по норме, одинаково слева и справа"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Niva (VAZ-2123)",
+        "notes": "Double wishbones on ball joints at the front, rigid axle on coil springs and links at the rear. Camber is not entered: the source writes it as “-0°30′ ± 30′”, and the text does not make clear whether that is a minus sign or a dash. If you have the manual, add camber with “Enter specs”.",
+        "reference": "autoruk.ru, “How to check and adjust the front wheel angles of the VAZ-2123” — a retelling of the workshop manual. Not checked page by page against the factory edition.",
+        "conditions": {
+          "load": "static load of 2250 N (225 kgf): 75 kg on each front seat and 75 kg in the middle of the rear seat",
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "camber_method": "washers on the bolts of the upper arm shaft: remove or add the same number on both bolts",
+          "caster_method": "the same washers: move them from one bolt to the other",
+          "toe_method": "side tie-rod sleeves: loosen the clamps and turn both sleeves by the same amount in opposite directions"
+        },
+        "rear": {
+          "camber_method": "not adjustable",
+          "toe_method": "not adjustable"
+        }
+      }
+    }
+  ]
+}

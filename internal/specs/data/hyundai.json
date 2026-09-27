@@ -1,0 +1,137 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "hyundai-solaris-1",
+      "make": "Hyundai",
+      "model": "Solaris I (Accent RB)",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "solaris",
+        "солярис",
+        "accent"
+      ],
+      "year_from": 2010,
+      "year_to": 2017,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "Solaris I (Accent RB)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "hyundai-porter",
+      "make": "Hyundai",
+      "model": "Porter / Porter II",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "porter",
+        "портер"
+      ],
+      "year_from": 1996,
+      "year_to": 0,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди двухрычажная с торсионами, сзади неразрезной мост на рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "Porter / Porter II",
+        "notes": "Double wishbones with torsion bars at the front, rigid rear axle on leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "hyundai-county",
+      "make": "Hyundai",
+      "model": "County",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "county",
+        "каунти",
+        "автобус"
+      ],
+      "year_from": 1998,
+      "year_to": 0,
+      "class": "bus",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Замер — без пассажиров, при одинаковом давлении во всех шинах, включая сдвоенные задние.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "County",
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Measure without passengers, with equal pressure in all tyres including the rear twins.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "hyundai-hd78",
+      "make": "Hyundai",
+      "model": "HD72 / HD78",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "hd72",
+        "hd78",
+        "грузовик"
+      ],
+      "year_from": 2004,
+      "year_to": 0,
+      "class": "truck",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал и поперечный наклон шкворня не регулируются; кастер — клиновыми прокладками, схождение — поперечной рулевой тягой.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "HD72 / HD78",
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber and kingpin inclination are not adjustable; caster by taper shims, toe by the cross tie rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

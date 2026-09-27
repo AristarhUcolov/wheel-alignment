@@ -1,0 +1,303 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "vw-golf-2",
+      "make": "Volkswagen",
+      "model": "Golf II",
+      "tags": [
+        "volkswagen",
+        "фольксваген",
+        "vw",
+        "golf",
+        "гольф",
+        "mk2"
+      ],
+      "year_from": 1983,
+      "year_to": 1992,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Volkswagen",
+        "model": "Golf II",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "vw-passat-b3-b4",
+      "make": "Volkswagen",
+      "model": "Passat B3 / B4",
+      "trim": "передний привод",
+      "tags": [
+        "volkswagen",
+        "фольксваген",
+        "vw",
+        "passat",
+        "пассат",
+        "b3",
+        "b4"
+      ],
+      "year_from": 1988,
+      "year_to": 1997,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Volkswagen",
+        "model": "Passat B3 / B4",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "front-wheel drive"
+      }
+    },
+    {
+      "id": "vw-golf-3",
+      "make": "Volkswagen",
+      "model": "Golf III / Vento",
+      "tags": [
+        "volkswagen",
+        "фольксваген",
+        "vw",
+        "golf",
+        "гольф",
+        "mk3",
+        "vento",
+        "венто"
+      ],
+      "year_from": 1991,
+      "year_to": 1999,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Volkswagen",
+        "model": "Golf III / Vento",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "vw-passat-b5",
+      "make": "Volkswagen",
+      "model": "Passat B5",
+      "trim": "передний привод",
+      "tags": [
+        "volkswagen",
+        "фольксваген",
+        "vw",
+        "passat",
+        "пассат",
+        "b5"
+      ],
+      "year_from": 1996,
+      "year_to": 2005,
+      "class": "car",
+      "front_suspension": "multilink",
+      "rear_suspension": "twist_beam",
+      "notes": "Спереди четырёхрычажная, сзади полузависимая балка (у 4motion — двухрычажная).",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Volkswagen",
+        "model": "Passat B5",
+        "notes": "Four-link front suspension, twist beam at the rear (double wishbones on 4motion).",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "front-wheel drive"
+      }
+    },
+    {
+      "id": "vw-golf-4",
+      "make": "Volkswagen",
+      "model": "Golf IV / Bora",
+      "trim": "передний привод",
+      "tags": [
+        "volkswagen",
+        "фольксваген",
+        "vw",
+        "golf",
+        "гольф",
+        "mk4",
+        "bora",
+        "бора"
+      ],
+      "year_from": 1997,
+      "year_to": 2006,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. У полноприводных 4motion сзади многорычажка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Volkswagen",
+        "model": "Golf IV / Bora",
+        "notes": "MacPherson struts at the front, twist beam at the rear. 4motion versions have a multi-link rear.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "front-wheel drive"
+      }
+    },
+    {
+      "id": "vw-polo-sedan",
+      "make": "Volkswagen",
+      "model": "Polo Sedan",
+      "tags": [
+        "volkswagen",
+        "фольксваген",
+        "vw",
+        "polo",
+        "поло"
+      ],
+      "year_from": 2010,
+      "year_to": 2020,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Volkswagen",
+        "model": "Polo Sedan",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "vw-t4",
+      "make": "Volkswagen",
+      "model": "Transporter T4",
+      "tags": [
+        "volkswagen",
+        "фольксваген",
+        "vw",
+        "transporter",
+        "транспортер",
+        "t4",
+        "caravelle",
+        "multivan"
+      ],
+      "year_from": 1990,
+      "year_to": 2003,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди двухрычажная с продольными торсионами, сзади независимая на косых рычагах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Volkswagen",
+        "model": "Transporter T4",
+        "notes": "Double wishbones with longitudinal torsion bars at the front, independent semi-trailing arms at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "vw-t5",
+      "make": "Volkswagen",
+      "model": "Transporter T5",
+      "tags": [
+        "volkswagen",
+        "фольксваген",
+        "vw",
+        "transporter",
+        "транспортер",
+        "t5",
+        "caravelle",
+        "multivan"
+      ],
+      "year_from": 2003,
+      "year_to": 2015,
+      "class": "lcv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди Макферсон, сзади независимая на косых рычагах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Volkswagen",
+        "model": "Transporter T5",
+        "notes": "MacPherson struts at the front, independent semi-trailing arms at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "vw-crafter-1",
+      "make": "Volkswagen",
+      "model": "Crafter I",
+      "tags": [
+        "volkswagen",
+        "фольксваген",
+        "vw",
+        "crafter",
+        "крафтер"
+      ],
+      "year_from": 2006,
+      "year_to": 2016,
+      "class": "lcv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди независимая, стойки типа Макферсон (у Sprinter и Crafter — с поперечной рессорой), сзади неразрезной мост на рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Volkswagen",
+        "model": "Crafter I",
+        "notes": "Independent front with MacPherson-type struts (a transverse leaf spring on the Sprinter and Crafter), rigid rear axle on leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

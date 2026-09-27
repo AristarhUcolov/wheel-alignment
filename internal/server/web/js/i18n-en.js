@@ -99,6 +99,7 @@ export default {
 "Найдите свою машину слева. Можно работать и без выбора — программа покажет углы, но не сравнит их с допуском.": "Find your car on the left. You can also work without choosing one — the program shows the angles but does not compare them with a spec.",
 "Продолжить без автомобиля": "Continue without a vehicle",
 "Источник:": "Source:",
+"Открыть страницу источника": "Open the source page",
 "Допуски для сравнения: {model} — ориентир по классу.": "Specs for comparison: {model} — class guidance.",
 "Допусков для сравнения нет — углы будут показаны без оценки «в норме / не в норме».": "No specs to compare with — the angles will be shown without an in-spec / out-of-spec verdict.",
 "Подвеска": "Suspension",

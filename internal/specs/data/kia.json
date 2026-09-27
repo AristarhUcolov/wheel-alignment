@@ -1,0 +1,72 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "kia-rio-3",
+      "make": "Kia",
+      "model": "Rio III",
+      "tags": [
+        "kia",
+        "киа",
+        "rio",
+        "рио"
+      ],
+      "year_from": 2011,
+      "year_to": 2017,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Kia",
+        "model": "Rio III",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "kia-bongo-3",
+      "make": "Kia",
+      "model": "Bongo III",
+      "tags": [
+        "kia",
+        "киа",
+        "bongo",
+        "бонго"
+      ],
+      "year_from": 2004,
+      "year_to": 0,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди двухрычажная с торсионами, сзади неразрезной мост на рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Kia",
+        "model": "Bongo III",
+        "notes": "Double wishbones with torsion bars at the front, rigid rear axle on leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

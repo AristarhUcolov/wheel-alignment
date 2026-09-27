@@ -1,14 +1,14 @@
 {
   "_comment": [
-    "ВНИМАНИЕ. Записи в этом файле помечены источником \"unverified\".",
-    "Они внесены при первоначальной сборке базы по широко цитируемым значениям и НЕ СВЕРЕНЫ",
-    "с заводским документом постранично. Программа будет показывать по ним предупреждение.",
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
     "",
-    "ЕСЛИ У ВАС ЕСТЬ РУКОВОДСТВО ПО РЕМОНТУ — сверьте цифры, исправьте при расхождении",
-    "и смените источник на \"factory\", указав издание и страницу. Это самый полезный вклад,",
-    "который можно внести в проект: одна проверенная запись помогает тысячам владельцев.",
-    "",
-    "Все углы — в градусах. Схождение продублировано в миллиметрах, как в оригинальных руководствах."
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
   ],
   "specs": [
     {
@@ -16,18 +16,38 @@
       "make": "ВАЗ (Lada)",
       "model": "2101–2107 «Классика»",
       "trim": "2101 / 2102 / 2103 / 2106",
-      "tags": ["vaz", "lada", "жигули", "копейка", "классика", "2101", "2103", "2106"],
+      "tags": [
+        "vaz",
+        "lada",
+        "жигули",
+        "копейка",
+        "классика",
+        "2101",
+        "2103",
+        "2106"
+      ],
       "year_from": 1970,
       "year_to": 2012,
       "class": "car",
       "front_suspension": "double_wishbone_ball",
       "rear_suspension": "live_axle_links",
       "rim_diameter_in": 13,
-      "notes": "Передняя подвеска — двухрычажная на пружинах, задний мост неразрезной на пружинах и реактивных штангах. Развал и кастер регулируются набором шайб между осью верхнего рычага и поперечиной: шайбы, переставленные поровну с обоих болтов, меняют развал, а переставленные с одного болта на другой — кастер. Задняя ось не регулируется.",
-      "front_total_toe_mm": { "min": 2.0, "max": 4.0 },
+      "notes": "Передняя подвеска — двухрычажная на пружинах, задний мост неразрезной на пружинах и реактивных штангах. Развал и кастер регулируются набором шайб между осью верхнего рычага и поперечиной: шайбы, снятые поровну с обоих болтов, меняют развал, а переставленные с одного болта на другой — кастер. Задняя ось не регулируется. Допуски — под нагрузкой после первого ТО; без нагрузки руководство даёт развал 0°5′±20′, кастер 3°±30′, схождение 3–5 мм.",
+      "front_total_toe_mm": {
+        "min": 2.0,
+        "max": 4.0
+      },
       "front": {
-        "camber": { "min": 0.17, "nominal": 0.5, "max": 0.83 },
-        "caster": { "min": 3.0, "nominal": 3.5, "max": 4.0 },
+        "camber": {
+          "min": 0.17,
+          "nominal": 0.5,
+          "max": 0.83
+        },
+        "caster": {
+          "min": 3.5,
+          "nominal": 4.0,
+          "max": 4.5
+        },
         "max_cross_camber": 0.5,
         "max_cross_caster": 0.5,
         "adjustable": {
@@ -50,34 +70,77 @@
       },
       "max_thrust_angle": 0.25,
       "conditions": {
-        "load": "снаряжённая масса: полный бак, запасное колесо и инструмент на штатных местах, без пассажиров и груза",
+        "load": "по 70 кг на четырёх подушках сидений и 40 кг в середине багажника",
         "pressure": "по заводской норме, обязательно одинаково слева и справа",
         "settle": "покачать кузов и прокатить автомобиль 2–3 м вперёд, чтобы подвеска заняла рабочее положение",
         "checks": "перед замером устраните люфты шаровых опор, рулевых наконечников, маятникового рычага и подшипников ступиц — иначе регулировка бессмысленна"
       },
       "source": {
         "kind": "unverified",
-        "reference": "Внесено при первоначальной сборке базы по общеизвестным значениям. НЕ СВЕРЕНО постранично с заводским документом. Требуется проверка по «Руководству по ремонту автомобилей ВАЗ-2101…2107».",
-        "contributor": "первоначальный импорт — требует проверки",
-        "added": "2026-07-22"
+        "reference": "autoruk.ru, «Углы установки колес ВАЗ-2107» — пересказ руководства по ремонту. Постранично с заводским изданием не сверено. При переносе исправлено: кастер был 3°…4°, по источнику 4°±30′; условия нагрузки были указаны неверно (снаряжённая масса).",
+        "url": "https://autoruk.ru/2101-2107-klass/podveska/ugly-ustanovki-koles-vaz-2107",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "2101–2107 “Classic”",
+        "trim": "2101 / 2102 / 2103 / 2106",
+        "notes": "Double wishbones on coil springs at the front, rigid rear axle on coil springs and reaction rods. Camber and caster are adjusted with washers between the upper arm shaft and the crossmember: washers removed equally from both bolts change camber, washers moved from one bolt to the other change caster. The rear axle is not adjustable. The tolerances are laden, after the first service; unladen the manual gives camber 0°5′±20′, caster 3°±30′, toe 3–5 mm.",
+        "reference": "autoruk.ru, “VAZ-2107 wheel alignment angles” — a retelling of the workshop manual. Not checked page by page against the factory edition. Corrected on transfer: caster was 3°…4°, the source says 4°±30′; the load condition was wrong (kerb weight).",
+        "conditions": {
+          "load": "70 kg on each of the four seat cushions and 40 kg in the middle of the boot",
+          "pressure": "to spec, strictly equal left and right",
+          "settle": "bounce the body and roll the car 2–3 m forward so the suspension takes its working position",
+          "checks": "before measuring, remove play in the ball joints, tie-rod ends, idler arm and wheel bearings — otherwise the adjustment is pointless"
+        },
+        "front": {
+          "camber_method": "adjusting washers between the upper arm shaft and the crossmember — remove/add the SAME number at the front and rear bolt",
+          "caster_method": "the same washers, moved from the front bolt to the rear one (or back) without changing their total",
+          "toe_method": "threaded sleeves of the side tie rods; turn both by the same amount so the steering wheel stays straight"
+        },
+        "rear": {
+          "camber_method": "not adjustable — a deviation means a deformed axle housing or its mountings",
+          "toe_method": "not adjustable — check the reaction rods and their bushings"
+        }
       }
     },
     {
       "id": "vaz-2108-21099",
       "make": "ВАЗ (Lada)",
       "model": "2108 / 2109 / 21099 «Самара»",
-      "tags": ["vaz", "lada", "самара", "спутник", "2108", "2109", "21099", "зубило"],
+      "tags": [
+        "vaz",
+        "lada",
+        "самара",
+        "спутник",
+        "2108",
+        "2109",
+        "21099",
+        "зубило"
+      ],
       "year_from": 1984,
       "year_to": 2004,
       "class": "car",
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
       "rim_diameter_in": 13,
-      "notes": "Спереди McPherson, сзади — балка на продольных рычагах. Штатно регулируется только схождение передних колёс. Развал и кастер спереди регулировок не имеют: отклонение указывает на деформацию кузова, стойки или рычага. Задняя ось не регулируется вовсе — её углы задаются геометрией балки.",
-      "front_total_toe_mm": { "min": -1.0, "max": 1.0 },
+      "notes": "Спереди McPherson, сзади — балка на продольных рычагах. Штатно регулируется только схождение передних колёс. Развал и кастер спереди регулировок не имеют: отклонение указывает на деформацию кузова, стойки или рычага. Задняя ось не регулируется вовсе — её углы задаются геометрией балки. Поперечный наклон оси поворота по руководству — 13°4′.",
+      "front_total_toe_mm": {
+        "min": -1.0,
+        "max": 1.0
+      },
       "front": {
-        "camber": { "min": -0.5, "nominal": 0.0, "max": 0.5 },
-        "caster": { "min": 0.5, "nominal": 1.5, "max": 2.5 },
+        "camber": {
+          "min": -0.5,
+          "nominal": 0.0,
+          "max": 0.5
+        },
+        "caster": {
+          "min": 1.0,
+          "nominal": 1.5,
+          "max": 2.0
+        },
         "max_cross_camber": 0.5,
         "max_cross_caster": 0.5,
         "adjustable": {
@@ -100,16 +163,429 @@
       },
       "max_thrust_angle": 0.25,
       "conditions": {
-        "load": "снаряжённая масса, полный бак",
+        "load": "статическая нагрузка 3140 Н (320 кгс): четыре человека и 40 кг в багажнике",
         "pressure": "по заводской норме, одинаково слева и справа",
         "settle": "прокатить автомобиль вперёд 3–5 м и дать подвеске сесть",
         "checks": "проверьте состояние опор стоек и сайлентблоков рычагов — их износ даёт «плавающий» развал"
       },
       "source": {
         "kind": "unverified",
-        "reference": "Внесено при первоначальной сборке базы по общеизвестным значениям. НЕ СВЕРЕНО постранично с заводским документом. Требуется проверка по руководству по ремонту ВАЗ-2108/2109.",
-        "contributor": "первоначальный импорт — требует проверки",
-        "added": "2026-07-22"
+        "reference": "autoruk.ru, «Углы установки колес ВАЗ-2108» — пересказ руководства по ремонту. Постранично с заводским изданием не сверено. При переносе исправлено: кастер был 0°30′…2°30′, по источнику 1°30′±30′; нагрузка была указана неверно (снаряжённая масса).",
+        "url": "https://autoruk.ru/marka-avto2/vaz-2108-2170/podveska/ugly-ustanovki-koles-vaz-2108",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "2108 / 2109 / 21099 “Samara”",
+        "notes": "MacPherson at the front, a beam on trailing arms at the rear. Only front toe is adjustable as standard. Front camber and caster have no adjustment: a deviation points to a deformed body, strut or arm. The rear axle is not adjustable at all — its angles are set by the beam geometry. Steering axis inclination per the manual is 13°4′.",
+        "reference": "autoruk.ru, “VAZ-2108 wheel alignment angles” — a retelling of the workshop manual. Not checked page by page against the factory edition. Corrected on transfer: caster was 0°30′…2°30′, the source says 1°30′±30′; the load was wrong (kerb weight).",
+        "conditions": {
+          "load": "static load of 3140 N (320 kgf): four people and 40 kg in the boot",
+          "pressure": "to factory spec, equal left and right",
+          "settle": "roll the car 3–5 m forward and let the suspension settle",
+          "checks": "check the strut top mounts and arm bushings — their wear makes camber “float”"
+        },
+        "front": {
+          "camber_method": "no standard adjustment — if off, check the strut, steering knuckle and chassis rail",
+          "caster_method": "no standard adjustment",
+          "toe_method": "threaded tie rods; turn both equally with the steering wheel locked straight"
+        },
+        "rear": {
+          "camber_method": "not adjustable — set by the beam geometry",
+          "toe_method": "not adjustable — set by the beam geometry"
+        }
+      }
+    },
+    {
+      "id": "vaz-2110-2112",
+      "make": "ВАЗ (Lada)",
+      "model": "2110 / 2111 / 2112",
+      "tags": [
+        "vaz",
+        "lada",
+        "2110",
+        "2111",
+        "2112",
+        "десятка",
+        "десятая"
+      ],
+      "year_from": 1995,
+      "year_to": 2014,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Допуски — для обкатанного автомобиля под нагрузкой; без нагрузки руководство даёт развал 0°30′±30′, схождение 0°15′±10′ (1,5±1 мм), кастер 0°20′±30′.",
+      "source": {
+        "kind": "unverified",
+        "reference": "autoruk.ru, «Регулировка углов схождения и развала автомобиля ВАЗ-2110» — пересказ руководства по ремонту. Постранично с заводским изданием не сверено.",
+        "url": "https://autoruk.ru/vaz-2110/podveska-vaz-2110/regulirovka-uglov-skhozhdeniya-i-razvala-avtomobilya-vaz-2110",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-27"
+      },
+      "rim_diameter_in": 14,
+      "front": {
+        "camber": {
+          "min": -0.5,
+          "nominal": 0.0,
+          "max": 0.5
+        },
+        "caster": {
+          "min": 1.0,
+          "nominal": 1.5,
+          "max": 2.0
+        },
+        "total_toe": {
+          "min": -0.1667,
+          "nominal": 0.0,
+          "max": 0.1667
+        },
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "поворот верхнего болта крепления стойки к поворотному кулаку",
+          "caster_method": "количество регулировочных шайб на наконечниках растяжки",
+          "toe_method": "вращение регулировочных тяг при ослабленных стяжных болтах наконечников"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false,
+          "camber_method": "не регулируется — задаётся балкой",
+          "toe_method": "не регулируется — задаётся балкой"
+        }
+      },
+      "conditions": {
+        "load": "статическая нагрузка 3140 Н (320 кгс): четыре человека и 40 кг в багажнике",
+        "pressure": "по норме, одинаково слева и справа",
+        "checks": "схождение иногда меряют по разности расстояний между закраинами ободьев сзади и спереди на уровне центров колёс: 0±1 мм"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "2110 / 2111 / 2112",
+        "notes": "MacPherson struts at the front, twist beam at the rear. The tolerances are for a run-in car under load; unladen the manual gives camber 0°30′±30′, toe 0°15′±10′ (1.5±1 mm), caster 0°20′±30′.",
+        "reference": "autoruk.ru, “Adjusting toe and camber on the VAZ-2110” — a retelling of the workshop manual. Not checked page by page against the factory edition.",
+        "conditions": {
+          "load": "static load of 3140 N (320 kgf): four people and 40 kg in the boot",
+          "pressure": "to spec, equal left and right",
+          "checks": "toe is sometimes measured as the difference between the rim-flange distances behind and in front at wheel-centre height: 0±1 mm"
+        },
+        "front": {
+          "camber_method": "turn the upper bolt joining the strut to the steering knuckle",
+          "caster_method": "number of adjusting washers on the tension-rod ends",
+          "toe_method": "turn the adjusting rods with the tie-rod end clamp bolts loosened"
+        },
+        "rear": {
+          "camber_method": "not adjustable — set by the beam",
+          "toe_method": "not adjustable — set by the beam"
+        }
+      }
+    },
+    {
+      "id": "vaz-2113-2115",
+      "make": "ВАЗ (Lada)",
+      "model": "2113 / 2114 / 2115 «Самара-2»",
+      "tags": [
+        "vaz",
+        "lada",
+        "самара",
+        "samara",
+        "2113",
+        "2114",
+        "2115",
+        "четырка",
+        "четырнадцатая"
+      ],
+      "year_from": 1997,
+      "year_to": 2013,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон (штатно регулируется только схождение), сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "2113 / 2114 / 2115 “Samara-2”",
+        "notes": "MacPherson struts at the front (only toe is adjustable as standard), twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "lada-kalina",
+      "make": "ВАЗ (Lada)",
+      "model": "Kalina (1117–1119, 2192–2194)",
+      "tags": [
+        "vaz",
+        "lada",
+        "kalina",
+        "калина",
+        "1117",
+        "1118",
+        "1119",
+        "2192",
+        "2194"
+      ],
+      "year_from": 2004,
+      "year_to": 2018,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "Kalina (1117–1119, 2192–2194)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "lada-priora",
+      "make": "ВАЗ (Lada)",
+      "model": "Priora (2170–2172)",
+      "tags": [
+        "vaz",
+        "lada",
+        "priora",
+        "приора",
+        "2170",
+        "2171",
+        "2172"
+      ],
+      "year_from": 2007,
+      "year_to": 2018,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "Priora (2170–2172)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "lada-granta",
+      "make": "ВАЗ (Lada)",
+      "model": "Granta (2190, 2191)",
+      "tags": [
+        "vaz",
+        "lada",
+        "granta",
+        "гранта",
+        "2190",
+        "2191"
+      ],
+      "year_from": 2011,
+      "year_to": 0,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "Granta (2190, 2191)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "lada-largus",
+      "make": "ВАЗ (Lada)",
+      "model": "Largus",
+      "tags": [
+        "vaz",
+        "lada",
+        "largus",
+        "ларгус"
+      ],
+      "year_from": 2012,
+      "year_to": 0,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "Largus",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "lada-vesta",
+      "make": "ВАЗ (Lada)",
+      "model": "Vesta",
+      "tags": [
+        "vaz",
+        "lada",
+        "vesta",
+        "веста"
+      ],
+      "year_from": 2015,
+      "year_to": 0,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "Vesta",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "lada-xray",
+      "make": "ВАЗ (Lada)",
+      "model": "XRAY",
+      "tags": [
+        "vaz",
+        "lada",
+        "xray",
+        "иксрей"
+      ],
+      "year_from": 2015,
+      "year_to": 2022,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "XRAY",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "vaz-2121-niva",
+      "make": "ВАЗ (Lada)",
+      "model": "2121 / 21213 / 21214 «Нива» (Lada 4x4, Niva Legend)",
+      "tags": [
+        "vaz",
+        "lada",
+        "нива",
+        "niva",
+        "2121",
+        "21213",
+        "21214",
+        "4x4",
+        "legend"
+      ],
+      "year_from": 1977,
+      "year_to": 0,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_links",
+      "notes": "Спереди двухрычажная на шаровых опорах (развал и кастер — регулировочными шайбами), сзади неразрезной мост на пружинах и тягах. В тексте источника перед значениями развала и схождения стоит дефис-маркер; схождение там определено как Б − А (сзади минус спереди), то есть положительное — так и внесено.",
+      "source": {
+        "kind": "unverified",
+        "reference": "autoruk.ru, «Как проверить и регулировать углы установки передних колес ВАЗ-2121» — пересказ руководства по ремонту. Постранично с заводским изданием не сверено.",
+        "url": "https://autoruk.ru/vaz-2121/podveska-vaz-2121/kak-proverit-i-regulirovat-ugly-ustanovki-perednikh-koles-vaz-2121",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-27"
+      },
+      "rim_diameter_in": 16,
+      "front_total_toe_mm": {
+        "min": 2.0,
+        "max": 4.0
+      },
+      "front": {
+        "camber": {
+          "min": 0.1667,
+          "nominal": 0.5,
+          "max": 0.8333
+        },
+        "caster": {
+          "min": 3.0,
+          "nominal": 3.5,
+          "max": 4.0
+        },
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "шайбы на болтах оси верхнего рычага: снять или добавить одинаковое количество на обоих болтах",
+          "caster_method": "те же шайбы: переставить с одного болта на другой",
+          "toe_method": "муфты боковых рулевых тяг при ослабленных хомутах"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false,
+          "camber_method": "не регулируется",
+          "toe_method": "не регулируется — проверьте тяги моста и их сайлентблоки"
+        }
+      },
+      "conditions": {
+        "load": "статическая нагрузка 3140 Н (320 кгс): четыре человека и 40 кг в багажнике",
+        "pressure": "по норме, одинаково слева и справа"
+      },
+      "en": {
+        "make": "VAZ (Lada)",
+        "model": "2121 / 21213 / 21214 Niva (Lada 4x4, Niva Legend)",
+        "notes": "Double wishbones on ball joints at the front (camber and caster by adjusting washers), rigid axle on coil springs and links at the rear. In the source text the camber and toe values are preceded by a dash used as a list marker; toe is defined there as B − A (behind minus in front), i.e. positive — and is entered so.",
+        "reference": "autoruk.ru, “How to check and adjust the front wheel angles of the VAZ-2121” — a retelling of the workshop manual. Not checked page by page against the factory edition.",
+        "conditions": {
+          "load": "static load of 3140 N (320 kgf): four people and 40 kg in the boot",
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "camber_method": "washers on the bolts of the upper arm shaft: remove or add the same number on both bolts",
+          "caster_method": "the same washers: move them from one bolt to the other",
+          "toe_method": "side tie-rod sleeves with the clamps loosened"
+        },
+        "rear": {
+          "camber_method": "not adjustable",
+          "toe_method": "not adjustable — check the axle links and their bushings"
+        }
       }
     }
   ]

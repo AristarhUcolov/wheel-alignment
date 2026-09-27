@@ -20,7 +20,15 @@ func (s *Server) openURL(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
-	if err := desktop.OpenURL(req.URL); err != nil {
+	// Besides its fixed list, the interface may open the page a built-in
+	// figure was taken from — so that anyone can check it at the source.
+	var err error
+	if !desktop.Allowed(req.URL) && s.db.IsSourceURL(req.URL) {
+		err = desktop.Open(req.URL)
+	} else {
+		err = desktop.OpenURL(req.URL)
+	}
+	if err != nil {
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}

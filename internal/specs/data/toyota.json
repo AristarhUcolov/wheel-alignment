@@ -1,0 +1,141 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "toyota-corolla-e120",
+      "make": "Toyota",
+      "model": "Corolla (E120)",
+      "tags": [
+        "toyota",
+        "тойота",
+        "corolla",
+        "королла"
+      ],
+      "year_from": 2000,
+      "year_to": 2007,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Toyota",
+        "model": "Corolla (E120)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "toyota-lc80",
+      "make": "Toyota",
+      "model": "Land Cruiser 80",
+      "tags": [
+        "toyota",
+        "тойота",
+        "land",
+        "cruiser",
+        "крузер",
+        "lc80",
+        "80"
+      ],
+      "year_from": 1990,
+      "year_to": 1997,
+      "class": "suv",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний ведущий мост со шкворневыми кулаками на пружинах и продольных тягах, задний мост на пружинах и тягах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Toyota",
+        "model": "Land Cruiser 80",
+        "notes": "Driven front axle with kingpin knuckles on coil springs and radius arms, rear axle on coil springs and links.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "toyota-lc100",
+      "make": "Toyota",
+      "model": "Land Cruiser 100",
+      "trim": "с независимой передней подвеской (не 105)",
+      "tags": [
+        "toyota",
+        "тойота",
+        "land",
+        "cruiser",
+        "крузер",
+        "lc100",
+        "100",
+        "сотка"
+      ],
+      "year_from": 1998,
+      "year_to": 2007,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная с торсионами, сзади неразрезной мост на пружинах и тягах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Toyota",
+        "model": "Land Cruiser 100",
+        "notes": "Double wishbones with torsion bars at the front, rigid rear axle on coil springs and links.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "with independent front suspension (not the 105)"
+      }
+    },
+    {
+      "id": "toyota-hilux-an10",
+      "make": "Toyota",
+      "model": "Hilux (AN10 / AN20)",
+      "tags": [
+        "toyota",
+        "тойота",
+        "hilux",
+        "хайлюкс",
+        "пикап"
+      ],
+      "year_from": 2004,
+      "year_to": 2015,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Toyota",
+        "model": "Hilux (AN10 / AN20)",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

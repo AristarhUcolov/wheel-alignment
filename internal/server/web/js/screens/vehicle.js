@@ -148,7 +148,7 @@ function renderDetail() {
   let trust = '';
   if (v.disclaimer) trust = `<div class="${v.source_kind === 'community' ? 'note' : 'warn'}" style="margin:10px 0">${esc(v.disclaimer)}</div>`;
   if (v.source_reference && v.source_kind !== 'class_guidance' && v.source_kind !== 'catalog') {
-    trust += `<p class="muted" style="font-size:12.5px"><b>${t('Источник:')}</b> ${esc(v.source_reference)}</p>`;
+    trust += `<p class="muted" style="font-size:12.5px"><b>${t('Источник:')}</b> ${esc(v.source_reference)}${v.source_url ? ` <a href="${esc(v.source_url)}">${t('Открыть страницу источника')}</a>` : ''}</p>`;
   }
   if (lim && lim.id !== v.id) trust += `<div class="note" style="margin:10px 0">${t('Допуски для сравнения: {model} — ориентир по классу.', { model: `<b>${esc(lim.model)}</b>` })}</div>`;
   if (!lim) trust += `<div class="note" style="margin:10px 0">${t('Допусков для сравнения нет — углы будут показаны без оценки «в норме / не в норме».')}</div>`;

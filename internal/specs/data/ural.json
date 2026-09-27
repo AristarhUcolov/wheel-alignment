@@ -1,0 +1,46 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "ural-4320",
+      "make": "Урал",
+      "model": "4320 / 375",
+      "tags": [
+        "ural",
+        "урал",
+        "4320",
+        "375",
+        "6x6",
+        "грузовик"
+      ],
+      "year_from": 1961,
+      "year_to": 0,
+      "class": "truck",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передний ведущий мост на шкворнях и рессорах, задние мосты на рессорах. Программа считает машину двухосной: параллельность задних мостов тележки проверяйте отдельно.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ural",
+        "model": "4320 / 375",
+        "notes": "Driven kingpin front axle on leaf springs, rear axles on leaf springs. The program treats the vehicle as two-axle: check the rear bogie axles for parallelism separately.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

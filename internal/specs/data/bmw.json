@@ -1,0 +1,234 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "bmw-e21",
+      "make": "BMW",
+      "model": "3 Series E21",
+      "tags": [
+        "bmw",
+        "бмв",
+        "e21"
+      ],
+      "year_from": 1975,
+      "year_to": 1983,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди Макферсон, сзади независимая на косых рычагах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "3 Series E21",
+        "notes": "MacPherson struts at the front, independent semi-trailing arms at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "bmw-e28",
+      "make": "BMW",
+      "model": "5 Series E28",
+      "tags": [
+        "bmw",
+        "бмв",
+        "e28"
+      ],
+      "year_from": 1981,
+      "year_to": 1988,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди Макферсон, сзади независимая на косых рычагах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "5 Series E28",
+        "notes": "MacPherson struts at the front, independent semi-trailing arms at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "bmw-e30",
+      "make": "BMW",
+      "model": "3 Series E30",
+      "tags": [
+        "bmw",
+        "бмв",
+        "e30",
+        "3",
+        "тройка"
+      ],
+      "year_from": 1982,
+      "year_to": 1994,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди Макферсон, сзади независимая на косых рычагах. Ориентира по классу для такой компоновки в базе нет — углы будут показаны без допуска, пока вы не внесёте данные из руководства.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "3 Series E30",
+        "notes": "MacPherson struts at the front, independent semi-trailing arms at the rear. The database has no class guidance for this layout — angles are shown without tolerances until you enter figures from a manual.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "bmw-e34",
+      "make": "BMW",
+      "model": "5 Series E34",
+      "tags": [
+        "bmw",
+        "бмв",
+        "e34"
+      ],
+      "year_from": 1988,
+      "year_to": 1996,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди Макферсон, сзади независимая на косых рычагах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "5 Series E34",
+        "notes": "MacPherson struts at the front, independent semi-trailing arms at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "bmw-e36",
+      "make": "BMW",
+      "model": "3 Series E36",
+      "tags": [
+        "bmw",
+        "бмв",
+        "e36"
+      ],
+      "year_from": 1990,
+      "year_to": 2000,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная. У E36 Compact сзади косые рычаги — выберите этот тип.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "3 Series E36",
+        "notes": "MacPherson struts at the front, multi-link at the rear. The E36 Compact has semi-trailing arms at the rear — choose that type.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "bmw-e39",
+      "make": "BMW",
+      "model": "5 Series E39",
+      "tags": [
+        "bmw",
+        "бмв",
+        "e39"
+      ],
+      "year_from": 1995,
+      "year_to": 2004,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "5 Series E39",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "bmw-e46",
+      "make": "BMW",
+      "model": "3 Series E46",
+      "tags": [
+        "bmw",
+        "бмв",
+        "e46"
+      ],
+      "year_from": 1997,
+      "year_to": 2006,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "3 Series E46",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "bmw-e90",
+      "make": "BMW",
+      "model": "3 Series E90 / E91",
+      "tags": [
+        "bmw",
+        "бмв",
+        "e90",
+        "e91"
+      ],
+      "year_from": 2005,
+      "year_to": 2012,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "3 Series E90 / E91",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

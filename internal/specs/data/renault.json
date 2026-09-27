@@ -1,0 +1,202 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "renault-megane-2",
+      "make": "Renault",
+      "model": "Megane II",
+      "tags": [
+        "renault",
+        "рено",
+        "megane",
+        "меган"
+      ],
+      "year_from": 2002,
+      "year_to": 2009,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Renault",
+        "model": "Megane II",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "renault-logan-1",
+      "make": "Renault",
+      "model": "Logan I (Dacia Logan)",
+      "tags": [
+        "renault",
+        "рено",
+        "logan",
+        "логан",
+        "dacia",
+        "дачия"
+      ],
+      "year_from": 2004,
+      "year_to": 2012,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Renault",
+        "model": "Logan I (Dacia Logan)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "renault-logan-2",
+      "make": "Renault",
+      "model": "Logan II / Sandero II",
+      "tags": [
+        "renault",
+        "рено",
+        "logan",
+        "логан",
+        "sandero",
+        "сандеро",
+        "dacia"
+      ],
+      "year_from": 2012,
+      "year_to": 2022,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Renault",
+        "model": "Logan II / Sandero II",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "renault-kangoo-1",
+      "make": "Renault",
+      "model": "Kangoo I",
+      "tags": [
+        "renault",
+        "рено",
+        "kangoo",
+        "кангу"
+      ],
+      "year_from": 1997,
+      "year_to": 2008,
+      "class": "lcv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "trailing_arm",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади продольные рычаги с поперечными торсионами.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Renault",
+        "model": "Kangoo I",
+        "notes": "MacPherson struts at the front, trailing arms with transverse torsion bars at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "renault-duster-4x2",
+      "make": "Renault",
+      "model": "Duster I",
+      "trim": "передний привод",
+      "tags": [
+        "renault",
+        "рено",
+        "duster",
+        "дастер",
+        "dacia",
+        "4x2"
+      ],
+      "year_from": 2010,
+      "year_to": 2021,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Renault",
+        "model": "Duster I",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "front-wheel drive"
+      }
+    },
+    {
+      "id": "renault-duster-4x4",
+      "make": "Renault",
+      "model": "Duster I",
+      "trim": "полный привод",
+      "tags": [
+        "renault",
+        "рено",
+        "duster",
+        "дастер",
+        "dacia",
+        "4x4"
+      ],
+      "year_from": 2010,
+      "year_to": 2021,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Renault",
+        "model": "Duster I",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "four-wheel drive"
+      }
+    }
+  ]
+}

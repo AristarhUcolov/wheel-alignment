@@ -1,0 +1,280 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "ford-sierra",
+      "make": "Ford",
+      "model": "Sierra",
+      "tags": [
+        "ford",
+        "форд",
+        "sierra",
+        "сиерра"
+      ],
+      "year_from": 1982,
+      "year_to": 1993,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди Макферсон, сзади независимая на косых рычагах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Sierra",
+        "notes": "MacPherson struts at the front, independent semi-trailing arms at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-crown-victoria",
+      "make": "Ford",
+      "model": "Crown Victoria / Grand Marquis",
+      "tags": [
+        "ford",
+        "форд",
+        "crown",
+        "victoria",
+        "mercury",
+        "marquis"
+      ],
+      "year_from": 1998,
+      "year_to": 2011,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-rwd-classic-sedan",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на пружинах и тягах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Crown Victoria / Grand Marquis",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on coil springs and links.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-focus-1",
+      "make": "Ford",
+      "model": "Focus I",
+      "tags": [
+        "ford",
+        "форд",
+        "focus",
+        "фокус"
+      ],
+      "year_from": 1998,
+      "year_to": 2004,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Focus I",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-mondeo-3",
+      "make": "Ford",
+      "model": "Mondeo III",
+      "tags": [
+        "ford",
+        "форд",
+        "mondeo",
+        "мондео"
+      ],
+      "year_from": 2000,
+      "year_to": 2007,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Mondeo III",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-focus-2",
+      "make": "Ford",
+      "model": "Focus II",
+      "tags": [
+        "ford",
+        "форд",
+        "focus",
+        "фокус"
+      ],
+      "year_from": 2004,
+      "year_to": 2011,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная подвеска: развал и схождение задних колёс регулируются эксцентриками.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Focus II",
+        "notes": "MacPherson struts at the front, multi-link at the rear: rear camber and toe are adjusted with eccentrics.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-focus-3",
+      "make": "Ford",
+      "model": "Focus III",
+      "tags": [
+        "ford",
+        "форд",
+        "focus",
+        "фокус"
+      ],
+      "year_from": 2011,
+      "year_to": 2018,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Focus III",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-transit-mk6-rwd",
+      "make": "Ford",
+      "model": "Transit (2000–2006)",
+      "trim": "задний привод",
+      "tags": [
+        "ford",
+        "форд",
+        "transit",
+        "транзит"
+      ],
+      "year_from": 2000,
+      "year_to": 2006,
+      "class": "lcv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди независимая, стойки типа Макферсон (у Sprinter и Crafter — с поперечной рессорой), сзади неразрезной мост на рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Transit (2000–2006)",
+        "notes": "Independent front with MacPherson-type struts (a transverse leaf spring on the Sprinter and Crafter), rigid rear axle on leaf springs.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "rear-wheel drive"
+      }
+    },
+    {
+      "id": "ford-f150-11",
+      "make": "Ford",
+      "model": "F-150 (2004–2008)",
+      "tags": [
+        "ford",
+        "форд",
+        "f150",
+        "f-150",
+        "пикап"
+      ],
+      "year_from": 2004,
+      "year_to": 2008,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "F-150 (2004–2008)",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-transit-mk8-rwd",
+      "make": "Ford",
+      "model": "Transit (2014–)",
+      "trim": "задний привод",
+      "tags": [
+        "ford",
+        "форд",
+        "transit",
+        "транзит"
+      ],
+      "year_from": 2014,
+      "year_to": 0,
+      "class": "lcv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди независимая, стойки типа Макферсон (у Sprinter и Crafter — с поперечной рессорой), сзади неразрезной мост на рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Transit (2014–)",
+        "notes": "Independent front with MacPherson-type struts (a transverse leaf spring on the Sprinter and Crafter), rigid rear axle on leaf springs.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "rear-wheel drive"
+      }
+    }
+  ]
+}

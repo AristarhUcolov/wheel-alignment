@@ -1,0 +1,132 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "uaz-452",
+      "make": "УАЗ",
+      "model": "452 / 2206 / 3303 «Буханка»",
+      "tags": [
+        "uaz",
+        "452",
+        "2206",
+        "3303",
+        "3909",
+        "буханка",
+        "таблетка"
+      ],
+      "year_from": 1965,
+      "year_to": 0,
+      "class": "lcv",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передний ведущий мост на рессорах, классическое исполнение — шкворневое. Если у вашей машины бесшкворневой мост на шаровых опорах — смените тип подвески в настройках.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "UAZ",
+        "model": "452 / 2206 / 3303 “Bukhanka”",
+        "notes": "Driven front axle on leaf springs, kingpin type in the classic version. If your vehicle has a kingpin-less axle on ball joints, change the suspension type in the settings.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "uaz-469-3151",
+      "make": "УАЗ",
+      "model": "469 / 3151 / Hunter",
+      "tags": [
+        "uaz",
+        "469",
+        "3151",
+        "hunter",
+        "хантер",
+        "козёл",
+        "козел"
+      ],
+      "year_from": 1972,
+      "year_to": 0,
+      "class": "suv",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Передний ведущий мост на рессорах, классическое исполнение — шкворневое. Встречаются машины с бесшкворневыми мостами на шаровых опорах — выберите тогда «Неразрезной мост на шаровых опорах». Схождение в руководстве — 1,5–3 мм по шинам; здесь пересчитано в градусы по диаметру шины 215/90-15 (≈768 мм). Поперечный наклон шкворня: УАЗ-469 — 8°, УАЗ-469Б — 5°30′. У Hunter обод 16″.",
+      "source": {
+        "kind": "unverified",
+        "reference": "avto-uaz-469.ru, «Техническое обслуживание переднего моста УАЗ-469» — пересказ руководства по эксплуатации. Постранично с заводским изданием не сверено.",
+        "url": "http://avto-uaz-469.ru/transmissiya-uaz-469/39-tekhnicheskoe-obsluzhivanie-perednego-mosta-uaz-469",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-27"
+      },
+      "rim_diameter_in": 15,
+      "front": {
+        "camber": {
+          "min": 1.25,
+          "nominal": 1.5,
+          "max": 1.75
+        },
+        "caster": {
+          "min": 2.5,
+          "nominal": 3.0,
+          "max": 3.5
+        },
+        "total_toe": {
+          "min": 0.1119,
+          "nominal": 0.1679,
+          "max": 0.2238
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется — задан мостом; отклонение означает износ шкворней, люфт подшипников или деформацию",
+          "caster_method": "задан конструкцией моста",
+          "toe_method": "поперечная рулевая тяга (изменение её длины)"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false,
+          "camber_method": "не регулируется",
+          "toe_method": "не регулируется"
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "checks": "схождение: разность расстояний между шинами сзади и спереди в горизонтальной плоскости на уровне оси"
+      },
+      "en": {
+        "make": "UAZ",
+        "model": "469 / 3151 / Hunter",
+        "notes": "Driven front axle on leaf springs, kingpin type in the classic version. Some vehicles have kingpin-less axles on ball joints — choose “Rigid axle, ball joints” then. The manual gives toe as 1.5–3 mm at the tyres; here it is converted to degrees using the diameter of a 215/90-15 tyre (≈768 mm). Kingpin inclination: UAZ-469 — 8°, UAZ-469B — 5°30′. The Hunter has 16″ rims.",
+        "reference": "avto-uaz-469.ru, “Maintenance of the UAZ-469 front axle” — a retelling of the owner's manual. Not checked page by page against the factory edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "checks": "toe: difference of the distances between the tyres behind and in front, horizontally at axle height"
+        },
+        "front": {
+          "camber_method": "not adjustable — set by the axle; a deviation means worn kingpins, bearing play or deformation",
+          "caster_method": "set by the axle design",
+          "toe_method": "cross tie rod (change its length)"
+        },
+        "rear": {
+          "camber_method": "not adjustable",
+          "toe_method": "not adjustable"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "ikarus-260-280",
+      "make": "Ikarus",
+      "model": "260 / 280",
+      "tags": [
+        "ikarus",
+        "икарус",
+        "260",
+        "280",
+        "гармошка",
+        "автобус"
+      ],
+      "year_from": 1971,
+      "year_to": 2002,
+      "class": "bus",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях, подвеска пневматическая; задний мост на пневмобаллонах и реактивных тягах. Замер — без пассажиров, в штатном дорожном положении подвески, при одинаковом давлении во всех шинах. У сочленённого 280 третий мост программа не учитывает.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Ikarus",
+        "model": "260 / 280",
+        "notes": "Kingpin front beam on air suspension; rear axle on air bags and reaction rods. Measure without passengers, with the suspension at normal ride height and equal pressure in all tyres. The program does not take the third axle of the articulated 280 into account.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

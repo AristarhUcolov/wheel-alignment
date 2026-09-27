@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -41,7 +42,7 @@ type DB struct {
 // without waiting for it to be merged upstream.
 func Load(extraDirs ...fs.FS) (*DB, error) {
 	db := &DB{byID: map[string]int{}, local: map[string]bool{}}
-	if err := db.addFS(builtin, "встроенная база", false); err != nil {
+	if err := db.addFS(builtin, i18n.T("встроенная база"), false); err != nil {
 		return nil, err
 	}
 	for i, f := range extraDirs {
@@ -69,7 +70,7 @@ func LoadWithUser(userDir string, extraDirs ...fs.FS) (*DB, error) {
 		return nil, fmt.Errorf(i18n.T("не удалось создать каталог пользовательских данных: %w"), err)
 	}
 	db.userDir = userDir
-	if err := db.addFS(os.DirFS(userDir), "ваши данные", true); err != nil {
+	if err := db.addFS(os.DirFS(userDir), i18n.T("ваши данные"), true); err != nil {
 		return nil, err
 	}
 	db.finish()
@@ -151,6 +152,29 @@ func (d *DB) sort() {
 	for i, s := range d.specs {
 		d.byID[s.ID] = i
 	}
+}
+
+// IsSourceURL reports whether u is the source address of an entry that ships
+// with the program (or comes from an added directory) — never of the owner's
+// own entries. Those addresses, and only those, the interface may open in the
+// browser besides its fixed list, so the person can check a figure where it
+// came from.
+func (d *DB) IsSourceURL(u string) bool {
+	if u == "" {
+		return false
+	}
+	p, err := url.Parse(u)
+	if err != nil || (p.Scheme != "https" && p.Scheme != "http") || p.User != nil || p.Host == "" {
+		return false
+	}
+	d.mu.RLock()
+	defer d.mu.RUnlock()
+	for _, s := range d.specs {
+		if s.Source.URL == u && !d.local[s.ID] {
+			return true
+		}
+	}
+	return false
 }
 
 // IsLocal reports whether an entry is the owner's own.

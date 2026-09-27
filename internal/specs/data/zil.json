@@ -1,0 +1,104 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "zil-130",
+      "make": "ЗИЛ",
+      "model": "130",
+      "tags": [
+        "zil",
+        "130",
+        "зил130",
+        "грузовик"
+      ],
+      "year_from": 1964,
+      "year_to": 1994,
+      "class": "truck",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал не регулируется, схождение — поперечной рулевой тягой.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "ZIL",
+        "model": "130",
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber is not adjustable; toe is set with the cross tie rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "zil-131",
+      "make": "ЗИЛ",
+      "model": "131",
+      "tags": [
+        "zil",
+        "131",
+        "зил131",
+        "грузовик",
+        "6x6"
+      ],
+      "year_from": 1966,
+      "year_to": 1994,
+      "class": "truck",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передний ведущий мост на шкворнях и рессорах, задние мосты на рессорах. Программа считает машину двухосной: параллельность задних мостов тележки проверяйте отдельно.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "ZIL",
+        "model": "131",
+        "notes": "Driven kingpin front axle on leaf springs, rear axles on leaf springs. The program treats the vehicle as two-axle: check the rear bogie axles for parallelism separately.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "zil-5301",
+      "make": "ЗИЛ",
+      "model": "5301 «Бычок»",
+      "tags": [
+        "zil",
+        "5301",
+        "бычок",
+        "bychok",
+        "грузовик"
+      ],
+      "year_from": 1996,
+      "year_to": 2016,
+      "class": "truck",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал и поперечный наклон шкворня не регулируются; кастер — клиновыми прокладками, схождение — поперечной рулевой тягой.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "ZIL",
+        "model": "5301 “Bychok”",
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber and kingpin inclination are not adjustable; caster by taper shims, toe by the cross tie rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

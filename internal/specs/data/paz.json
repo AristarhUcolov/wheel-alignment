@@ -1,0 +1,102 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "paz-672",
+      "make": "ПАЗ",
+      "model": "672",
+      "tags": [
+        "paz",
+        "672",
+        "паз672",
+        "автобус"
+      ],
+      "year_from": 1967,
+      "year_to": 1989,
+      "class": "bus",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Замер — без пассажиров, при одинаковом давлении во всех шинах, включая сдвоенные задние.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "PAZ",
+        "model": "672",
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Measure without passengers, with equal pressure in all tyres including the rear twins.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "paz-3205",
+      "make": "ПАЗ",
+      "model": "3205",
+      "tags": [
+        "paz",
+        "3205",
+        "паз3205",
+        "автобус"
+      ],
+      "year_from": 1989,
+      "year_to": 0,
+      "class": "bus",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Замер — без пассажиров, при одинаковом давлении во всех шинах, включая сдвоенные задние.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "PAZ",
+        "model": "3205",
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Measure without passengers, with equal pressure in all tyres including the rear twins.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "paz-4234",
+      "make": "ПАЗ",
+      "model": "4234",
+      "tags": [
+        "paz",
+        "4234",
+        "паз4234",
+        "автобус"
+      ],
+      "year_from": 2001,
+      "year_to": 0,
+      "class": "bus",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Замер — без пассажиров, при одинаковом давлении во всех шинах, включая сдвоенные задние.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "PAZ",
+        "model": "4234",
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Measure without passengers, with equal pressure in all tyres including the rear twins.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

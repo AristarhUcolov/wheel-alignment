@@ -330,6 +330,11 @@ func init() {
 	})
 
 	add(map[string]string{
+		"встроенная база": "built-in database",
+		"ваши данные":     "your data",
+	})
+
+	add(map[string]string{
 		`Сход-развал — открытый стенд.
 
   wheelalign                       запустить программу

@@ -1,0 +1,44 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "scania-r",
+      "make": "Scania",
+      "model": "R-series (2004–2016)",
+      "tags": [
+        "scania",
+        "скания",
+        "r",
+        "тягач",
+        "грузовик"
+      ],
+      "year_from": 2004,
+      "year_to": 2016,
+      "class": "truck",
+      "front_suspension": "beam_kingpin",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях; задний мост — на рессорах или пневмобаллонах, в зависимости от исполнения (выберите свой тип). Развал и поперечный наклон шкворня не регулируются, схождение — поперечной рулевой тягой.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "Scania",
+        "model": "R-series (2004–2016)",
+        "notes": "Kingpin front beam; the rear axle is on leaf springs or air bags depending on the version (choose yours). Camber and kingpin inclination are not adjustable, toe is set by the cross tie rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

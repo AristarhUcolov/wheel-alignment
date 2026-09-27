@@ -1,0 +1,74 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "liaz-677",
+      "make": "ЛиАЗ",
+      "model": "677",
+      "tags": [
+        "liaz",
+        "лиаз",
+        "677",
+        "скотовоз",
+        "автобус"
+      ],
+      "year_from": 1967,
+      "year_to": 1994,
+      "class": "bus",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях, подвеска пневматическая; задний мост на пневмобаллонах и реактивных тягах. Замер — без пассажиров, в штатном дорожном положении подвески, при одинаковом давлении во всех шинах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "LiAZ",
+        "model": "677",
+        "notes": "Kingpin front beam on air suspension; rear axle on air bags and reaction rods. Measure without passengers, with the suspension at normal ride height and equal pressure in all tyres.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "liaz-5256",
+      "make": "ЛиАЗ",
+      "model": "5256",
+      "tags": [
+        "liaz",
+        "лиаз",
+        "5256",
+        "автобус"
+      ],
+      "year_from": 1986,
+      "year_to": 2021,
+      "class": "bus",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях, подвеска пневматическая; задний мост на пневмобаллонах и реактивных тягах. Замер — без пассажиров, в штатном дорожном положении подвески, при одинаковом давлении во всех шинах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "LiAZ",
+        "model": "5256",
+        "notes": "Kingpin front beam on air suspension; rear axle on air bags and reaction rods. Measure without passengers, with the suspension at normal ride height and equal pressure in all tyres.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

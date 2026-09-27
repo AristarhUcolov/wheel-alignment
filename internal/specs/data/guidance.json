@@ -5,7 +5,11 @@
     "Назначение: если вашей модели нет в базе, вы всё равно сможете понять, насколько ваши",
     "углы отличаются от разумных для машины такой конструкции, и стоит ли вообще что-то трогать.",
     "Регулировать 'в эти цифры' нельзя. Ищите руководство по ремонту вашей модели.",
-    "Все значения в градусах."
+    "Все значения в градусах.",
+    "",
+    "RANGES BY VEHICLE CLASS. These are NOT the factory figures of any particular vehicle and cannot serve as such.",
+    "They let you judge, for a model missing from the database, how far your angles are from sensible values for",
+    "such a design. Do not adjust “to these figures”. Look for the workshop manual of your model. All values in degrees."
   ],
   "specs": [
     {
@@ -13,7 +17,13 @@
       "make": "— Ориентир по классу —",
       "model": "Заднеприводный седан с зависимым задним мостом",
       "trim": "1950–1990-е",
-      "tags": ["классика", "rwd", "ретро", "мост", "guidance"],
+      "tags": [
+        "классика",
+        "rwd",
+        "ретро",
+        "мост",
+        "guidance"
+      ],
       "year_from": 1950,
       "year_to": 1995,
       "class": "car",
@@ -22,9 +32,21 @@
       "rim_diameter_in": 13,
       "notes": "Двухрычажная передняя подвеска — шкворневая или на шаровых опорах (выберите свою: от неё зависят советы по регулировке), неразрезной задний мост на рессорах или пружинах. Задняя ось у таких машин штатно не регулируется — если её углы «уехали», это деформация моста, рессор или их креплений.",
       "front": {
-        "camber": { "min": -0.25, "nominal": 0.5, "max": 1.25 },
-        "caster": { "min": 1.0, "nominal": 2.75, "max": 4.5 },
-        "total_toe": { "min": 0.08, "nominal": 0.25, "max": 0.42 },
+        "camber": {
+          "min": -0.25,
+          "nominal": 0.5,
+          "max": 1.25
+        },
+        "caster": {
+          "min": 1.0,
+          "nominal": 2.75,
+          "max": 4.5
+        },
+        "total_toe": {
+          "min": 0.08,
+          "nominal": 0.25,
+          "max": 0.42
+        },
         "max_cross_camber": 0.5,
         "max_cross_caster": 0.5,
         "adjustable": {
@@ -37,8 +59,16 @@
         }
       },
       "rear": {
-        "camber": { "min": -1.0, "nominal": 0.0, "max": 1.0 },
-        "total_toe": { "min": -0.25, "nominal": 0.0, "max": 0.25 },
+        "camber": {
+          "min": -1.0,
+          "nominal": 0.0,
+          "max": 1.0
+        },
+        "total_toe": {
+          "min": -0.25,
+          "nominal": 0.0,
+          "max": 0.25
+        },
         "adjustable": {
           "camber": false,
           "caster": false,
@@ -57,6 +87,27 @@
         "kind": "class_guidance",
         "reference": "Типичные диапазоны для автомобилей данной конструкции. НЕ заводские данные.",
         "added": "2026-07-22"
+      },
+      "en": {
+        "make": "— Class guidance —",
+        "model": "Rear-wheel-drive saloon with a live rear axle",
+        "trim": "1950s–1990s",
+        "notes": "Double-wishbone front suspension — kingpin or ball-joint (choose yours: the adjustment advice depends on it), live rear axle on leaf or coil springs. The rear axle of such cars has no standard adjustment — if its angles are off, the axle, springs or their mountings are deformed.",
+        "reference": "Typical ranges for vehicles of this design. NOT factory data.",
+        "conditions": {
+          "load": "kerb weight, full tank, spare wheel and tools in place",
+          "pressure": "per the manufacturer's placard, equal left and right",
+          "settle": "roll the car 3–5 m forward and bounce the body so the suspension settles"
+        },
+        "front": {
+          "camber_method": "most often adjusting shims between the upper arm shaft and the body bracket",
+          "caster_method": "redistributing the same shims between the front and rear bolt of the upper arm shaft",
+          "toe_method": "threaded tie-rod sleeves"
+        },
+        "rear": {
+          "camber_method": "not adjustable: a deviation means a deformed axle or mountings",
+          "toe_method": "not adjustable: a deviation means the axle has shifted relative to the body"
+        }
       }
     },
     {
@@ -64,7 +115,13 @@
       "make": "— Ориентир по классу —",
       "model": "Переднеприводный автомобиль, McPherson спереди",
       "trim": "1980-е — наши дни",
-      "tags": ["fwd", "макферсон", "mcpherson", "переднеприводный", "guidance"],
+      "tags": [
+        "fwd",
+        "макферсон",
+        "mcpherson",
+        "переднеприводный",
+        "guidance"
+      ],
       "year_from": 1980,
       "year_to": 0,
       "class": "car",
@@ -73,10 +130,26 @@
       "rim_diameter_in": 15,
       "notes": "У большинства таких машин развал спереди штатно не регулируется — стойка крепится к кулаку двумя болтами без овальных отверстий. Если развал ушёл, ищите деформацию, а не регулировку. Сзади у балки регулировки чаще всего тоже нет.",
       "front": {
-        "camber": { "min": -1.25, "nominal": -0.5, "max": 0.25 },
-        "caster": { "min": 1.5, "nominal": 3.0, "max": 4.5 },
-        "sai": { "min": 10.0, "nominal": 13.0, "max": 16.0 },
-        "total_toe": { "min": -0.1, "nominal": 0.08, "max": 0.25 },
+        "camber": {
+          "min": -1.25,
+          "nominal": -0.5,
+          "max": 0.25
+        },
+        "caster": {
+          "min": 1.5,
+          "nominal": 3.0,
+          "max": 4.5
+        },
+        "sai": {
+          "min": 10.0,
+          "nominal": 13.0,
+          "max": 16.0
+        },
+        "total_toe": {
+          "min": -0.1,
+          "nominal": 0.08,
+          "max": 0.25
+        },
         "max_cross_camber": 0.5,
         "max_cross_caster": 0.5,
         "adjustable": {
@@ -89,8 +162,16 @@
         }
       },
       "rear": {
-        "camber": { "min": -2.0, "nominal": -1.0, "max": 0.0 },
-        "total_toe": { "min": 0.0, "nominal": 0.2, "max": 0.42 },
+        "camber": {
+          "min": -2.0,
+          "nominal": -1.0,
+          "max": 0.0
+        },
+        "total_toe": {
+          "min": 0.0,
+          "nominal": 0.2,
+          "max": 0.42
+        },
         "max_cross_camber": 0.5,
         "adjustable": {
           "camber": false,
@@ -110,6 +191,27 @@
         "kind": "class_guidance",
         "reference": "Типичные диапазоны для автомобилей данной конструкции. НЕ заводские данные.",
         "added": "2026-07-22"
+      },
+      "en": {
+        "make": "— Class guidance —",
+        "model": "Front-wheel-drive car, MacPherson front",
+        "trim": "1980s — today",
+        "notes": "On most such cars front camber has no standard adjustment — the strut is bolted to the knuckle with two bolts in round holes. If camber is off, look for deformation, not an adjuster. A rear twist beam usually has no adjustment either.",
+        "reference": "Typical ranges for vehicles of this design. NOT factory data.",
+        "conditions": {
+          "load": "kerb weight, full tank",
+          "pressure": "per the placard on the driver's door pillar",
+          "settle": "roll the car 3–5 m forward; do not push it sideways"
+        },
+        "front": {
+          "camber_method": "no standard adjustment; if needed — an eccentric bolt in the lower strut mounting or plates at the top mount",
+          "caster_method": "no standard adjustment",
+          "toe_method": "threaded tie rods, both by the same amount"
+        },
+        "rear": {
+          "camber_method": "not adjustable on a beam; eccentric on an arm on multi-link",
+          "toe_method": "not adjustable on a beam; eccentric on the trailing arm on multi-link"
+        }
       }
     },
     {
@@ -117,16 +219,34 @@
       "make": "— Ориентир по классу —",
       "model": "Внедорожник / кроссовер",
       "trim": "рамный или несущий кузов",
-      "tags": ["suv", "внедорожник", "кроссовер", "4x4", "guidance"],
+      "tags": [
+        "suv",
+        "внедорожник",
+        "кроссовер",
+        "4x4",
+        "guidance"
+      ],
       "year_from": 1980,
       "year_to": 0,
       "class": "suv",
       "rim_diameter_in": 16,
       "notes": "Высокий центр тяжести и мягкая подвеска: углы заметно зависят от загрузки, поэтому условия замера соблюдать особенно строго. У рамных машин с неразрезным передним мостом развал и кастер задаются самим мостом и регулируются только клиновыми шайбами (кастер) или ремонтом.",
       "front": {
-        "camber": { "min": -0.75, "nominal": 0.0, "max": 0.75 },
-        "caster": { "min": 1.5, "nominal": 3.5, "max": 5.5 },
-        "total_toe": { "min": 0.0, "nominal": 0.15, "max": 0.35 },
+        "camber": {
+          "min": -0.75,
+          "nominal": 0.0,
+          "max": 0.75
+        },
+        "caster": {
+          "min": 1.5,
+          "nominal": 3.5,
+          "max": 5.5
+        },
+        "total_toe": {
+          "min": 0.0,
+          "nominal": 0.15,
+          "max": 0.35
+        },
         "max_cross_camber": 0.5,
         "max_cross_caster": 0.5,
         "adjustable": {
@@ -138,9 +258,21 @@
         }
       },
       "rear": {
-        "camber": { "min": -1.5, "nominal": -0.5, "max": 0.5 },
-        "total_toe": { "min": -0.1, "nominal": 0.1, "max": 0.35 },
-        "adjustable": { "camber": false, "caster": false, "toe": false }
+        "camber": {
+          "min": -1.5,
+          "nominal": -0.5,
+          "max": 0.5
+        },
+        "total_toe": {
+          "min": -0.1,
+          "nominal": 0.1,
+          "max": 0.35
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
       },
       "max_thrust_angle": 0.25,
       "conditions": {
@@ -152,6 +284,22 @@
         "kind": "class_guidance",
         "reference": "Типичные диапазоны для автомобилей данной конструкции. НЕ заводские данные.",
         "added": "2026-07-22"
+      },
+      "en": {
+        "make": "— Class guidance —",
+        "model": "SUV / crossover",
+        "trim": "body-on-frame or unibody",
+        "notes": "High centre of gravity and soft suspension: the angles depend noticeably on the load, so keep to the measuring conditions especially strictly. On body-on-frame vehicles with a rigid front axle, camber and caster are set by the axle itself and can be changed only with taper shims (caster) or by repair.",
+        "reference": "Typical ranges for vehicles of this design. NOT factory data.",
+        "conditions": {
+          "load": "kerb weight; with air suspension — normal road mode",
+          "pressure": "per the manufacturer's placard",
+          "settle": "roll forward 3–5 m and let the suspension settle"
+        },
+        "front": {
+          "caster_method": "taper spacers under the leaf springs or adjustable links (on axle designs)",
+          "toe_method": "cross tie rod"
+        }
       }
     },
     {
@@ -159,7 +307,17 @@
       "make": "— Ориентир по классу —",
       "model": "Передняя балка (мост) на шкворнях: грузовик, автобус, фургон, внедорожник",
       "trim": "двухосные, рессорная подвеска",
-      "tags": ["грузовик", "грузовой", "автобус", "фургон", "балка", "шкворень", "truck", "bus", "guidance"],
+      "tags": [
+        "грузовик",
+        "грузовой",
+        "автобус",
+        "фургон",
+        "балка",
+        "шкворень",
+        "truck",
+        "bus",
+        "guidance"
+      ],
       "year_from": 1950,
       "year_to": 0,
       "class": "truck",
@@ -168,10 +326,26 @@
       "rim_diameter_in": 16,
       "notes": "Передняя неразрезная балка со шкворнями, задний мост на рессорах. Развал и поперечный наклон шкворня задаются балкой и не регулируются; кастер исправляют клиновыми прокладками под рессоры; схождение — поперечной рулевой тягой. Диаметр обода укажите свой: от него зависит пересчёт схождения в миллиметры.",
       "front": {
-        "camber": { "min": -0.25, "nominal": 0.75, "max": 1.5 },
-        "caster": { "min": 1.0, "nominal": 3.0, "max": 5.0 },
-        "sai": { "min": 5.0, "nominal": 7.0, "max": 9.0 },
-        "total_toe": { "min": 0.0, "nominal": 0.12, "max": 0.3 },
+        "camber": {
+          "min": -0.25,
+          "nominal": 0.75,
+          "max": 1.5
+        },
+        "caster": {
+          "min": 1.0,
+          "nominal": 3.0,
+          "max": 5.0
+        },
+        "sai": {
+          "min": 5.0,
+          "nominal": 7.0,
+          "max": 9.0
+        },
+        "total_toe": {
+          "min": 0.0,
+          "nominal": 0.12,
+          "max": 0.3
+        },
         "max_cross_camber": 0.5,
         "max_cross_caster": 0.75,
         "adjustable": {
@@ -184,8 +358,16 @@
         }
       },
       "rear": {
-        "camber": { "min": -0.5, "nominal": 0.0, "max": 0.5 },
-        "total_toe": { "min": -0.2, "nominal": 0.0, "max": 0.2 },
+        "camber": {
+          "min": -0.5,
+          "nominal": 0.0,
+          "max": 0.5
+        },
+        "total_toe": {
+          "min": -0.2,
+          "nominal": 0.0,
+          "max": 0.2
+        },
         "adjustable": {
           "camber": false,
           "caster": false,
@@ -205,6 +387,28 @@
         "kind": "class_guidance",
         "reference": "Типичные диапазоны для автомобилей данной конструкции. НЕ заводские данные.",
         "added": "2026-09-27"
+      },
+      "en": {
+        "make": "— Class guidance —",
+        "model": "Kingpin beam front axle: truck, bus, van, off-roader",
+        "trim": "two-axle, leaf springs",
+        "notes": "Rigid kingpin front beam, rear axle on leaf springs. Camber and kingpin inclination are set by the beam and are not adjustable; caster is corrected with taper shims under the springs; toe with the cross tie rod. Enter your own rim diameter: converting toe to millimetres depends on it.",
+        "reference": "Typical ranges for vehicles of this design. NOT factory data.",
+        "conditions": {
+          "load": "kerb weight without cargo; a bus without passengers",
+          "pressure": "to factory spec, equal left and right; with twin wheels — equal in both tyres",
+          "settle": "roll the vehicle 3–5 m forward, let the suspension settle",
+          "checks": "before measuring: kingpin play, spring U-bolt torque, tie-rod joints, wheel bearings"
+        },
+        "front": {
+          "camber_method": "not adjustable — a deviation means a bent beam, worn kingpins or wheel-bearing play",
+          "caster_method": "taper shims between the leaf spring and the beam pad",
+          "toe_method": "cross tie rod (sets the total toe)"
+        },
+        "rear": {
+          "camber_method": "not adjustable: a deviation means a bent axle housing",
+          "toe_method": "not adjustable: a skewed axle means a sheared spring centre bolt, loose U-bolts or worn shackles"
+        }
       }
     }
   ]

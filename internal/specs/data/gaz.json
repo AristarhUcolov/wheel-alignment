@@ -1,0 +1,497 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "gaz-m20-pobeda",
+      "make": "ГАЗ",
+      "model": "М-20 «Победа»",
+      "tags": [
+        "gaz",
+        "победа",
+        "pobeda",
+        "м20",
+        "m20"
+      ],
+      "year_from": 1946,
+      "year_to": 1958,
+      "class": "car",
+      "front_suspension": "double_wishbone_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-rwd-classic-sedan",
+      "notes": "Передняя подвеска двухрычажная шкворневая, задний мост на продольных рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "M-20 Pobeda",
+        "notes": "Double-wishbone kingpin front suspension, rear axle on longitudinal leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "gaz-21",
+      "make": "ГАЗ",
+      "model": "21 «Волга»",
+      "tags": [
+        "gaz",
+        "volga",
+        "волга",
+        "21",
+        "газ21"
+      ],
+      "year_from": 1956,
+      "year_to": 1970,
+      "class": "car",
+      "front_suspension": "double_wishbone_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-rwd-classic-sedan",
+      "notes": "Передняя подвеска двухрычажная шкворневая, задний мост на продольных рессорах. Перед регулировкой обязательно проверьте люфт шкворней и резьбовых шарниров стоек и прошприцуйте их.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "21 Volga",
+        "notes": "Double-wishbone kingpin front suspension, rear axle on longitudinal leaf springs. Before adjusting, always check the play of the kingpins and of the threaded strut bushings, and grease them.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "gaz-24",
+      "make": "ГАЗ",
+      "model": "24 / 24-10 «Волга»",
+      "tags": [
+        "gaz",
+        "volga",
+        "волга",
+        "24",
+        "2410",
+        "24-10",
+        "газ24"
+      ],
+      "year_from": 1970,
+      "year_to": 1992,
+      "class": "car",
+      "front_suspension": "double_wishbone_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-rwd-classic-sedan",
+      "notes": "Передняя подвеска двухрычажная шкворневая, задний мост на продольных рессорах. Перед регулировкой обязательно проверьте люфт шкворней и резьбовых шарниров стоек и прошприцуйте их.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "24 / 24-10 Volga",
+        "notes": "Double-wishbone kingpin front suspension, rear axle on longitudinal leaf springs. Before adjusting, always check the play of the kingpins and of the threaded strut bushings, and grease them.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "gaz-3102",
+      "make": "ГАЗ",
+      "model": "3102 «Волга»",
+      "tags": [
+        "gaz",
+        "volga",
+        "волга",
+        "3102",
+        "газ3102"
+      ],
+      "year_from": 1982,
+      "year_to": 2008,
+      "class": "car",
+      "front_suspension": "double_wishbone_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-rwd-classic-sedan",
+      "notes": "Передняя подвеска двухрычажная шкворневая, задний мост на продольных рессорах. Если на вашей машине вместо шкворней стоят шаровые опоры — выберите в настройках подвески «Двухрычажная на шаровых опорах».",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "3102 Volga",
+        "notes": "Double-wishbone kingpin front suspension, rear axle on longitudinal leaf springs. If your car has ball joints instead of kingpins, choose “Double wishbone, ball joints” in the suspension settings.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "gaz-3110",
+      "make": "ГАЗ",
+      "model": "3110 «Волга»",
+      "tags": [
+        "gaz",
+        "volga",
+        "волга",
+        "3110",
+        "газ3110",
+        "шкворень",
+        "шкворневая"
+      ],
+      "year_from": 1997,
+      "year_to": 2005,
+      "class": "car",
+      "front_suspension": "double_wishbone_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Выпускалась в двух исполнениях передней подвески: шкворневой и бесшкворневой (на шаровых опорах, у поздних машин). По умолчанию выбрана шкворневая — посмотрите на свою машину и при необходимости смените тип. Задний мост на продольных рессорах. Схождение 0,7–1,3 мм по ободьям соответствует 1–2 мм по шинам. Порядок регулировки по руководству: развал, затем наклон шкворня, затем схождение.",
+      "source": {
+        "kind": "unverified",
+        "reference": "autoruk.ru, «Сход развал ГАЗ-3110» — пересказ руководства по ремонту ГАЗ-3110. Постранично с заводским изданием не сверено. Положительный кастер +3…+6° для 3110/31105 приводит и таблица стенда, процитированная на форуме allgaz.ru.",
+        "url": "https://autoruk.ru/gaz-3110-volga/podveska/skhod-razval-gaz-3110",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-27"
+      },
+      "rim_diameter_in": 15,
+      "front_total_toe_mm": {
+        "min": 0.7,
+        "max": 1.3
+      },
+      "front": {
+        "camber": {
+          "min": -0.5,
+          "nominal": 0.0,
+          "max": 0.5
+        },
+        "caster": {
+          "min": 4.5,
+          "nominal": 5.25,
+          "max": 6.0
+        },
+        "max_cross_camber": 0.5,
+        "max_cross_caster": 0.5,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "регулировочные прокладки между осью верхнего рычага и кронштейном поперечины; одна прокладка 1,0 мм меняет развал примерно на 0°12′",
+          "caster_method": "те же прокладки: одна прокладка меняет наклон шкворня примерно на 0°25′",
+          "toe_method": "регулировочные трубки боковых рулевых тяг"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false,
+          "camber_method": "не регулируется — задний мост на рессорах",
+          "toe_method": "не регулируется — перекос моста означает неисправность рессор или их креплений"
+        }
+      },
+      "conditions": {
+        "load": "без нагрузки; при полной нагрузке (5 человек или 150 кг спереди и 225 кг сзади) наклон шкворня должен быть 5°…6°30′",
+        "pressure": "по норме, одинаково слева и справа",
+        "checks": "износ протектора слева и справа примерно одинаков, нет люфта в подшипниках ступиц и рулевом управлении, диски не деформированы"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "3110 Volga",
+        "notes": "Built with two front suspensions: kingpin and kingpin-less (ball joints, on late cars). Kingpin is the default — look at your car and change the type if needed. Rear axle on longitudinal leaf springs. Toe of 0.7–1.3 mm at the rims equals 1–2 mm at the tyres. Order per the manual: camber, then kingpin caster, then toe.",
+        "reference": "autoruk.ru, “Wheel alignment GAZ-3110” — a retelling of the GAZ-3110 workshop manual. Not checked page by page against the factory edition. A positive caster of +3…+6° for the 3110/31105 is also given by an aligner table quoted on the allgaz.ru forum.",
+        "conditions": {
+          "load": "unladen; fully laden (5 people, or 150 kg front and 225 kg rear) the kingpin caster must be 5°…6°30′",
+          "pressure": "to spec, equal left and right",
+          "checks": "tread wear roughly equal left and right, no play in wheel bearings or steering, rims not bent"
+        },
+        "front": {
+          "camber_method": "adjusting shims between the upper arm shaft and the crossmember bracket; one 1.0 mm shim changes camber by about 0°12′",
+          "caster_method": "the same shims: one shim changes kingpin caster by about 0°25′",
+          "toe_method": "adjusting tubes of the side tie rods"
+        },
+        "rear": {
+          "camber_method": "not adjustable — rear axle on leaf springs",
+          "toe_method": "not adjustable — a skewed axle means faulty leaf springs or mountings"
+        }
+      }
+    },
+    {
+      "id": "gaz-31105",
+      "make": "ГАЗ",
+      "model": "31105 «Волга»",
+      "tags": [
+        "gaz",
+        "volga",
+        "волга",
+        "31105",
+        "газ31105",
+        "шаровая",
+        "бесшкворневая"
+      ],
+      "year_from": 2004,
+      "year_to": 2010,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-rwd-classic-sedan",
+      "notes": "Передняя подвеска двухрычажная бесшкворневая, на шаровых опорах. Если на вашей машине стоят шкворни — выберите в настройках подвески шкворневую. Задний мост на продольных рессорах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "31105 Volga",
+        "notes": "Double-wishbone front suspension without kingpins, on ball joints. If your car has kingpins, choose the kingpin type in the suspension settings. Rear axle on longitudinal leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "gaz-69",
+      "make": "ГАЗ",
+      "model": "69 / 69А",
+      "tags": [
+        "gaz",
+        "69",
+        "газ69",
+        "газик"
+      ],
+      "year_from": 1953,
+      "year_to": 1973,
+      "class": "suv",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передний ведущий мост на шкворнях и рессорах, задний мост на рессорах. Развал и поперечный наклон шкворня не регулируются, схождение — поперечной рулевой тягой.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "69 / 69A",
+        "notes": "Driven kingpin front axle on leaf springs, rear axle on leaf springs. Camber and kingpin inclination are not adjustable, toe is set by the cross tie rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "gaz-53-3307",
+      "make": "ГАЗ",
+      "model": "53 / 3307",
+      "tags": [
+        "gaz",
+        "53",
+        "3307",
+        "газ53",
+        "грузовик"
+      ],
+      "year_from": 1961,
+      "year_to": 2020,
+      "class": "truck",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал не регулируется, схождение — поперечной рулевой тягой.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "53 / 3307",
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber is not adjustable; toe is set with the cross tie rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "gaz-66",
+      "make": "ГАЗ",
+      "model": "66 «Шишига»",
+      "tags": [
+        "gaz",
+        "66",
+        "газ66",
+        "шишига",
+        "грузовик"
+      ],
+      "year_from": 1964,
+      "year_to": 1999,
+      "class": "truck",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передний ведущий мост на шкворнях и рессорах, задний мост на рессорах. Развал и поперечный наклон шкворня не регулируются, схождение — поперечной рулевой тягой.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "66 “Shishiga”",
+        "notes": "Driven kingpin front axle on leaf springs, rear axle on leaf springs. Camber and kingpin inclination are not adjustable, toe is set by the cross tie rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "gaz-gazelle-3302",
+      "make": "ГАЗ",
+      "model": "ГАЗель (3302, 2705, 3221)",
+      "tags": [
+        "gaz",
+        "газель",
+        "gazelle",
+        "3302",
+        "2705",
+        "3221",
+        "соболь"
+      ],
+      "year_from": 1994,
+      "year_to": 0,
+      "class": "lcv",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Классическая ГАЗель: передняя неразрезная балка на шкворнях и рессорах, задний мост на рессорах. Регулируется только схождение. В руководстве оно дано в миллиметрах между внутренними боковинами шин на уровне оси колёс (0–3 мм); здесь пересчитано в градусы по наружному диаметру шины 185/75 R16 (≈684 мм). Поперечный наклон шкворня — 8°, не регулируется. К ГАЗели NEXT эта запись не относится.",
+      "source": {
+        "kind": "unverified",
+        "reference": "autoruk.ru, «Проверка и регулировка углов установки передних колес автомобиля Газель» — пересказ руководства по ремонту. Постранично с заводским изданием не сверено.",
+        "url": "https://autoruk.ru/marka-avto2/gaz-2705/rulevoe-upravlenie/proverka-i-regulirovka-uglov-ustanovki-perednikh-koles-avtomobilya-gazel",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-27"
+      },
+      "rim_diameter_in": 16,
+      "front": {
+        "camber": {
+          "min": 0.75,
+          "nominal": 1.0,
+          "max": 1.25
+        },
+        "caster": {
+          "min": 3.0,
+          "nominal": 3.5,
+          "max": 4.0
+        },
+        "total_toe": {
+          "min": 0.0,
+          "nominal": 0.1257,
+          "max": 0.2513
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется — задан наклоном цапфы поворотного кулака; отклонение означает износ шкворней и втулок, ослабленные подшипники ступиц или деформацию балки",
+          "caster_method": "задан конструкцией балки; при деформации — замена деталей или стальные клиновые прокладки между подушкой рессоры и площадкой балки",
+          "toe_method": "поперечная рулевая тяга: ослабить хомуты и вращать тягу"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false,
+          "camber_method": "не регулируется",
+          "toe_method": "не регулируется"
+        }
+      },
+      "conditions": {
+        "load": "кастер 3°30′±30′ указан для гружёного автомобиля",
+        "pressure": "по норме, одинаково слева и справа",
+        "checks": "схождение: замер между внутренними боковинами шин на уровне оси колёс спереди, затем колёса прокатить на пол-оборота и замерить сзади"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "GAZelle (3302, 2705, 3221)",
+        "notes": "The classic GAZelle: rigid kingpin front beam on leaf springs, rear axle on leaf springs. Only toe is adjustable. The manual gives it in millimetres between the inner tyre sidewalls at axle height (0–3 mm); here it is converted to degrees using the outer diameter of a 185/75 R16 tyre (≈684 mm). Kingpin inclination is 8°, not adjustable. This entry does not cover the GAZelle NEXT.",
+        "reference": "autoruk.ru, “Checking and adjusting the front wheel angles of the Gazelle” — a retelling of the workshop manual. Not checked page by page against the factory edition.",
+        "conditions": {
+          "load": "the caster of 3°30′±30′ is given for a laden vehicle",
+          "pressure": "to spec, equal left and right",
+          "checks": "toe: measure between the inner tyre sidewalls at axle height in front, then roll the wheels half a turn and measure behind"
+        },
+        "front": {
+          "camber_method": "not adjustable — set by the stub-axle inclination; a deviation means worn kingpins and bushes, loose wheel bearings or a bent beam",
+          "caster_method": "set by the beam; if bent — replace parts or fit steel taper shims between the spring pad and the beam",
+          "toe_method": "cross tie rod: loosen the clamps and turn the rod"
+        },
+        "rear": {
+          "camber_method": "not adjustable",
+          "toe_method": "not adjustable"
+        }
+      }
+    },
+    {
+      "id": "gaz-gazelle-next",
+      "make": "ГАЗ",
+      "model": "ГАЗель NEXT",
+      "trim": "заднеприводные",
+      "tags": [
+        "gaz",
+        "газель",
+        "gazelle",
+        "next",
+        "некст",
+        "a21r",
+        "a22r"
+      ],
+      "year_from": 2013,
+      "year_to": 0,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах. Полноприводные версии имеют передний мост — для них выберите тип подвески «Неразрезная балка на шкворнях».",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "GAZelle NEXT",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs. Four-wheel-drive versions have a front axle — choose “Rigid beam, kingpins” for them.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "rear-wheel drive"
+      }
+    },
+    {
+      "id": "gaz-gazon-next",
+      "make": "ГАЗ",
+      "model": "ГАЗон NEXT",
+      "tags": [
+        "gaz",
+        "газон",
+        "gazon",
+        "next",
+        "c41r",
+        "грузовик"
+      ],
+      "year_from": 2014,
+      "year_to": 0,
+      "class": "truck",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-truck-bus-beam",
+      "notes": "Передняя балка на шкворнях и рессорах, задний мост на рессорах. Развал и поперечный наклон шкворня не регулируются; кастер — клиновыми прокладками, схождение — поперечной рулевой тягой.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-27"
+      },
+      "en": {
+        "make": "GAZ",
+        "model": "GAZon NEXT",
+        "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber and kingpin inclination are not adjustable; caster by taper shims, toe by the cross tie rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}
