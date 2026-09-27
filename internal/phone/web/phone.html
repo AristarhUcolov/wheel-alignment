@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#080d17">
+<title>Датчик — Сход-развал</title>
+<style>
+  :root { --bg:#080d17; --panel:#111a2c; --line:#23324d; --text:#e8eef8; --muted:#93a3bb; --green:#2bd46a; --red:#ff4d4d; --amber:#ffb020; --blue:#4f8cff;
+          --num: Bahnschrift, "Roboto Condensed", "DIN Alternate", "Arial Narrow", sans-serif; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { min-height: 100vh; display: flex; flex-direction: column; padding: max(12px, env(safe-area-inset-top)) 14px 18px; gap: 12px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  header b { font-size: 17px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--red); display: inline-block; margin-right: 6px; vertical-align: 0; }
+  .dot.on { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  button { font: inherit; color: inherit; border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 14px 12px; cursor: pointer; }
+  button:active { transform: scale(.98); }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
+  button.wheel { font-size: 20px; padding: 26px 8px; font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  .big { font: 600 clamp(64px, 24vw, 128px)/1 var(--num); text-align: center; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
+  .big.good { color: var(--green); } .big.bad { color: var(--red); } .big.marginal { color: var(--amber); } .big.none { color: #5d6d87; }
+  .sub { text-align: center; color: var(--muted); font-family: var(--num); font-size: 18px; min-height: 24px; }
+  .norm { text-align: center; color: var(--green); font-family: var(--num); font-size: 17px; min-height: 22px; }
+  .prompt { font-size: 18px; line-height: 1.35; }
+  .err { color: #ffb4b4; background: rgba(255,77,77,.12); border-left: 3px solid var(--red); padding: 10px 12px; border-radius: 0 10px 10px 0; }
+  .bar { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; margin-top: 10px; }
+  .bar div { height: 100%; background: var(--green); width: 0; transition: width .15s; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .chip { font-size: 13px; padding: 4px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
+  .chip.ok { color: var(--green); border-color: #164d2e; }
+  .steer { font: 600 56px/1 var(--num); text-align: center; color: var(--blue); }
+  .hide { display: none !important; }
+  .muted { color: var(--muted); font-size: 14px; }
+  small { color: var(--muted); }
+</style>
+</head>
+<body>
+  <header>
+    <b id="title">Датчик сход-развала</b>
+    <span><span class="dot" id="dot"></span><span id="conn" class="muted">нет связи</span></span>
+  </header>
+
+  <section id="pick" class="hide">
+    <p class="prompt">На каком колесе будет телефон?</p>
+    <div class="grid2">
+      <button class="wheel" data-w="FL">Переднее<br>левое</button>
+      <button class="wheel" data-w="FR">Переднее<br>правое</button>
+      <button class="wheel" data-w="RL">Заднее<br>левое</button>
+      <button class="wheel" data-w="RR">Заднее<br>правое</button>
+    </div>
+    <p class="muted" style="text-align:center;margin-top:10px">Левое и правое — если смотреть с места водителя.</p>
+  </section>
+
+  <section id="start" class="hide">
+    <div class="card">
+      <p class="prompt">Телефон будет передавать наклон колеса по Wi-Fi. Экран не погаснет, пока открыта эта страница.</p>
+      <button class="primary" id="go" style="width:100%;font-size:19px;padding:18px">Включить датчики</button>
+      <p class="muted" id="startErr"></p>
+    </div>
+  </section>
+
+  <section id="main" class="hide" style="display:flex;flex-direction:column;gap:12px">
+    <div class="card">
+      <div class="sub" id="wheelName"></div>
+      <div class="big none" id="camber">— — —</div>
+      <div class="sub" id="camberDeg"></div>
+      <div class="norm" id="norm"></div>
+      <div class="steer hide" id="steer"></div>
+      <div class="chips" style="margin-top:8px">
+        <span class="chip" id="cFlat">калибровка</span>
+        <span class="chip" id="cMount">крепление</span>
+        <span class="chip" id="cRun">биение</span>
+        <span class="chip" id="cStable">стабильно</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="prompt" id="prompt"></div>
+      <div class="bar" id="barWrap"><div id="bar"></div></div>
+    </div>
+    <div class="err hide" id="err"></div>
+    <div class="grid2" id="actions">
+      <button data-cmd="flat">Калибровка телефона</button>
+      <button data-cmd="mount">Калибровка крепления</button>
+      <button data-cmd="runout">Биение диска</button>
+      <button data-cmd="caster" id="bCaster">Кастер</button>
+      <button data-cmd="cancel" id="bCancel" class="hide">Отмена</button>
+      <button id="bWheel">Другое колесо</button>
+    </div>
+    <p class="muted">Телефон прижимайте к ровной планке, лежащей на закраинах обода, экраном наружу. Не к шине.</p>
+  </section>
+
+<script>
+'use strict';
+const token = location.pathname.split('/')[2] || '';
+const $ = s => document.querySelector(s);
+const store = {
+  get(k) { try { return localStorage.getItem('wa.' + k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem('wa.' + k, v); } catch {} },
+};
+let id = store.get('device');
+if (!id) { id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); store.set('device', id); }
+let wheel = store.get('wheel') || '';
+
+function deviceName() {
+  const ua = navigator.userAgent;
+  if (/iPhone/.test(ua)) return 'iPhone ' + id.slice(0, 4).toUpperCase();
+  if (/iPad/.test(ua)) return 'iPad ' + id.slice(0, 4).toUpperCase();
+  const m = ua.match(/Android[^;]*;\s*([^;)]+)/);
+  return (m ? m[1].trim() : 'Android') + ' ' + id.slice(0, 4).toUpperCase();
+}
+
+// ── Датчики ────────────────────────────────────────────────────────
+let acc = null, lastEvent = 0, gotMotion = false;
+function reset() { acc = { n: 0, dt: 0, ax: 0, ay: 0, az: 0, gx: 0, gy: 0, gz: 0, gyro: false }; }
+reset();
+function onMotion(e) {
+  const a = e.accelerationIncludingGravity;
+  if (!a || a.x === null) return;
+  gotMotion = true;
+  const now = performance.now();
+  const dt = e.interval ? (e.interval > 1 ? e.interval / 1000 : e.interval) : (lastEvent ? (now - lastEvent) / 1000 : 0.016);
+  lastEvent = now;
+  acc.n++; acc.dt += Math.min(dt, 0.2);
+  acc.ax += a.x; acc.ay += a.y; acc.az += a.z;
+  const r = e.rotationRate;
+  if (r && r.alpha !== null && r.alpha !== undefined) {
+    acc.gyro = true;
+    // W3C: alpha — вокруг z, beta — вокруг x, gamma — вокруг y.
+    acc.gx += r.beta; acc.gy += r.gamma; acc.gz += r.alpha;
+  }
+}
+function takeBatch() {
+  if (!acc.n) return null;
+  const n = acc.n;
+  const b = { n, dt: acc.dt, ax: acc.ax / n, ay: acc.ay / n, az: acc.az / n, gx: acc.gx / n, gy: acc.gy / n, gz: acc.gz / n, gyro: acc.gyro };
+  reset();
+  return b;
+}
+
+// ── Связь ──────────────────────────────────────────────────────────
+let queue = [], inflight = false, pending = {}, lastOK = 0, lastStep = '';
+async function send(extra) {
+  if (extra) Object.assign(pending, extra);
+  if (inflight) return;
+  const b = takeBatch();
+  if (b) queue.push(b);
+  if (queue.length > 30) queue = queue.slice(-30);
+  const body = { d: id, name: deviceName(), samples: queue, ...pending };
+  if (wheel && !body.wheel && !lastOK) body.wheel = wheel;
+  const sentPending = pending;
+  queue = []; pending = {};
+  inflight = true;
+  try {
+    const r = await fetch(`/p/${token}/data`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (r.status === 404) { conn(false, 'ссылка устарела — отсканируйте код заново'); return; }
+    const st = await r.json();
+    lastOK = Date.now();
+    conn(true);
+    render(st);
+  } catch {
+    // Не дошло: вернём команды в очередь, показания — выбросим (они устареют).
+    pending = { ...sentPending, ...pending };
+    conn(false);
+  } finally { inflight = false; }
+}
+function conn(ok, why) {
+  $('#dot').classList.toggle('on', ok);
+  $('#conn').textContent = ok ? 'на связи' : (why || 'нет связи');
+}
+
+// ── Показ ──────────────────────────────────────────────────────────
+function dm(v) {
+  if (v === null || v === undefined) return '— — —';
+  const neg = v < 0, a = Math.abs(v);
+  let d = Math.floor(a), m = Math.round((a - d) * 60);
+  if (m === 60) { d++; m = 0; }
+  return (neg && (d || m) ? '−' : '+') + d + '°' + String(m).padStart(2, '0') + '′';
+}
+function render(st) {
+  if (st.step !== lastStep) {
+    if (lastStep && navigator.vibrate) navigator.vibrate(st.error ? [60, 60, 60] : 120);
+    lastStep = st.step;
+  }
+  $('#wheelName').textContent = st.wheel_name ? 'Развал · ' + st.wheel_name.toLowerCase() : 'колесо не выбрано';
+  const c = $('#camber');
+  c.textContent = dm(st.camber);
+  c.className = 'big ' + (st.camber === null || st.camber === undefined ? 'none' : (st.status && st.status !== 'no_spec' ? st.status : ''));
+  $('#camberDeg').textContent = st.camber === null || st.camber === undefined ? '' : (st.camber >= 0 ? '+' : '−') + Math.abs(st.camber).toFixed(2) + '°';
+  $('#norm').textContent = st.spec ? `норма ${dm(st.spec.min)} … ${dm(st.spec.max)}` : '';
+  const steer = $('#steer');
+  steer.classList.toggle('hide', st.steer === undefined || st.steer === null);
+  if (st.steer !== undefined && st.steer !== null) steer.textContent = 'поворот ' + Math.abs(st.steer).toFixed(1) + '°';
+  $('#prompt').textContent = st.prompt || '';
+  const err = $('#err');
+  err.classList.toggle('hide', !st.error);
+  err.textContent = st.error || '';
+  $('#bar').style.width = Math.round((st.progress || 0) * 100) + '%';
+  $('#barWrap').classList.toggle('hide', st.step === 'live');
+  $('#cFlat').classList.toggle('ok', !!st.flat);
+  $('#cMount').classList.toggle('ok', !!st.mounted);
+  $('#cRun').classList.toggle('ok', st.runout !== undefined && st.runout !== null);
+  $('#cRun').textContent = st.runout !== undefined && st.runout !== null ? 'биение ' + Math.abs(st.runout).toFixed(2) + '°' : 'биение';
+  $('#cStable').classList.toggle('ok', !!st.stable);
+  $('#bCaster').classList.toggle('hide', !st.front);
+  $('#bCancel').classList.toggle('hide', st.step === 'live');
+  if (st.caster !== undefined && st.caster !== null && st.step === 'caster_back') {
+    $('#prompt').textContent = `Кастер ${dm(st.caster)} передан на компьютер. Верните колёса прямо.`;
+  }
+}
+
+// ── Экраны ─────────────────────────────────────────────────────────
+function show(which) {
+  for (const s of ['pick', 'start', 'main']) $('#' + s).classList.toggle('hide', s !== which);
+  if (which === 'main') $('#main').style.display = 'flex';
+}
+document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
+  wheel = b.dataset.w;
+  store.set('wheel', wheel);
+  send({ wheel });
+  show(running ? 'main' : 'start');
+});
+document.querySelectorAll('[data-cmd]').forEach(b => b.onclick = () => send({ cmd: b.dataset.cmd }));
+$('#bWheel').onclick = () => show('pick');
+
+let running = false, wakeLock = null;
+async function keepAwake() {
+  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch {}
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && running) keepAwake(); });
+
+$('#go').onclick = async () => {
+  $('#startErr').textContent = '';
+  try {
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+      const p = await DeviceMotionEvent.requestPermission();
+      if (p !== 'granted') { $('#startErr').textContent = 'Доступ к датчикам запрещён. Разрешите его в настройках Safari для этого сайта.'; return; }
+    }
+  } catch (e) { $('#startErr').textContent = 'Не удалось запросить доступ к датчикам: ' + e.message; return; }
+  window.addEventListener('devicemotion', onMotion);
+  running = true;
+  keepAwake();
+  show('main');
+  setTimeout(() => {
+    if (!gotMotion) {
+      const why = window.isSecureContext ? 'Датчики не отвечают. Откройте страницу в Chrome (Android) или Safari (iPhone).'
+                                         : 'Страница открыта не по защищённому адресу — браузер не даёт доступа к датчикам.';
+      render({ step: 'live', prompt: why, error: why });
+    }
+  }, 2500);
+};
+
+setInterval(() => { if (running || Object.keys(pending).length) send(); }, 100);
+setInterval(() => { if (!running) send(); }, 1500);
+show(wheel ? 'start' : 'pick');
+send(wheel ? { wheel } : null);
+</script>
+</body>
+</html>
