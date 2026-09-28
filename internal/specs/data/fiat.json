@@ -1,0 +1,107 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "fiat-punto-2",
+      "make": "Fiat",
+      "model": "Punto II (188)",
+      "tags": [
+        "fiat",
+        "фиат",
+        "punto",
+        "пунто"
+      ],
+      "year_from": 1999,
+      "year_to": 2010,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Fiat",
+        "model": "Punto II (188)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "fiat-albea",
+      "make": "Fiat",
+      "model": "Albea",
+      "tags": [
+        "fiat",
+        "фиат",
+        "albea",
+        "альбеа"
+      ],
+      "year_from": 2002,
+      "year_to": 2012,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Fiat",
+        "model": "Albea",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "fiat-ducato-250",
+      "make": "Fiat",
+      "model": "Ducato (250)",
+      "tags": [
+        "fiat",
+        "фиат",
+        "ducato",
+        "дукато",
+        "peugeot",
+        "boxer",
+        "боксер",
+        "citroen",
+        "jumper",
+        "джампер"
+      ],
+      "year_from": 2006,
+      "year_to": 0,
+      "class": "lcv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди Макферсон, сзади неразрезная балка на рессорах. Передний привод. Тот же фургон — Peugeot Boxer и Citroën Jumper.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Fiat",
+        "model": "Ducato (250)",
+        "notes": "MacPherson struts at the front, rigid rear beam on leaf springs. Front-wheel drive. The same van is sold as the Peugeot Boxer and Citroën Jumper.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

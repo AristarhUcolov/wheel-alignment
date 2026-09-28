@@ -245,6 +245,160 @@
         "notes": "Independent front with MacPherson-type struts (a transverse leaf spring on the Sprinter and Crafter), rigid rear axle on leaf springs.",
         "reference": "Design description. No tolerances entered."
       }
+    },
+    {
+      "id": "mercedes-w115",
+      "make": "Mercedes-Benz",
+      "model": "/8 (W114 / W115)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "benz",
+        "w114",
+        "w115",
+        "strich",
+        "штрих"
+      ],
+      "year_from": 1968,
+      "year_to": 1976,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади независимая на косых рычагах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "/8 (W114 / W115)",
+        "notes": "Double wishbones on ball joints at the front, independent semi-trailing arms at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-w203",
+      "make": "Mercedes-Benz",
+      "model": "C-Class (W203)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "benz",
+        "w203",
+        "c-class"
+      ],
+      "year_from": 2000,
+      "year_to": 2007,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "C-Class (W203)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-w163",
+      "make": "Mercedes-Benz",
+      "model": "M-Class (W163)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "benz",
+        "w163",
+        "ml",
+        "m-class"
+      ],
+      "year_from": 1997,
+      "year_to": 2005,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "double_wishbone_ball",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Двухрычажная спереди (с торсионами) и сзади.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "M-Class (W163)",
+        "notes": "Double wishbones front (with torsion bars) and rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-w164",
+      "make": "Mercedes-Benz",
+      "model": "M-Class (W164)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "benz",
+        "w164",
+        "ml",
+        "m-class"
+      ],
+      "year_from": 2005,
+      "year_to": 2011,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "M-Class (W164)",
+        "notes": "Double wishbones on ball joints at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mercedes-vito-w639",
+      "make": "Mercedes-Benz",
+      "model": "Vito / Viano (W639)",
+      "tags": [
+        "mercedes",
+        "мерседес",
+        "benz",
+        "vito",
+        "вито",
+        "viano",
+        "виано",
+        "w639"
+      ],
+      "year_from": 2003,
+      "year_to": 2014,
+      "class": "lcv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди Макферсон, сзади независимая на косых рычагах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mercedes-Benz",
+        "model": "Vito / Viano (W639)",
+        "notes": "MacPherson struts at the front, independent semi-trailing arms at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
     }
   ]
 }

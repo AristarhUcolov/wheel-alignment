@@ -69,6 +69,129 @@
         "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs.",
         "reference": "Design description. No tolerances entered."
       }
+    },
+    {
+      "id": "mitsubishi-lancer-9",
+      "make": "Mitsubishi",
+      "model": "Lancer IX",
+      "tags": [
+        "mitsubishi",
+        "мицубиси",
+        "митсубиси",
+        "lancer",
+        "лансер"
+      ],
+      "year_from": 2000,
+      "year_to": 2010,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mitsubishi",
+        "model": "Lancer IX",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mitsubishi-lancer-10",
+      "make": "Mitsubishi",
+      "model": "Lancer X",
+      "tags": [
+        "mitsubishi",
+        "мицубиси",
+        "митсубиси",
+        "lancer",
+        "лансер"
+      ],
+      "year_from": 2007,
+      "year_to": 2017,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mitsubishi",
+        "model": "Lancer X",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mitsubishi-outlander-xl",
+      "make": "Mitsubishi",
+      "model": "Outlander XL (CW)",
+      "tags": [
+        "mitsubishi",
+        "мицубиси",
+        "митсубиси",
+        "outlander",
+        "аутлендер",
+        "xl"
+      ],
+      "year_from": 2006,
+      "year_to": 2012,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mitsubishi",
+        "model": "Outlander XL (CW)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mitsubishi-pajero-sport-1",
+      "make": "Mitsubishi",
+      "model": "Pajero Sport I",
+      "tags": [
+        "mitsubishi",
+        "мицубиси",
+        "митсубиси",
+        "pajero",
+        "паджеро",
+        "sport",
+        "спорт"
+      ],
+      "year_from": 1996,
+      "year_to": 2008,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах. Спереди торсионы.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mitsubishi",
+        "model": "Pajero Sport I",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs. Torsion bars at the front.",
+        "reference": "Design description. No tolerances entered."
+      }
     }
   ]
 }

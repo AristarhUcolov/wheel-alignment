@@ -1,0 +1,200 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "jeep-cherokee-xj",
+      "make": "Jeep",
+      "model": "Cherokee (XJ)",
+      "tags": [
+        "jeep",
+        "джип",
+        "cherokee",
+        "чероки",
+        "xj"
+      ],
+      "year_from": 1984,
+      "year_to": 2001,
+      "class": "suv",
+      "front_suspension": "beam_ball_joint",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний неразрезной мост на шаровых опорах, пружинах и продольных тягах; задний мост на рессорах. Развал задан мостом и штатно не регулируется.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Jeep",
+        "model": "Cherokee (XJ)",
+        "notes": "Rigid front axle with ball joints on coil springs and links; rear axle on leaf springs. Camber is set by the axle and is not adjustable as standard.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "jeep-grand-cherokee-zj",
+      "make": "Jeep",
+      "model": "Grand Cherokee (ZJ)",
+      "tags": [
+        "jeep",
+        "джип",
+        "grand",
+        "cherokee",
+        "чероки",
+        "zj"
+      ],
+      "year_from": 1993,
+      "year_to": 1998,
+      "class": "suv",
+      "front_suspension": "beam_ball_joint",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний и задний неразрезные мосты на пружинах и тягах, передний — на шаровых опорах. Развал задан мостом и штатно не регулируется.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Jeep",
+        "model": "Grand Cherokee (ZJ)",
+        "notes": "Rigid front and rear axles on coil springs and links; the front axle has ball joints. Camber is set by the axle and is not adjustable as standard.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "jeep-grand-cherokee-wj",
+      "make": "Jeep",
+      "model": "Grand Cherokee (WJ)",
+      "tags": [
+        "jeep",
+        "джип",
+        "grand",
+        "cherokee",
+        "чероки",
+        "wj"
+      ],
+      "year_from": 1999,
+      "year_to": 2004,
+      "class": "suv",
+      "front_suspension": "beam_ball_joint",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний и задний неразрезные мосты на пружинах и тягах, передний — на шаровых опорах. Развал задан мостом и штатно не регулируется.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Jeep",
+        "model": "Grand Cherokee (WJ)",
+        "notes": "Rigid front and rear axles on coil springs and links; the front axle has ball joints. Camber is set by the axle and is not adjustable as standard.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "jeep-grand-cherokee-wk",
+      "make": "Jeep",
+      "model": "Grand Cherokee (WK)",
+      "tags": [
+        "jeep",
+        "джип",
+        "grand",
+        "cherokee",
+        "чероки",
+        "wk"
+      ],
+      "year_from": 2005,
+      "year_to": 2010,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на пружинах и тягах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Jeep",
+        "model": "Grand Cherokee (WK)",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on coil springs and links.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "jeep-wrangler-tj",
+      "make": "Jeep",
+      "model": "Wrangler (TJ)",
+      "tags": [
+        "jeep",
+        "джип",
+        "wrangler",
+        "вранглер",
+        "рэнглер",
+        "tj"
+      ],
+      "year_from": 1997,
+      "year_to": 2006,
+      "class": "suv",
+      "front_suspension": "beam_ball_joint",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний и задний неразрезные мосты на пружинах и тягах, передний — на шаровых опорах. Развал задан мостом и штатно не регулируется.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Jeep",
+        "model": "Wrangler (TJ)",
+        "notes": "Rigid front and rear axles on coil springs and links; the front axle has ball joints. Camber is set by the axle and is not adjustable as standard.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "jeep-wrangler-jk",
+      "make": "Jeep",
+      "model": "Wrangler (JK)",
+      "tags": [
+        "jeep",
+        "джип",
+        "wrangler",
+        "вранглер",
+        "рэнглер",
+        "jk"
+      ],
+      "year_from": 2007,
+      "year_to": 2018,
+      "class": "suv",
+      "front_suspension": "beam_ball_joint",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний и задний неразрезные мосты на пружинах и тягах, передний — на шаровых опорах. Развал задан мостом и штатно не регулируется.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Jeep",
+        "model": "Wrangler (JK)",
+        "notes": "Rigid front and rear axles on coil springs and links; the front axle has ball joints. Camber is set by the axle and is not adjustable as standard.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

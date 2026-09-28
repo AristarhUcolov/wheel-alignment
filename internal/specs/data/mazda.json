@@ -12,111 +12,21 @@
   ],
   "specs": [
     {
-      "id": "nissan-navara-d40",
-      "make": "Nissan",
-      "model": "Navara (D40)",
+      "id": "mazda-3-bk",
+      "make": "Mazda",
+      "model": "3 (BK)",
       "tags": [
-        "nissan",
-        "ниссан",
-        "navara",
-        "навара",
-        "пикап"
+        "mazda",
+        "мазда",
+        "3",
+        "bk"
       ],
-      "year_from": 2005,
-      "year_to": 2015,
-      "class": "lcv",
-      "front_suspension": "double_wishbone_ball",
-      "rear_suspension": "live_axle_leaf",
-      "guidance_id": "guidance-suv-4x4",
-      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах.",
-      "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
-      },
-      "en": {
-        "make": "Nissan",
-        "model": "Navara (D40)",
-        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs.",
-        "reference": "Design description. No tolerances entered."
-      }
-    },
-    {
-      "id": "nissan-almera-classic",
-      "make": "Nissan",
-      "model": "Almera Classic (B10)",
-      "tags": [
-        "nissan",
-        "ниссан",
-        "almera",
-        "альмера",
-        "classic",
-        "классик"
-      ],
-      "year_from": 2006,
-      "year_to": 2012,
+      "year_from": 2003,
+      "year_to": 2009,
       "class": "car",
-      "front_suspension": "macpherson",
-      "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
-      "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-28"
-      },
-      "en": {
-        "make": "Nissan",
-        "model": "Almera Classic (B10)",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
-        "reference": "Design description. No tolerances entered."
-      }
-    },
-    {
-      "id": "nissan-tiida-c11",
-      "make": "Nissan",
-      "model": "Tiida (C11)",
-      "tags": [
-        "nissan",
-        "ниссан",
-        "tiida",
-        "тиида"
-      ],
-      "year_from": 2004,
-      "year_to": 2014,
-      "class": "car",
-      "front_suspension": "macpherson",
-      "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
-      "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-28"
-      },
-      "en": {
-        "make": "Nissan",
-        "model": "Tiida (C11)",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
-        "reference": "Design description. No tolerances entered."
-      }
-    },
-    {
-      "id": "nissan-qashqai-j10",
-      "make": "Nissan",
-      "model": "Qashqai (J10)",
-      "tags": [
-        "nissan",
-        "ниссан",
-        "qashqai",
-        "кашкай"
-      ],
-      "year_from": 2006,
-      "year_to": 2013,
-      "class": "suv",
       "front_suspension": "macpherson",
       "rear_suspension": "multilink",
-      "guidance_id": "guidance-suv-4x4",
+      "guidance_id": "guidance-fwd-mcpherson",
       "notes": "Спереди Макферсон, сзади многорычажная.",
       "source": {
         "kind": "catalog",
@@ -124,26 +34,81 @@
         "added": "2026-09-28"
       },
       "en": {
-        "make": "Nissan",
-        "model": "Qashqai (J10)",
+        "make": "Mazda",
+        "model": "3 (BK)",
         "notes": "MacPherson struts at the front, multi-link at the rear.",
         "reference": "Design description. No tolerances entered."
       }
     },
     {
-      "id": "nissan-x-trail-t31",
-      "make": "Nissan",
-      "model": "X-Trail (T31)",
+      "id": "mazda-6-gg",
+      "make": "Mazda",
+      "model": "6 (GG)",
       "tags": [
-        "nissan",
-        "ниссан",
-        "x-trail",
-        "xtrail",
-        "икстрейл",
-        "т31"
+        "mazda",
+        "мазда",
+        "6",
+        "gg"
+      ],
+      "year_from": 2002,
+      "year_to": 2008,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "multilink",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mazda",
+        "model": "6 (GG)",
+        "notes": "Double wishbones on ball joints at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mazda-6-gh",
+      "make": "Mazda",
+      "model": "6 (GH)",
+      "tags": [
+        "mazda",
+        "мазда",
+        "6",
+        "gh"
       ],
       "year_from": 2007,
-      "year_to": 2014,
+      "year_to": 2012,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "multilink",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mazda",
+        "model": "6 (GH)",
+        "notes": "Double wishbones on ball joints at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mazda-cx-5-ke",
+      "make": "Mazda",
+      "model": "CX-5 (KE)",
+      "tags": [
+        "mazda",
+        "мазда",
+        "cx-5",
+        "cx5",
+        "ke"
+      ],
+      "year_from": 2011,
+      "year_to": 2017,
       "class": "suv",
       "front_suspension": "macpherson",
       "rear_suspension": "multilink",
@@ -155,9 +120,39 @@
         "added": "2026-09-28"
       },
       "en": {
-        "make": "Nissan",
-        "model": "X-Trail (T31)",
+        "make": "Mazda",
+        "model": "CX-5 (KE)",
         "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "mazda-mx-5-na-nb",
+      "make": "Mazda",
+      "model": "MX-5 (NA / NB)",
+      "tags": [
+        "mazda",
+        "мазда",
+        "mx-5",
+        "mx5",
+        "miata",
+        "миата"
+      ],
+      "year_from": 1989,
+      "year_to": 2005,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "double_wishbone_ball",
+      "notes": "Двухрычажная спереди и сзади.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Mazda",
+        "model": "MX-5 (NA / NB)",
+        "notes": "Double wishbones front and rear.",
         "reference": "Design description. No tolerances entered."
       }
     }

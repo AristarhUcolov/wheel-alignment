@@ -1,0 +1,101 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "subaru-impreza-gd",
+      "make": "Subaru",
+      "model": "Impreza (GD / GG)",
+      "tags": [
+        "subaru",
+        "субару",
+        "impreza",
+        "импреза"
+      ],
+      "year_from": 2000,
+      "year_to": 2007,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "macpherson",
+      "notes": "Макферсон спереди и сзади.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Subaru",
+        "model": "Impreza (GD / GG)",
+        "notes": "MacPherson struts front and rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "subaru-forester-sg",
+      "make": "Subaru",
+      "model": "Forester (SG)",
+      "tags": [
+        "subaru",
+        "субару",
+        "forester",
+        "форестер"
+      ],
+      "year_from": 2002,
+      "year_to": 2008,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "macpherson",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Макферсон спереди и сзади.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Subaru",
+        "model": "Forester (SG)",
+        "notes": "MacPherson struts front and rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "subaru-forester-sh",
+      "make": "Subaru",
+      "model": "Forester (SH)",
+      "tags": [
+        "subaru",
+        "субару",
+        "forester",
+        "форестер"
+      ],
+      "year_from": 2007,
+      "year_to": 2013,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "double_wishbone_ball",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади двухрычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Subaru",
+        "model": "Forester (SH)",
+        "notes": "MacPherson struts at the front, double wishbones at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

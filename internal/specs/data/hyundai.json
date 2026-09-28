@@ -132,6 +132,294 @@
         "notes": "Kingpin front beam on leaf springs, rear axle on leaf springs. Camber and kingpin inclination are not adjustable; caster by taper shims, toe by the cross tie rod.",
         "reference": "Design description. No tolerances entered."
       }
+    },
+    {
+      "id": "hyundai-getz",
+      "make": "Hyundai",
+      "model": "Getz",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "хёндэ",
+        "getz",
+        "гетц"
+      ],
+      "year_from": 2002,
+      "year_to": 2011,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "Getz",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "hyundai-elantra-hd",
+      "make": "Hyundai",
+      "model": "Elantra IV (HD)",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "хёндэ",
+        "elantra",
+        "элантра",
+        "hd"
+      ],
+      "year_from": 2006,
+      "year_to": 2011,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "Elantra IV (HD)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "hyundai-solaris-2",
+      "make": "Hyundai",
+      "model": "Solaris II",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "хёндэ",
+        "solaris",
+        "солярис"
+      ],
+      "year_from": 2017,
+      "year_to": 2022,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Сайт, где взяты допуски Kia Rio IV (FB), относит их и к Solaris II — но это не проверено по руководству Hyundai, поэтому здесь они не внесены.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "Solaris II",
+        "notes": "MacPherson struts at the front, twist beam at the rear. The site the Kia Rio IV (FB) figures come from says they apply to the Solaris II as well — this is not checked against a Hyundai manual, so they are not entered here.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "hyundai-tucson-jm",
+      "make": "Hyundai",
+      "model": "Tucson I (JM)",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "хёндэ",
+        "tucson",
+        "туксон",
+        "тусан"
+      ],
+      "year_from": 2004,
+      "year_to": 2010,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "Tucson I (JM)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "hyundai-santa-fe-sm",
+      "make": "Hyundai",
+      "model": "Santa Fe I (SM, Classic)",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "хёндэ",
+        "santa",
+        "fe",
+        "санта",
+        "фе",
+        "classic",
+        "классик"
+      ],
+      "year_from": 2000,
+      "year_to": 2012,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "Santa Fe I (SM, Classic)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "hyundai-creta-1",
+      "make": "Hyundai",
+      "model": "Creta I",
+      "trim": "передний привод",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "хёндэ",
+        "creta",
+        "крета"
+      ],
+      "year_from": 2016,
+      "year_to": 2021,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. У полноприводной Creta сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "Creta I",
+        "notes": "MacPherson struts at the front, twist beam at the rear. The four-wheel-drive Creta has a multi-link rear.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "front-wheel drive"
+      }
+    },
+    {
+      "id": "hyundai-tucson-lm",
+      "make": "Hyundai",
+      "model": "Tucson II / ix35 (LM)",
+      "tags": [
+        "hyundai",
+        "хендай",
+        "хундай",
+        "хёндэ",
+        "tucson",
+        "туксон",
+        "тусан",
+        "ix35",
+        "lm"
+      ],
+      "year_from": 2010,
+      "year_to": 2015,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная. Регулируется только схождение, спереди и сзади; развал и кастер заданы на заводе. Переднее схождение на странице записано без знака градуса («0.1 ± 0.2»); внесено в градусах, как заднее.",
+      "source": {
+        "kind": "unverified",
+        "reference": "htmanual.net, Hyundai Tucson (LM) 2010–2015, «Alignment — Repair procedures» — копия руководства по ремонту. Постранично с печатным изданием не сверено.",
+        "url": "https://www.htmanual.net/alignment_repair_procedures-921.html",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "front": {
+        "camber": {
+          "min": -1.0,
+          "nominal": -0.5,
+          "max": 0.0
+        },
+        "caster": {
+          "min": 3.55,
+          "nominal": 4.05,
+          "max": 4.55
+        },
+        "total_toe": {
+          "min": -0.1,
+          "nominal": 0.1,
+          "max": 0.3
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется — задан на заводе",
+          "caster_method": "не регулируется — задан на заводе",
+          "toe_method": "рулевые тяги, на одинаковую величину слева и справа"
+        }
+      },
+      "rear": {
+        "camber": {
+          "min": -1.5,
+          "nominal": -1.0,
+          "max": -0.5
+        },
+        "total_toe": {
+          "min": 0.0,
+          "nominal": 0.2,
+          "max": 0.4
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется — задан на заводе",
+          "toe_method": "эксцентриковые болты вспомогательных рычагов (assist arm), одинаково с обеих сторон"
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа"
+      },
+      "en": {
+        "make": "Hyundai",
+        "model": "Tucson II / ix35 (LM)",
+        "notes": "MacPherson struts at the front, multi-link at the rear. Only toe is adjustable, front and rear; camber and caster are set at the factory. The front toe on the page is written without a degree sign (“0.1 ± 0.2”); it is entered in degrees, like the rear toe.",
+        "reference": "htmanual.net, Hyundai Tucson (LM) 2010–2015, “Alignment — Repair procedures” — a copy of the shop manual. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "camber_method": "not adjustable — set at the factory",
+          "caster_method": "not adjustable — set at the factory",
+          "toe_method": "the tie rods, by the same amount left and right"
+        },
+        "rear": {
+          "camber_method": "not adjustable — set at the factory",
+          "toe_method": "the cam bolts of the assist arms, equally on both sides"
+        }
+      }
     }
   ]
 }

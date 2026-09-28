@@ -103,7 +103,7 @@ go build -ldflags "-H=windowsgui" -o wheelalign.exe ./cmd/wheelalign
 | **Струна и угломер** | Леска, рулетка, угломер | Развал, схождение, угол тяги; с поворотными кругами — кастер |
 | **Телефон на колесе** | Любой смартфон с браузером | Развал в реальном времени по Wi-Fi; кастер по гироскопу |
 | **Камера и мишени** | Фотоаппарат или телефон, распечатанные мишени | Развал, схождение, угол тяги — по серии снимков |
-| **Живой режим камерой** | Телефон на штативе, распечатанные мишени | Развал и схождение вживую, 3–4 раза в секунду, пока крутите тягу |
+| **Живой режим камерой** | Телефон на штативе, мишени — печатает сама программа | Развал и схождение вживую, 3–4 раза в секунду, пока крутите тягу; кастер и поперечный наклон оси — поворотом руля |
 | **Свой датчик** | ESP32, лазерный указатель — что угодно с JSON | Что умеет датчик — [протокол](docs/SENSORS.md) |
 
 Способы сочетаются: развал и кастер телефоном, схождение струной — программа
@@ -163,11 +163,13 @@ go build -ldflags "-H=windowsgui" -o wheelalign.exe ./cmd/wheelalign
 
 ## База автомобилей
 
-**113 записей, 32 марки** — легковые, внедорожники, фургоны, грузовые и
-автобусы: ГАЗ, ВАЗ (Lada), УАЗ, ЗИЛ, КамАЗ, МАЗ, Урал, ПАЗ, ЛиАЗ, Ikarus,
-Москвич, BMW, Mercedes-Benz, Volkswagen, Ford, Chevrolet, Renault, Toyota,
-Hyundai, Kia, Škoda, Audi, Opel, Peugeot, Nissan, Mitsubishi, Daewoo, MAN,
-Scania, Volvo, DAF.
+**224 записи, 43 марки** — легковые, внедорожники, пикапы, фургоны, грузовые
+и автобусы с 1946 года до наших дней: ГАЗ, ВАЗ (Lada), УАЗ, ЗИЛ, КамАЗ, МАЗ,
+Урал, ПАЗ, ЛиАЗ, Ikarus, Москвич; американские — Ford, Chevrolet, Dodge, Jeep,
+Tesla; европейские — BMW, Mercedes-Benz, Volkswagen, Audi, Opel, Škoda, SEAT,
+Renault, Peugeot, Citroën, Fiat, Volvo, Saab, Land Rover, MAN, Scania, DAF;
+азиатские — Toyota, Nissan, Mitsubishi, Honda, Mazda, Subaru, Suzuki, Hyundai,
+Kia, Daewoo.
 
 Каждая марка — свой файл в [`internal/specs/data/`](internal/specs/data):
 `gaz.json`, `vaz.json`, `chevrolet.json`, `bmw.json`, `mercedes.json`,
@@ -175,12 +177,14 @@ Scania, Volvo, DAF.
 на двух языках и **источник**.
 
 Допуски (не «ориентир по классу», а цифры конкретной модели) сейчас есть у
-21 модели: ГАЗ-21, ГАЗ-24, ГАЗ-3110, ГАЗель, ГАЗель NEXT, УАЗ-469, УАЗ-452,
+28 моделей: ГАЗ-21, ГАЗ-24, ГАЗ-3110, ГАЗель, ГАЗель NEXT, УАЗ-469, УАЗ-452,
 ВАЗ-2101…2107, 2108/2109, 2110, 2113–2115, Приора, Калина, Ларгус, «Нива» 2121,
-Chevrolet Niva, «Москвич-2141»; у ЗИЛ-130, КамАЗ-5320, ГАЗ-53 и «Урала-4320» —
-схождение. Все они помечены **«не проверено»**: взяты из открытых пересказов
-руководств по ремонту и книг, у каждой есть ссылка на страницу, которую можно
-открыть прямо из программы. Где источники расходятся (Веста) или читаются
+Chevrolet Niva, «Москвич-2141», Kia Rio III (UB) и Rio IV (российский FB и
+европейский YB), Kia Ceed II, Hyundai Tucson / ix35, Toyota Camry XV70;
+у Chevrolet Silverado GMT800 — развал по исполнениям; у ЗИЛ-130, КамАЗ-5320,
+ГАЗ-53 и «Урала-4320» — схождение. Все они помечены **«не проверено»**: взяты
+из открытых пересказов и копий руководств по ремонту и книг, у каждой есть
+ссылка на страницу, которую можно открыть прямо из программы. Где источники расходятся (Веста) или читаются
 неоднозначно (Гранта), цифры не внесены, и в записи сказано почему. Остальные модели — **только конструкция**:
 программа знает их подвеску и даёт правильные советы, а углы сравнивает с
 ориентиром по классу, прямо говоря об этом.
@@ -253,8 +257,10 @@ Chevrolet Niva, «Москвич-2141»; у ЗИЛ-130, КамАЗ-5320, ГАЗ-
 
 **Оптика без OpenCV.** Детектор шахматной мишени, калибровка камеры по Чжану,
 решение позы и связывание четырёх колёс напольными мишенями — всё своё, на Go,
-проверено сквозными тестами от нарисованных пикселей до угла колеса. Подробно —
-[docs/OPTICAL.md](docs/OPTICAL.md).
+проверено сквозными тестами от нарисованных пикселей до угла колеса. Мишени
+программа печатает сама — PDF на A4, A3, Letter или одним листом для типографии,
+с линейкой для проверки масштаба; на каждом колесе своя мишень, и колесо
+узнаётся по ней. Подробно — [docs/OPTICAL.md](docs/OPTICAL.md).
 
 ---
 
@@ -326,9 +332,8 @@ internal/server/       HTTP API и интерфейс (встроен в про�
 1. **Проверенные допуски** — инструменты готовы, нужны люди с руководствами по
    ремонту. Это самое ценное, что можно сделать для проекта.
 2. Проверка на реальных автомобилях против профессионального стенда.
-3. Кастер камерой в живом режиме (сейчас — телефоном на колесе или струной).
-4. Многоосные грузовики: параллельность мостов задней тележки.
-5. Приложение для телефона, работающее и без компьютера.
+3. Многоосные грузовики: параллельность мостов задней тележки.
+4. Приложение для телефона, работающее и без компьютера.
 
 ---
 
@@ -459,7 +464,7 @@ be printed or saved as PDF.
 | **Strings and inclinometer** | Fishing line, tape measure, inclinometer | Camber, toe, thrust angle; with turn plates — caster |
 | **Phone on the wheel** | Any smartphone with a browser | Live camber over Wi-Fi; caster with the gyroscope |
 | **Camera and targets** | A camera or phone, printed targets | Camber, toe, thrust angle — from a photo series |
-| **Live camera mode** | A phone on a tripod, printed targets | Live camber and toe, 3–4 times a second while you turn the tie rod |
+| **Live camera mode** | A phone on a tripod, targets printed by the program itself | Live camber and toe, 3–4 times a second while you turn the tie rod; caster and steering axis inclination by steering |
 | **Your own sensor** | ESP32, a laser pointer — anything that sends JSON | Whatever the sensor measures — [protocol](docs/SENSORS.md#eng) |
 
 The methods combine: camber and caster by phone, toe by string — the program
@@ -517,10 +522,12 @@ taper shims, and the cross tie rod sets only the total toe.
 
 ## Vehicle database
 
-**113 entries, 32 makes** — cars, SUVs, vans, trucks and buses: GAZ,
-VAZ (Lada), UAZ, ZIL, KAMAZ, MAZ, Ural, PAZ, LiAZ, Ikarus, Moskvich, BMW,
-Mercedes-Benz, Volkswagen, Ford, Chevrolet, Renault, Toyota, Hyundai, Kia,
-Škoda, Audi, Opel, Peugeot, Nissan, Mitsubishi, Daewoo, MAN, Scania, Volvo, DAF.
+**224 entries, 43 makes** — cars, SUVs, pickups, vans, trucks and buses from
+1946 to the present: GAZ, VAZ (Lada), UAZ, ZIL, KAMAZ, MAZ, Ural, PAZ, LiAZ,
+Ikarus, Moskvich; American — Ford, Chevrolet, Dodge, Jeep, Tesla; European —
+BMW, Mercedes-Benz, Volkswagen, Audi, Opel, Škoda, SEAT, Renault, Peugeot,
+Citroën, Fiat, Volvo, Saab, Land Rover, MAN, Scania, DAF; Asian — Toyota,
+Nissan, Mitsubishi, Honda, Mazda, Subaru, Suzuki, Hyundai, Kia, Daewoo.
 
 Each make is a file of its own in [`internal/specs/data/`](internal/specs/data):
 `gaz.json`, `vaz.json`, `chevrolet.json`, `bmw.json`, `mercedes.json`,
@@ -528,12 +535,14 @@ Each make is a file of its own in [`internal/specs/data/`](internal/specs/data):
 both languages and **its source**.
 
 Tolerances (the figures of a particular model, not class guidance) currently
-exist for 21 models: GAZ-21, GAZ-24, GAZ-3110, GAZelle, GAZelle NEXT, UAZ-469,
+exist for 28 models: GAZ-21, GAZ-24, GAZ-3110, GAZelle, GAZelle NEXT, UAZ-469,
 UAZ-452, VAZ-2101…2107, 2108/2109, 2110, 2113–2115, Priora, Kalina, Largus,
-Niva 2121, Chevrolet Niva, Moskvich-2141; toe for the ZIL-130, KAMAZ-5320,
-GAZ-53 and Ural-4320. All are labelled **“unverified”**: they come from open
-retellings of workshop manuals and books, and each links to its page, which can
-be opened right from the program. Where sources disagree (Vesta) or read
+Niva 2121, Chevrolet Niva, Moskvich-2141, Kia Rio III (UB) and Rio IV (the
+Russian FB and the European YB), Kia Ceed II, Hyundai Tucson / ix35, Toyota
+Camry XV70; camber by version for the Chevrolet Silverado GMT800; toe for the
+ZIL-130, KAMAZ-5320, GAZ-53 and Ural-4320. All are labelled **“unverified”**:
+they come from open retellings and copies of workshop manuals and books, and
+each links to its page, which can be opened right from the program. Where sources disagree (Vesta) or read
 ambiguously (Granta), no figures are entered, and the entry says why. All other models are **design
 only**: the program knows their suspension and gives the right advice, and
 compares the angles with class guidance — saying so plainly.
@@ -607,8 +616,10 @@ differences, unequal wheelbase, large setback — the program tells “bent” f
 
 **Optics without OpenCV.** Chessboard detection, Zhang camera calibration, pose
 estimation and linking four wheels through floor targets — all our own, in Go,
-covered by end-to-end tests from rendered pixels to the wheel angle. Details:
-[docs/OPTICAL.md](docs/OPTICAL.md#eng).
+covered by end-to-end tests from rendered pixels to the wheel angle. The program
+prints the targets itself — a PDF on A4, A3, Letter or one sheet for a print
+shop, with a ruler to check the scale; every wheel has its own target, and the
+wheel is recognised by it. Details: [docs/OPTICAL.md](docs/OPTICAL.md#eng).
 
 ---
 
@@ -682,9 +693,8 @@ workshop.
 1. **Verified tolerances** — the tools are ready; people with workshop manuals
    are needed. This is the most valuable thing you can do for the project.
 2. Testing on real cars against a professional aligner.
-3. Caster by camera in live mode (now by phone on the wheel or by string).
-4. Multi-axle trucks: parallelism of the rear bogie axles.
-5. A phone app that works without a computer.
+3. Multi-axle trucks: parallelism of the rear bogie axles.
+4. A phone app that works without a computer.
 
 ---
 

@@ -27,7 +27,7 @@
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
       "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Для Rio III других рынков (UB) в базе есть запись с допусками — у российского Rio цифры могут отличаться.",
       "source": {
         "kind": "catalog",
         "reference": "Описание конструкции. Допуски не внесены.",
@@ -36,7 +36,7 @@
       "en": {
         "make": "Kia",
         "model": "Rio III",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "notes": "MacPherson struts at the front, twist beam at the rear. The database has an entry with figures for the Rio III of other markets (UB) — the Russian Rio may differ.",
         "reference": "Design description. No tolerances entered."
       }
     },
@@ -66,6 +66,447 @@
         "model": "Bongo III",
         "notes": "Double wishbones with torsion bars at the front, rigid rear axle on leaf springs.",
         "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "kia-ceed-ed",
+      "make": "Kia",
+      "model": "Ceed I (ED)",
+      "tags": [
+        "kia",
+        "киа",
+        "ceed",
+        "сид",
+        "ed"
+      ],
+      "year_from": 2006,
+      "year_to": 2012,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Kia",
+        "model": "Ceed I (ED)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "kia-sportage-2",
+      "make": "Kia",
+      "model": "Sportage II (KM)",
+      "tags": [
+        "kia",
+        "киа",
+        "sportage",
+        "спортейдж",
+        "km"
+      ],
+      "year_from": 2004,
+      "year_to": 2010,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Kia",
+        "model": "Sportage II (KM)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "kia-sportage-3",
+      "make": "Kia",
+      "model": "Sportage III (SL)",
+      "tags": [
+        "kia",
+        "киа",
+        "sportage",
+        "спортейдж",
+        "sl"
+      ],
+      "year_from": 2010,
+      "year_to": 2016,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Kia",
+        "model": "Sportage III (SL)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "kia-rio-4",
+      "make": "Kia",
+      "model": "Rio IV (FB, для России)",
+      "tags": [
+        "kia",
+        "киа",
+        "rio",
+        "рио",
+        "fb"
+      ],
+      "year_from": 2017,
+      "year_to": 2022,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Регулируется только переднее схождение. Развал и кастер заданы на заводе; если они вне допуска — ищите повреждённые детали. Это российский Rio (FB); у европейского Rio IV (YB) кастер другой — это отдельная запись.",
+      "source": {
+        "kind": "unverified",
+        "reference": "okia-rio.narod.ru, «Регулировка углов установки колёс, сход-развал Киа Рио 4» — из руководства по ремонту Kia Rio 4 поколения с 2017 г. Постранично с печатным изданием не сверено.",
+        "url": "https://okia-rio.narod.ru/rio4/159.html",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "front": {
+        "camber": {
+          "min": -1.0,
+          "nominal": -0.5,
+          "max": 0.0
+        },
+        "caster": {
+          "min": 4.41,
+          "nominal": 4.91,
+          "max": 5.41
+        },
+        "sai": {
+          "min": 12.26,
+          "nominal": 12.76,
+          "max": 13.26
+        },
+        "total_toe": {
+          "min": -0.05,
+          "nominal": 0.15,
+          "max": 0.35
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется — задан на заводе",
+          "caster_method": "не регулируется — задан на заводе",
+          "toe_method": "рулевые тяги"
+        }
+      },
+      "rear": {
+        "camber": {
+          "min": -2.0,
+          "nominal": -1.5,
+          "max": -1.0
+        },
+        "total_toe": {
+          "min": 0.0,
+          "nominal": 0.3,
+          "max": 0.6
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false,
+          "camber_method": "не регулируется — задан на заводе",
+          "toe_method": "не регулируется — задан на заводе"
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа"
+      },
+      "en": {
+        "make": "Kia",
+        "model": "Rio IV (FB, for Russia)",
+        "notes": "MacPherson struts at the front, twist beam at the rear. Only the front toe is adjustable. Camber and caster are set at the factory; if they are out of tolerance, look for damaged parts. This is the Russian Rio (FB); the European Rio IV (YB) has a different caster — that is a separate entry.",
+        "reference": "okia-rio.narod.ru, “Wheel alignment of the Kia Rio 4” — from the Kia Rio 4th generation (2017 on) workshop manual. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "camber_method": "not adjustable — set at the factory",
+          "caster_method": "not adjustable — set at the factory",
+          "toe_method": "the tie rods"
+        },
+        "rear": {
+          "camber_method": "not adjustable — set at the factory",
+          "toe_method": "not adjustable — set at the factory"
+        }
+      }
+    },
+    {
+      "id": "kia-rio-4-yb",
+      "make": "Kia",
+      "model": "Rio IV (YB, Европа)",
+      "trim": "Европа и Австралия",
+      "tags": [
+        "kia",
+        "киа",
+        "rio",
+        "рио",
+        "yb"
+      ],
+      "year_from": 2017,
+      "year_to": 2023,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Внесены цифры для Европы и Австралии (EU/AUS); для «общего» рынка (GEN) руководство даёт развал −0,4° ± 0,5° и кастер 4,54° ± 0,5°. Задних углов на странице нет. Развал и кастер заданы на заводе; если они вне допуска — ищите повреждённые детали.",
+      "source": {
+        "kind": "unverified",
+        "reference": "kiamanual.com, Kia Rio YB 2017–2020, «Tires/Wheels — Alignment» — копия руководства по ремонту. Постранично с печатным изданием не сверено.",
+        "url": "https://kiamanual.com/kia-rio-yb/alignment-549.html",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "front": {
+        "camber": {
+          "min": -1.0,
+          "nominal": -0.5,
+          "max": 0.0
+        },
+        "caster": {
+          "min": 4.15,
+          "nominal": 4.65,
+          "max": 5.15
+        },
+        "total_toe": {
+          "min": -0.05,
+          "nominal": 0.15,
+          "max": 0.35
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "toe_method": "рулевые тяги"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа"
+      },
+      "en": {
+        "make": "Kia",
+        "model": "Rio IV (YB, Europe)",
+        "notes": "MacPherson struts at the front, twist beam at the rear. The figures are for Europe and Australia (EU/AUS); for the general market (GEN) the manual gives camber −0.4° ± 0.5° and caster 4.54° ± 0.5°. The page has no rear angles. Camber and caster are set at the factory; if they are out of tolerance, look for damaged parts.",
+        "reference": "kiamanual.com, Kia Rio YB 2017–2020, “Tires/Wheels — Alignment” — a copy of the shop manual. Not checked page by page against the printed edition.",
+        "trim": "Europe and Australia",
+        "conditions": {
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "toe_method": "the tie rods"
+        }
+      }
+    },
+    {
+      "id": "kia-rio-3-ub",
+      "make": "Kia",
+      "model": "Rio III (UB, не для России)",
+      "tags": [
+        "kia",
+        "киа",
+        "rio",
+        "рио",
+        "ub",
+        "pride"
+      ],
+      "year_from": 2011,
+      "year_to": 2017,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. Это Rio для Европы, США и других рынков. Российский Rio III (QB, на базе Solaris) — отдельная запись без допусков: его цифры могут отличаться.",
+      "source": {
+        "kind": "unverified",
+        "reference": "kiamanual.com, Kia Rio UB, раздел «Suspension System — Specifications» — копия руководства по ремонту. Постранично с печатным изданием не сверено.",
+        "url": "https://www.kiamanual.com/kia-rio/specifications-704",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "front": {
+        "camber": {
+          "min": -1.0,
+          "nominal": -0.5,
+          "max": 0.0
+        },
+        "caster": {
+          "min": 3.6,
+          "nominal": 4.1,
+          "max": 4.6
+        },
+        "sai": {
+          "min": 13.3,
+          "nominal": 13.8,
+          "max": 14.3
+        },
+        "total_toe": {
+          "min": -0.2,
+          "nominal": 0.0,
+          "max": 0.2
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "toe_method": "рулевые тяги"
+        }
+      },
+      "rear": {
+        "camber": {
+          "min": -2.0,
+          "nominal": -1.5,
+          "max": -1.0
+        },
+        "total_toe": {
+          "min": 0.0,
+          "nominal": 0.5,
+          "max": 0.9
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа"
+      },
+      "en": {
+        "make": "Kia",
+        "model": "Rio III (UB, not the Russian car)",
+        "notes": "MacPherson struts at the front, twist beam at the rear. This is the Rio for Europe, the USA and other markets. The Russian Rio III (QB, based on the Solaris) is a separate entry without figures: its values may differ.",
+        "reference": "kiamanual.com, Kia Rio UB, “Suspension System — Specifications” — a copy of the shop manual. Not checked page by page against the printed edition.",
+        "conditions": {
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "toe_method": "the tie rods"
+        }
+      }
+    },
+    {
+      "id": "kia-ceed-jd",
+      "make": "Kia",
+      "model": "Ceed II (JD)",
+      "trim": "кроме T-GDI",
+      "tags": [
+        "kia",
+        "киа",
+        "ceed",
+        "сид",
+        "jd",
+        "proceed"
+      ],
+      "year_from": 2012,
+      "year_to": 2018,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная. Регулируется переднее и заднее схождение; развал и кастер заданы на заводе. Заднее схождение у версий T-GDI другое: суммарное 0,06° ± 0,2°. На странице технических данных того же руководства подписи «суммарное» и «на колесо» у заднего схождения стоят наоборот — внесены цифры со страницы регулировки, где суммарное вдвое больше, чем на колесо.",
+      "source": {
+        "kind": "unverified",
+        "reference": "kiamanual.com, Kia Cee’d JD, «Alignment — Repair procedures» и «Suspension System — Specifications» (поперечный наклон) — копия руководства по ремонту. Постранично с печатным изданием не сверено.",
+        "url": "https://www.kiamanual.com/kia-ceed/alignment_repair_procedures-1167",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "front": {
+        "camber": {
+          "min": -1.0,
+          "nominal": -0.5,
+          "max": 0.0
+        },
+        "caster": {
+          "min": 4.7,
+          "nominal": 5.2,
+          "max": 5.7
+        },
+        "sai": {
+          "min": 13.3,
+          "nominal": 13.8,
+          "max": 14.3
+        },
+        "total_toe": {
+          "min": -0.04,
+          "nominal": 0.16,
+          "max": 0.36
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется — задан на заводе",
+          "caster_method": "не регулируется — задан на заводе",
+          "toe_method": "рулевые тяги, на одинаковую величину слева и справа"
+        }
+      },
+      "rear": {
+        "camber": {
+          "min": -1.5,
+          "nominal": -1.0,
+          "max": -0.5
+        },
+        "total_toe": {
+          "min": -0.06,
+          "nominal": 0.14,
+          "max": 0.34
+        },
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "camber_method": "не регулируется — задан на заводе",
+          "toe_method": "эксцентриковый болт вспомогательного рычага (assist arm)"
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа"
+      },
+      "en": {
+        "make": "Kia",
+        "model": "Ceed II (JD)",
+        "notes": "MacPherson struts at the front, multi-link at the rear. Front and rear toe are adjustable; camber and caster are set at the factory. Rear toe differs on T-GDI versions: 0.06° ± 0.2° total. The specifications page of the same manual has the “total” and “individual” labels of the rear toe swapped — the figures here are from the alignment page, where the total is twice the per-wheel value.",
+        "reference": "kiamanual.com, Kia Cee’d JD, “Alignment — Repair procedures” and “Suspension System — Specifications” (kingpin angle) — a copy of the shop manual. Not checked page by page against the printed edition.",
+        "trim": "except T-GDI",
+        "conditions": {
+          "pressure": "to spec, equal left and right"
+        },
+        "front": {
+          "camber_method": "not adjustable — set at the factory",
+          "caster_method": "not adjustable — set at the factory",
+          "toe_method": "the tie rods, by the same amount left and right"
+        },
+        "rear": {
+          "camber_method": "not adjustable — set at the factory",
+          "toe_method": "the cam bolt of the assist arm"
+        }
       }
     }
   ]

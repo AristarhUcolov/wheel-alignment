@@ -151,7 +151,7 @@
       "front_suspension": "double_wishbone_ball",
       "rear_suspension": "live_axle_leaf",
       "guidance_id": "guidance-suv-4x4",
-      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах. Спереди торсионы (у 2WD и 4WD); кастер и развал — эксцентриками на осях верхнего рычага.",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах. Спереди торсионы (у 2WD и 4WD); кастер и развал — эксцентриками на осях верхнего рычага. Допуски развала по исполнениям (C1500, K1500, шины 16″/17″/20″, HD) — в отдельных записях «Silverado (GMT800)».",
       "source": {
         "kind": "catalog",
         "reference": "Описание конструкции. Допуски не внесены.",
@@ -160,7 +160,7 @@
       "en": {
         "make": "Chevrolet",
         "model": "Silverado 1500 (GMT800)",
-        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs. Torsion bars at the front (2WD and 4WD); caster and camber by cams on the upper arm shafts.",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs. Torsion bars at the front (2WD and 4WD); caster and camber by cams on the upper arm shafts. Camber limits by version (C1500, K1500, 16″/17″/20″ tyres, HD) are in separate “Silverado (GMT800)” entries.",
         "reference": "Design description. No tolerances entered."
       }
     },
@@ -239,6 +239,511 @@
         "rear": {
           "camber_method": "not adjustable",
           "toe_method": "not adjustable"
+        }
+      }
+    },
+    {
+      "id": "chevrolet-tahoe-gmt800",
+      "make": "Chevrolet",
+      "model": "Tahoe / Suburban (GMT800)",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "tahoe",
+        "тахо",
+        "suburban",
+        "субурбан",
+        "gmc",
+        "yukon",
+        "юкон",
+        "cadillac",
+        "escalade",
+        "эскалейд"
+      ],
+      "year_from": 2000,
+      "year_to": 2006,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на пружинах и тягах. У Suburban 2500 сзади рессоры. Те же GMC Yukon и Cadillac Escalade.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Tahoe / Suburban (GMT800)",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on coil springs and links. The Suburban 2500 has leaf springs at the rear. The GMC Yukon and Cadillac Escalade are the same.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "chevrolet-camaro-4",
+      "make": "Chevrolet",
+      "model": "Camaro (4-е поколение)",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "camaro",
+        "камаро",
+        "pontiac",
+        "firebird",
+        "trans am"
+      ],
+      "year_from": 1993,
+      "year_to": 2002,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-rwd-classic-sedan",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на пружинах, продольных рычагах, реактивной штанге и тяге Панара.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Camaro (4th generation)",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on coil springs, trailing arms, a torque arm and a Panhard rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "chevrolet-camaro-5",
+      "make": "Chevrolet",
+      "model": "Camaro (5-е поколение)",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "camaro",
+        "камаро"
+      ],
+      "year_from": 2010,
+      "year_to": 2015,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Camaro (5th generation)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "chevrolet-corvette-c5",
+      "make": "Chevrolet",
+      "model": "Corvette C5",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "corvette",
+        "корвет",
+        "c5"
+      ],
+      "year_from": 1997,
+      "year_to": 2004,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "double_wishbone_ball",
+      "notes": "Двухрычажная спереди и сзади, с поперечными композитными рессорами.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Corvette C5",
+        "notes": "Double wishbones front and rear, with transverse composite leaf springs.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "chevrolet-silverado-gmt800-c1500-16",
+      "make": "Chevrolet",
+      "model": "Silverado (GMT800)",
+      "trim": "C1500 (задний привод), шины 16″",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "silverado",
+        "сильверадо",
+        "gmc",
+        "sierra",
+        "сиерра",
+        "пикап",
+        "gmt800"
+      ],
+      "year_from": 2003,
+      "year_to": 2007,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди двухрычажная на шаровых опорах с торсионами, сзади неразрезной мост на рессорах. Внесён только развал и разница развала слева-справа (0,00° ± 0,60°). Кастер не внесён: в таблице он дан отдельно для левого и правого колеса и «относительно рамы» (его нужно пересчитывать на угол рамы), а колонка «Cross caster» не сходится с разницей этих значений. Схождение не внесено: в таблице +0,10° ± 0,20° без указания, суммарное это или на колесо. В таблице есть Silverado SS и Quadrasteer, значит она не старше 2003 модельного года; для более ранних машин сверьтесь с руководством своего года.",
+      "source": {
+        "kind": "unverified",
+        "reference": "gooodsystems.com, распечатка GM «Wheel Alignment — Sierra & Silverado», таблица Wheel Alignment Specifications. Постранично с печатным изданием не сверено.",
+        "url": "https://gooodsystems.com/wp-content/uploads/2021/04/Wheel-Alignment-04-05.pdf",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "rim_diameter_in": 16,
+      "front": {
+        "camber": {
+          "min": -1.0,
+          "nominal": -0.25,
+          "max": 0.5
+        },
+        "max_cross_camber": 0.6,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "эксцентриковые болты оси верхнего рычага (гайки 190 Н·м)",
+          "caster_method": "те же эксцентриковые болты",
+          "toe_method": "рулевые тяги (контргайки 68 Н·м)"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "снаряжённое состояние, штатная высота (Z) по руководству; перед замером трижды качнуть передний и задний бампер",
+        "fuel": "полный бак или компенсирующий груз"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Silverado (GMT800)",
+        "notes": "Double wishbones on ball joints with torsion bars at the front, rigid rear axle on leaf springs. Only camber and the left-right camber difference (0.00° ± 0.60°) are entered. Caster is not entered: the table gives it separately for the left and right wheel and “relative to frame” (it must be corrected for the frame angle), and its “Cross caster” column does not match the difference of those values. Toe is not entered: the table gives +0.10° ± 0.20° without saying whether it is total or per wheel. The table includes the Silverado SS and Quadrasteer, so it is no older than the 2003 model year; for earlier trucks check the manual for your year.",
+        "reference": "gooodsystems.com, GM printout “Wheel Alignment — Sierra & Silverado”, Wheel Alignment Specifications table. Not checked page by page against the printed edition.",
+        "trim": "C1500 (rear-wheel drive), 16″ tyres",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "curb condition, standard trim height (Z) per the manual; jounce the front and rear bumpers three times before measuring",
+          "fuel": "a full tank or a compensating load"
+        },
+        "front": {
+          "camber_method": "the cam bolts of the upper control arm (nuts 190 N·m)",
+          "caster_method": "the same cam bolts",
+          "toe_method": "the tie rods (jam nuts 68 N·m)"
+        }
+      }
+    },
+    {
+      "id": "chevrolet-silverado-gmt800-k1500-16",
+      "make": "Chevrolet",
+      "model": "Silverado (GMT800)",
+      "trim": "K1500 (полный привод), шины 16″",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "silverado",
+        "сильверадо",
+        "gmc",
+        "sierra",
+        "сиерра",
+        "пикап",
+        "gmt800"
+      ],
+      "year_from": 2003,
+      "year_to": 2007,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди двухрычажная на шаровых опорах с торсионами, сзади неразрезной мост на рессорах. Внесён только развал и разница развала слева-справа (0,00° ± 0,60°). Кастер не внесён: в таблице он дан отдельно для левого и правого колеса и «относительно рамы» (его нужно пересчитывать на угол рамы), а колонка «Cross caster» не сходится с разницей этих значений. Схождение не внесено: в таблице +0,10° ± 0,20° без указания, суммарное это или на колесо. В таблице есть Silverado SS и Quadrasteer, значит она не старше 2003 модельного года; для более ранних машин сверьтесь с руководством своего года.",
+      "source": {
+        "kind": "unverified",
+        "reference": "gooodsystems.com, распечатка GM «Wheel Alignment — Sierra & Silverado», таблица Wheel Alignment Specifications. Постранично с печатным изданием не сверено.",
+        "url": "https://gooodsystems.com/wp-content/uploads/2021/04/Wheel-Alignment-04-05.pdf",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "rim_diameter_in": 16,
+      "front": {
+        "camber": {
+          "min": -1.05,
+          "nominal": -0.3,
+          "max": 0.45
+        },
+        "max_cross_camber": 0.6,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "эксцентриковые болты оси верхнего рычага (гайки 190 Н·м)",
+          "caster_method": "те же эксцентриковые болты",
+          "toe_method": "рулевые тяги (контргайки 68 Н·м)"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "снаряжённое состояние, штатная высота (Z) по руководству; перед замером трижды качнуть передний и задний бампер",
+        "fuel": "полный бак или компенсирующий груз"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Silverado (GMT800)",
+        "notes": "Double wishbones on ball joints with torsion bars at the front, rigid rear axle on leaf springs. Only camber and the left-right camber difference (0.00° ± 0.60°) are entered. Caster is not entered: the table gives it separately for the left and right wheel and “relative to frame” (it must be corrected for the frame angle), and its “Cross caster” column does not match the difference of those values. Toe is not entered: the table gives +0.10° ± 0.20° without saying whether it is total or per wheel. The table includes the Silverado SS and Quadrasteer, so it is no older than the 2003 model year; for earlier trucks check the manual for your year.",
+        "reference": "gooodsystems.com, GM printout “Wheel Alignment — Sierra & Silverado”, Wheel Alignment Specifications table. Not checked page by page against the printed edition.",
+        "trim": "K1500 (four-wheel drive), 16″ tyres",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "curb condition, standard trim height (Z) per the manual; jounce the front and rear bumpers three times before measuring",
+          "fuel": "a full tank or a compensating load"
+        },
+        "front": {
+          "camber_method": "the cam bolts of the upper control arm (nuts 190 N·m)",
+          "caster_method": "the same cam bolts",
+          "toe_method": "the tie rods (jam nuts 68 N·m)"
+        }
+      }
+    },
+    {
+      "id": "chevrolet-silverado-gmt800-k1500-17",
+      "make": "Chevrolet",
+      "model": "Silverado (GMT800)",
+      "trim": "K1500 (полный привод), шины 17″",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "silverado",
+        "сильверадо",
+        "gmc",
+        "sierra",
+        "сиерра",
+        "пикап",
+        "gmt800"
+      ],
+      "year_from": 2003,
+      "year_to": 2007,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди двухрычажная на шаровых опорах с торсионами, сзади неразрезной мост на рессорах. Внесён только развал и разница развала слева-справа (0,00° ± 0,60°). Кастер не внесён: в таблице он дан отдельно для левого и правого колеса и «относительно рамы» (его нужно пересчитывать на угол рамы), а колонка «Cross caster» не сходится с разницей этих значений. Схождение не внесено: в таблице +0,10° ± 0,20° без указания, суммарное это или на колесо. В таблице есть Silverado SS и Quadrasteer, значит она не старше 2003 модельного года; для более ранних машин сверьтесь с руководством своего года.",
+      "source": {
+        "kind": "unverified",
+        "reference": "gooodsystems.com, распечатка GM «Wheel Alignment — Sierra & Silverado», таблица Wheel Alignment Specifications. Постранично с печатным изданием не сверено.",
+        "url": "https://gooodsystems.com/wp-content/uploads/2021/04/Wheel-Alignment-04-05.pdf",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "rim_diameter_in": 17,
+      "front": {
+        "camber": {
+          "min": -1.45,
+          "nominal": -0.7,
+          "max": 0.05
+        },
+        "max_cross_camber": 0.6,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "эксцентриковые болты оси верхнего рычага (гайки 190 Н·м)",
+          "caster_method": "те же эксцентриковые болты",
+          "toe_method": "рулевые тяги (контргайки 68 Н·м)"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "снаряжённое состояние, штатная высота (Z) по руководству; перед замером трижды качнуть передний и задний бампер",
+        "fuel": "полный бак или компенсирующий груз"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Silverado (GMT800)",
+        "notes": "Double wishbones on ball joints with torsion bars at the front, rigid rear axle on leaf springs. Only camber and the left-right camber difference (0.00° ± 0.60°) are entered. Caster is not entered: the table gives it separately for the left and right wheel and “relative to frame” (it must be corrected for the frame angle), and its “Cross caster” column does not match the difference of those values. Toe is not entered: the table gives +0.10° ± 0.20° without saying whether it is total or per wheel. The table includes the Silverado SS and Quadrasteer, so it is no older than the 2003 model year; for earlier trucks check the manual for your year.",
+        "reference": "gooodsystems.com, GM printout “Wheel Alignment — Sierra & Silverado”, Wheel Alignment Specifications table. Not checked page by page against the printed edition.",
+        "trim": "K1500 (four-wheel drive), 17″ tyres",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "curb condition, standard trim height (Z) per the manual; jounce the front and rear bumpers three times before measuring",
+          "fuel": "a full tank or a compensating load"
+        },
+        "front": {
+          "camber_method": "the cam bolts of the upper control arm (nuts 190 N·m)",
+          "caster_method": "the same cam bolts",
+          "toe_method": "the tie rods (jam nuts 68 N·m)"
+        }
+      }
+    },
+    {
+      "id": "chevrolet-silverado-gmt800-1500-20",
+      "make": "Chevrolet",
+      "model": "Silverado (GMT800)",
+      "trim": "C1500 / K1500 и Silverado SS, Sierra Denali, шины 20″",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "silverado",
+        "сильверадо",
+        "gmc",
+        "sierra",
+        "сиерра",
+        "пикап",
+        "gmt800"
+      ],
+      "year_from": 2003,
+      "year_to": 2007,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди двухрычажная на шаровых опорах с торсионами, сзади неразрезной мост на рессорах. Внесён только развал и разница развала слева-справа (0,00° ± 0,60°). Кастер не внесён: в таблице он дан отдельно для левого и правого колеса и «относительно рамы» (его нужно пересчитывать на угол рамы), а колонка «Cross caster» не сходится с разницей этих значений. Схождение не внесено: в таблице +0,10° ± 0,20° без указания, суммарное это или на колесо. В таблице есть Silverado SS и Quadrasteer, значит она не старше 2003 модельного года; для более ранних машин сверьтесь с руководством своего года.",
+      "source": {
+        "kind": "unverified",
+        "reference": "gooodsystems.com, распечатка GM «Wheel Alignment — Sierra & Silverado», таблица Wheel Alignment Specifications. Постранично с печатным изданием не сверено.",
+        "url": "https://gooodsystems.com/wp-content/uploads/2021/04/Wheel-Alignment-04-05.pdf",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "rim_diameter_in": 20,
+      "front": {
+        "camber": {
+          "min": -1.75,
+          "nominal": -1.0,
+          "max": -0.25
+        },
+        "max_cross_camber": 0.6,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "эксцентриковые болты оси верхнего рычага (гайки 190 Н·м)",
+          "caster_method": "те же эксцентриковые болты",
+          "toe_method": "рулевые тяги (контргайки 68 Н·м)"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "снаряжённое состояние, штатная высота (Z) по руководству; перед замером трижды качнуть передний и задний бампер",
+        "fuel": "полный бак или компенсирующий груз"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Silverado (GMT800)",
+        "notes": "Double wishbones on ball joints with torsion bars at the front, rigid rear axle on leaf springs. Only camber and the left-right camber difference (0.00° ± 0.60°) are entered. Caster is not entered: the table gives it separately for the left and right wheel and “relative to frame” (it must be corrected for the frame angle), and its “Cross caster” column does not match the difference of those values. Toe is not entered: the table gives +0.10° ± 0.20° without saying whether it is total or per wheel. The table includes the Silverado SS and Quadrasteer, so it is no older than the 2003 model year; for earlier trucks check the manual for your year.",
+        "reference": "gooodsystems.com, GM printout “Wheel Alignment — Sierra & Silverado”, Wheel Alignment Specifications table. Not checked page by page against the printed edition.",
+        "trim": "C1500 / K1500 and Silverado SS, Sierra Denali, 20″ tyres",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "curb condition, standard trim height (Z) per the manual; jounce the front and rear bumpers three times before measuring",
+          "fuel": "a full tank or a compensating load"
+        },
+        "front": {
+          "camber_method": "the cam bolts of the upper control arm (nuts 190 N·m)",
+          "caster_method": "the same cam bolts",
+          "toe_method": "the tie rods (jam nuts 68 N·m)"
+        }
+      }
+    },
+    {
+      "id": "chevrolet-silverado-gmt800-hd",
+      "make": "Chevrolet",
+      "model": "Silverado (GMT800)",
+      "trim": "1500HD, 2500, 3500",
+      "tags": [
+        "chevrolet",
+        "шевроле",
+        "silverado",
+        "сильверадо",
+        "gmc",
+        "sierra",
+        "сиерра",
+        "пикап",
+        "gmt800"
+      ],
+      "year_from": 2003,
+      "year_to": 2007,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "notes": "Спереди двухрычажная на шаровых опорах с торсионами, сзади неразрезной мост на рессорах. Внесён только развал и разница развала слева-справа (0,00° ± 0,60°). Кастер не внесён: в таблице он дан отдельно для левого и правого колеса и «относительно рамы» (его нужно пересчитывать на угол рамы), а колонка «Cross caster» не сходится с разницей этих значений. Схождение не внесено: в таблице +0,10° ± 0,20° без указания, суммарное это или на колесо. В таблице есть Silverado SS и Quadrasteer, значит она не старше 2003 модельного года; для более ранних машин сверьтесь с руководством своего года. Кроме K3500 на одинарных задних колёсах: у него развал −0,50° ± 0,75°.",
+      "source": {
+        "kind": "unverified",
+        "reference": "gooodsystems.com, распечатка GM «Wheel Alignment — Sierra & Silverado», таблица Wheel Alignment Specifications. Постранично с печатным изданием не сверено.",
+        "url": "https://gooodsystems.com/wp-content/uploads/2021/04/Wheel-Alignment-04-05.pdf",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "front": {
+        "camber": {
+          "min": -1.0,
+          "nominal": -0.25,
+          "max": 0.5
+        },
+        "max_cross_camber": 0.6,
+        "adjustable": {
+          "camber": true,
+          "caster": true,
+          "toe": true,
+          "camber_method": "эксцентриковые болты оси верхнего рычага (гайки 190 Н·м)",
+          "caster_method": "те же эксцентриковые болты",
+          "toe_method": "рулевые тяги (контргайки 68 Н·м)"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "снаряжённое состояние, штатная высота (Z) по руководству; перед замером трижды качнуть передний и задний бампер",
+        "fuel": "полный бак или компенсирующий груз"
+      },
+      "en": {
+        "make": "Chevrolet",
+        "model": "Silverado (GMT800)",
+        "notes": "Double wishbones on ball joints with torsion bars at the front, rigid rear axle on leaf springs. Only camber and the left-right camber difference (0.00° ± 0.60°) are entered. Caster is not entered: the table gives it separately for the left and right wheel and “relative to frame” (it must be corrected for the frame angle), and its “Cross caster” column does not match the difference of those values. Toe is not entered: the table gives +0.10° ± 0.20° without saying whether it is total or per wheel. The table includes the Silverado SS and Quadrasteer, so it is no older than the 2003 model year; for earlier trucks check the manual for your year. Except the K3500 with single rear wheels: its camber is −0.50° ± 0.75°.",
+        "reference": "gooodsystems.com, GM printout “Wheel Alignment — Sierra & Silverado”, Wheel Alignment Specifications table. Not checked page by page against the printed edition.",
+        "trim": "1500HD, 2500, 3500",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "curb condition, standard trim height (Z) per the manual; jounce the front and rear bumpers three times before measuring",
+          "fuel": "a full tank or a compensating load"
+        },
+        "front": {
+          "camber_method": "the cam bolts of the upper control arm (nuts 190 N·m)",
+          "caster_method": "the same cam bolts",
+          "toe_method": "the tie rods (jam nuts 68 N·m)"
         }
       }
     }

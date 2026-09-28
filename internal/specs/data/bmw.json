@@ -229,6 +229,90 @@
         "notes": "MacPherson struts at the front, multi-link at the rear.",
         "reference": "Design description. No tolerances entered."
       }
+    },
+    {
+      "id": "bmw-e12",
+      "make": "BMW",
+      "model": "5 Series E12",
+      "tags": [
+        "bmw",
+        "бмв",
+        "e12"
+      ],
+      "year_from": 1972,
+      "year_to": 1981,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "semi_trailing_arm",
+      "notes": "Спереди Макферсон, сзади независимая на косых рычагах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "5 Series E12",
+        "notes": "MacPherson struts at the front, independent semi-trailing arms at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "bmw-f30",
+      "make": "BMW",
+      "model": "3 Series F30 / F31",
+      "tags": [
+        "bmw",
+        "бмв",
+        "f30",
+        "f31"
+      ],
+      "year_from": 2011,
+      "year_to": 2019,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "3 Series F30 / F31",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "bmw-e53",
+      "make": "BMW",
+      "model": "X5 (E53)",
+      "tags": [
+        "bmw",
+        "бмв",
+        "x5",
+        "e53"
+      ],
+      "year_from": 1999,
+      "year_to": 2006,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "BMW",
+        "model": "X5 (E53)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
     }
   ]
 }

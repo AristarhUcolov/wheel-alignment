@@ -275,6 +275,164 @@
         "reference": "Design description. No tolerances entered.",
         "trim": "rear-wheel drive"
       }
+    },
+    {
+      "id": "ford-mustang-s197",
+      "make": "Ford",
+      "model": "Mustang (S197)",
+      "tags": [
+        "ford",
+        "форд",
+        "mustang",
+        "мустанг",
+        "s197"
+      ],
+      "year_from": 2005,
+      "year_to": 2014,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "live_axle_links",
+      "notes": "Спереди Макферсон, сзади неразрезной мост на пружинах и тягах. Задний мост держат продольные рычаги и тяга Панара.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Mustang (S197)",
+        "notes": "MacPherson struts at the front, rigid rear axle on coil springs and links. The rear axle is located by trailing links and a Panhard rod.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-mustang-s550",
+      "make": "Ford",
+      "model": "Mustang (S550)",
+      "tags": [
+        "ford",
+        "форд",
+        "mustang",
+        "мустанг",
+        "s550"
+      ],
+      "year_from": 2015,
+      "year_to": 2023,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Mustang (S550)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-explorer-3",
+      "make": "Ford",
+      "model": "Explorer III (U152)",
+      "tags": [
+        "ford",
+        "форд",
+        "explorer",
+        "эксплорер",
+        "u152",
+        "mercury",
+        "mountaineer"
+      ],
+      "year_from": 2002,
+      "year_to": 2005,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Explorer III (U152)",
+        "notes": "Double wishbones on ball joints at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-ranger-na",
+      "make": "Ford",
+      "model": "Ranger (Северная Америка, 1998–2011)",
+      "tags": [
+        "ford",
+        "форд",
+        "ranger",
+        "рейнджер",
+        "пикап",
+        "mazda",
+        "b-series"
+      ],
+      "year_from": 1998,
+      "year_to": 2011,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах. У заднеприводных спереди пружины, у полноприводных — торсионы. Не путать с Ranger для остального мира (PJ, T6).",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "Ranger (North America, 1998–2011)",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs. Rear-wheel-drive trucks have coil springs at the front, four-wheel-drive ones torsion bars. Not to be confused with the Ranger for other markets (PJ, T6).",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "ford-f250-sd-4x4",
+      "make": "Ford",
+      "model": "F-250 / F-350 Super Duty (1999–2004)",
+      "trim": "полный привод",
+      "tags": [
+        "ford",
+        "форд",
+        "f250",
+        "f-250",
+        "f350",
+        "f-350",
+        "super",
+        "duty",
+        "пикап"
+      ],
+      "year_from": 1999,
+      "year_to": 2004,
+      "class": "lcv",
+      "front_suspension": "beam_ball_joint",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний ведущий неразрезной мост на шаровых опорах и рессорах, задний мост на рессорах. Развал задан мостом и штатно не регулируется.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Ford",
+        "model": "F-250 / F-350 Super Duty (1999–2004)",
+        "notes": "Driven rigid front axle with ball joints on leaf springs, rear axle on leaf springs. Camber is set by the axle and is not adjustable as standard.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "four-wheel drive"
+      }
     }
   ]
 }

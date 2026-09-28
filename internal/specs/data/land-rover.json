@@ -1,0 +1,83 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "land-rover-defender",
+      "make": "Land Rover",
+      "model": "Defender (90 / 110)",
+      "tags": [
+        "land",
+        "rover",
+        "ленд",
+        "ровер",
+        "defender",
+        "дефендер",
+        "landrover",
+        "лендровер",
+        "лендик"
+      ],
+      "year_from": 1983,
+      "year_to": 2016,
+      "class": "suv",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний и задний неразрезные мосты на пружинах и тягах; кулаки переднего моста поворачиваются на шкворнях. Развал задан мостом и штатно не регулируется.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Land Rover",
+        "model": "Defender (90 / 110)",
+        "notes": "Rigid front and rear axles on coil springs and links; the front knuckles turn on kingpins. Camber is set by the axle and is not adjustable as standard.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "land-rover-discovery-1-2",
+      "make": "Land Rover",
+      "model": "Discovery I / II",
+      "tags": [
+        "land",
+        "rover",
+        "ленд",
+        "ровер",
+        "discovery",
+        "дискавери",
+        "landrover",
+        "лендровер",
+        "лендик"
+      ],
+      "year_from": 1989,
+      "year_to": 2004,
+      "class": "suv",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний и задний неразрезные мосты на пружинах и тягах; кулаки переднего моста поворачиваются на шкворнях. Развал задан мостом и штатно не регулируется.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Land Rover",
+        "model": "Discovery I / II",
+        "notes": "Rigid front and rear axles on coil springs and links; the front knuckles turn on kingpins. Camber is set by the axle and is not adjustable as standard.",
+        "reference": "Design description. No tolerances entered."
+      }
+    }
+  ]
+}

@@ -136,6 +136,240 @@
         "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs.",
         "reference": "Design description. No tolerances entered."
       }
+    },
+    {
+      "id": "toyota-corolla-e150",
+      "make": "Toyota",
+      "model": "Corolla (E150)",
+      "tags": [
+        "toyota",
+        "тойота",
+        "corolla",
+        "королла",
+        "e150"
+      ],
+      "year_from": 2006,
+      "year_to": 2013,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Toyota",
+        "model": "Corolla (E150)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "toyota-camry-xv40",
+      "make": "Toyota",
+      "model": "Camry (XV40)",
+      "tags": [
+        "toyota",
+        "тойота",
+        "camry",
+        "камри",
+        "xv40",
+        "40"
+      ],
+      "year_from": 2006,
+      "year_to": 2011,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "macpherson",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Макферсон спереди и сзади (сзади — стойки с двумя поперечными рычагами).",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Toyota",
+        "model": "Camry (XV40)",
+        "notes": "MacPherson struts front and rear (at the rear, struts with two transverse links).",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "toyota-rav4-xa30",
+      "make": "Toyota",
+      "model": "RAV4 (XA30)",
+      "tags": [
+        "toyota",
+        "тойота",
+        "rav4",
+        "рав4",
+        "рав",
+        "xa30"
+      ],
+      "year_from": 2005,
+      "year_to": 2012,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Toyota",
+        "model": "RAV4 (XA30)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "toyota-prado-120",
+      "make": "Toyota",
+      "model": "Land Cruiser Prado 120",
+      "tags": [
+        "toyota",
+        "тойота",
+        "land",
+        "cruiser",
+        "крузер",
+        "prado",
+        "прадо",
+        "120"
+      ],
+      "year_from": 2002,
+      "year_to": 2009,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на пружинах и тягах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Toyota",
+        "model": "Land Cruiser Prado 120",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on coil springs and links.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "toyota-lc200",
+      "make": "Toyota",
+      "model": "Land Cruiser 200",
+      "tags": [
+        "toyota",
+        "тойота",
+        "land",
+        "cruiser",
+        "крузер",
+        "lc200",
+        "200"
+      ],
+      "year_from": 2007,
+      "year_to": 2021,
+      "class": "suv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на пружинах и тягах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Toyota",
+        "model": "Land Cruiser 200",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on coil springs and links.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "toyota-camry-xv70",
+      "make": "Toyota",
+      "model": "Camry (XV70)",
+      "trim": "2AR-FE, A25A-FKS; обычное исполнение",
+      "tags": [
+        "toyota",
+        "тойота",
+        "camry",
+        "камри",
+        "xv70",
+        "70"
+      ],
+      "year_from": 2017,
+      "year_to": 2024,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "notes": "Спереди Макферсон, сзади многорычажная. Внесены только передние углы для 2AR-FE и A25A-FKS в обычном исполнении. Для 2GR-FKS (V6) и для исполнения под плохие дороги руководство даёт другие развал и кастер — сверьтесь с ним. Поперечный наклон оси поворота — справочно 12°55′, без допуска. Схождение в миллиметрах (B − A = 1,7 ± 2,0 мм) не внесено: на странице не сказано, где его мерить.",
+      "source": {
+        "kind": "unverified",
+        "reference": "toyotacamry.ru, руководство по ремонту Toyota Camry XV70 (RM33A1RU), «Регулировка углов установки передних колёс». Постранично с печатным изданием не сверено.",
+        "url": "https://toyotacamry.ru/doccamry/v70/td/td3/RM33A1RU_v1/topic/rm1000000014nxd.html",
+        "contributor": "перенесено из открытого источника, требует сверки с руководством",
+        "added": "2026-09-28"
+      },
+      "front": {
+        "camber": {
+          "min": -1.25,
+          "nominal": -0.5,
+          "max": 0.25
+        },
+        "caster": {
+          "min": 4.5833,
+          "nominal": 5.3333,
+          "max": 6.0833
+        },
+        "total_toe": {
+          "min": -0.0167,
+          "nominal": 0.15,
+          "max": 0.3167
+        },
+        "max_cross_camber": 0.75,
+        "max_cross_caster": 0.75,
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": true,
+          "toe_method": "рулевые тяги"
+        }
+      },
+      "rear": {
+        "adjustable": {
+          "camber": false,
+          "caster": false,
+          "toe": false
+        }
+      },
+      "conditions": {
+        "pressure": "по норме, одинаково слева и справа",
+        "load": "без нагрузки (ненагруженный автомобиль)"
+      },
+      "en": {
+        "make": "Toyota",
+        "model": "Camry (XV70)",
+        "notes": "MacPherson struts at the front, multi-link at the rear. Only the front angles for the 2AR-FE and A25A-FKS in standard form are entered. For the 2GR-FKS (V6) and the rough-road version the manual gives different camber and caster — check it. Steering axis inclination is for reference, 12°55′, with no tolerance. Toe in millimetres (B − A = 1.7 ± 2.0 mm) is not entered: the page does not say where to measure it.",
+        "reference": "toyotacamry.ru, Toyota Camry XV70 repair manual (RM33A1RU), “Front wheel alignment adjustment”. Not checked page by page against the printed edition.",
+        "trim": "2AR-FE, A25A-FKS; standard version",
+        "conditions": {
+          "pressure": "to spec, equal left and right",
+          "load": "unloaded"
+        },
+        "front": {
+          "toe_method": "the tie rods"
+        }
+      }
     }
   ]
 }

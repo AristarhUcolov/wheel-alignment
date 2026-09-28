@@ -39,6 +39,154 @@
         "notes": "MacPherson struts at the front, twist beam at the rear.",
         "reference": "Design description. No tolerances entered."
       }
+    },
+    {
+      "id": "opel-kadett-e",
+      "make": "Opel",
+      "model": "Kadett E",
+      "tags": [
+        "opel",
+        "опель",
+        "kadett",
+        "кадет",
+        "кадетт"
+      ],
+      "year_from": 1984,
+      "year_to": 1991,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Opel",
+        "model": "Kadett E",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "opel-vectra-a",
+      "make": "Opel",
+      "model": "Vectra A",
+      "trim": "передний привод",
+      "tags": [
+        "opel",
+        "опель",
+        "vectra",
+        "вектра"
+      ],
+      "year_from": 1988,
+      "year_to": 1995,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Opel",
+        "model": "Vectra A",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "front-wheel drive"
+      }
+    },
+    {
+      "id": "opel-astra-g",
+      "make": "Opel",
+      "model": "Astra G",
+      "tags": [
+        "opel",
+        "опель",
+        "astra",
+        "астра"
+      ],
+      "year_from": 1998,
+      "year_to": 2004,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Opel",
+        "model": "Astra G",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "opel-corsa-c",
+      "make": "Opel",
+      "model": "Corsa C",
+      "tags": [
+        "opel",
+        "опель",
+        "corsa",
+        "корса"
+      ],
+      "year_from": 2000,
+      "year_to": 2006,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Opel",
+        "model": "Corsa C",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "opel-zafira-a",
+      "make": "Opel",
+      "model": "Zafira A",
+      "tags": [
+        "opel",
+        "опель",
+        "zafira",
+        "зафира"
+      ],
+      "year_from": 1999,
+      "year_to": 2005,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Opel",
+        "model": "Zafira A",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
     }
   ]
 }

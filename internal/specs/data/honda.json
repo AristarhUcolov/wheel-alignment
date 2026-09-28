@@ -12,139 +12,135 @@
   ],
   "specs": [
     {
-      "id": "skoda-octavia-a4",
-      "make": "Škoda",
-      "model": "Octavia (A4, Tour)",
-      "trim": "передний привод",
+      "id": "honda-civic-7",
+      "make": "Honda",
+      "model": "Civic VII",
       "tags": [
-        "skoda",
-        "шкода",
-        "octavia",
-        "октавия",
-        "tour",
-        "тур",
-        "a4"
+        "honda",
+        "хонда",
+        "civic",
+        "цивик"
       ],
-      "year_from": 1996,
-      "year_to": 2010,
+      "year_from": 2000,
+      "year_to": 2005,
       "class": "car",
       "front_suspension": "macpherson",
-      "rear_suspension": "twist_beam",
+      "rear_suspension": "double_wishbone_ball",
       "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
-      "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
-      },
-      "en": {
-        "make": "Škoda",
-        "model": "Octavia (A4, Tour)",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
-        "reference": "Design description. No tolerances entered.",
-        "trim": "front-wheel drive"
-      }
-    },
-    {
-      "id": "skoda-fabia-1",
-      "make": "Škoda",
-      "model": "Fabia I",
-      "tags": [
-        "skoda",
-        "шкода",
-        "fabia",
-        "фабия"
-      ],
-      "year_from": 1999,
-      "year_to": 2007,
-      "class": "car",
-      "front_suspension": "macpherson",
-      "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
-      "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
-      },
-      "en": {
-        "make": "Škoda",
-        "model": "Fabia I",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
-        "reference": "Design description. No tolerances entered."
-      }
-    },
-    {
-      "id": "skoda-octavia-a5",
-      "make": "Škoda",
-      "model": "Octavia (A5)",
-      "tags": [
-        "skoda",
-        "шкода",
-        "octavia",
-        "октавия",
-        "a5"
-      ],
-      "year_from": 2004,
-      "year_to": 2013,
-      "class": "car",
-      "front_suspension": "macpherson",
-      "rear_suspension": "multilink",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади многорычажная.",
-      "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
-      },
-      "en": {
-        "make": "Škoda",
-        "model": "Octavia (A5)",
-        "notes": "MacPherson struts at the front, multi-link at the rear.",
-        "reference": "Design description. No tolerances entered."
-      }
-    },
-    {
-      "id": "skoda-rapid",
-      "make": "Škoda",
-      "model": "Rapid",
-      "tags": [
-        "skoda",
-        "шкода",
-        "rapid",
-        "рапид"
-      ],
-      "year_from": 2012,
-      "year_to": 2020,
-      "class": "car",
-      "front_suspension": "macpherson",
-      "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "notes": "Спереди Макферсон, сзади двухрычажная.",
       "source": {
         "kind": "catalog",
         "reference": "Описание конструкции. Допуски не внесены.",
         "added": "2026-09-28"
       },
       "en": {
-        "make": "Škoda",
-        "model": "Rapid",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "make": "Honda",
+        "model": "Civic VII",
+        "notes": "MacPherson struts at the front, double wishbones at the rear.",
         "reference": "Design description. No tolerances entered."
       }
     },
     {
-      "id": "skoda-yeti",
-      "make": "Škoda",
-      "model": "Yeti",
+      "id": "honda-civic-8-sedan",
+      "make": "Honda",
+      "model": "Civic VIII (седан FD)",
       "tags": [
-        "skoda",
-        "шкода",
-        "yeti",
-        "йети"
+        "honda",
+        "хонда",
+        "civic",
+        "цивик",
+        "fd"
       ],
-      "year_from": 2009,
-      "year_to": 2018,
+      "year_from": 2005,
+      "year_to": 2011,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная. У хэтчбека (FK, FN) сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Honda",
+        "model": "Civic VIII (FD sedan)",
+        "notes": "MacPherson struts at the front, multi-link at the rear. The hatchback (FK, FN) has a twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "honda-accord-7",
+      "make": "Honda",
+      "model": "Accord VII",
+      "tags": [
+        "honda",
+        "хонда",
+        "accord",
+        "аккорд"
+      ],
+      "year_from": 2002,
+      "year_to": 2008,
+      "class": "car",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "multilink",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Honda",
+        "model": "Accord VII",
+        "notes": "Double wishbones on ball joints at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "honda-cr-v-2",
+      "make": "Honda",
+      "model": "CR-V II",
+      "tags": [
+        "honda",
+        "хонда",
+        "cr-v",
+        "crv",
+        "срв"
+      ],
+      "year_from": 2001,
+      "year_to": 2006,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "double_wishbone_ball",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади двухрычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Honda",
+        "model": "CR-V II",
+        "notes": "MacPherson struts at the front, double wishbones at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "honda-cr-v-3",
+      "make": "Honda",
+      "model": "CR-V III",
+      "tags": [
+        "honda",
+        "хонда",
+        "cr-v",
+        "crv",
+        "срв"
+      ],
+      "year_from": 2006,
+      "year_to": 2012,
       "class": "suv",
       "front_suspension": "macpherson",
       "rear_suspension": "multilink",
@@ -156,8 +152,8 @@
         "added": "2026-09-28"
       },
       "en": {
-        "make": "Škoda",
-        "model": "Yeti",
+        "make": "Honda",
+        "model": "CR-V III",
         "notes": "MacPherson struts at the front, multi-link at the rear.",
         "reference": "Design description. No tolerances entered."
       }

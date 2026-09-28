@@ -1,0 +1,81 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "dodge-ram-1500-dr",
+      "make": "Dodge",
+      "model": "Ram 1500 (DR)",
+      "tags": [
+        "dodge",
+        "додж",
+        "ram",
+        "рэм",
+        "рам",
+        "пикап"
+      ],
+      "year_from": 2002,
+      "year_to": 2008,
+      "class": "lcv",
+      "front_suspension": "double_wishbone_ball",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди двухрычажная на шаровых опорах, сзади неразрезной мост на рессорах. У Ram 2500/3500 спереди неразрезной мост — это отдельная запись.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Dodge",
+        "model": "Ram 1500 (DR)",
+        "notes": "Double wishbones on ball joints at the front, rigid rear axle on leaf springs. The Ram 2500/3500 has a rigid front axle — that is a separate entry.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "dodge-ram-hd-4x4",
+      "make": "Dodge",
+      "model": "Ram 2500 / 3500 (2003–2009)",
+      "trim": "полный привод",
+      "tags": [
+        "dodge",
+        "додж",
+        "ram",
+        "рэм",
+        "рам",
+        "2500",
+        "3500",
+        "пикап"
+      ],
+      "year_from": 2003,
+      "year_to": 2009,
+      "class": "lcv",
+      "front_suspension": "beam_ball_joint",
+      "rear_suspension": "live_axle_leaf",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний ведущий неразрезной мост на шаровых опорах, пружинах и продольных тягах; задний мост на рессорах. Развал задан мостом и штатно не регулируется.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Dodge",
+        "model": "Ram 2500 / 3500 (2003–2009)",
+        "notes": "Driven rigid front axle with ball joints on coil springs and radius links; rear axle on leaf springs. Camber is set by the axle and is not adjustable as standard.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "four-wheel drive"
+      }
+    }
+  ]
+}

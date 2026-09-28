@@ -12,44 +12,17 @@
   ],
   "specs": [
     {
-      "id": "peugeot-206",
-      "make": "Peugeot",
-      "model": "206",
+      "id": "citroen-xsara",
+      "make": "Citroën",
+      "model": "Xsara",
       "tags": [
-        "peugeot",
-        "пежо",
-        "206"
+        "citroen",
+        "ситроен",
+        "xsara",
+        "ксара"
       ],
-      "year_from": 1998,
-      "year_to": 2012,
-      "class": "car",
-      "front_suspension": "macpherson",
-      "rear_suspension": "trailing_arm",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади продольные рычаги с поперечными торсионами.",
-      "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
-      },
-      "en": {
-        "make": "Peugeot",
-        "model": "206",
-        "notes": "MacPherson struts at the front, trailing arms with transverse torsion bars at the rear.",
-        "reference": "Design description. No tolerances entered."
-      }
-    },
-    {
-      "id": "peugeot-405",
-      "make": "Peugeot",
-      "model": "405",
-      "tags": [
-        "peugeot",
-        "пежо",
-        "405"
-      ],
-      "year_from": 1987,
-      "year_to": 1997,
+      "year_from": 1997,
+      "year_to": 2006,
       "class": "car",
       "front_suspension": "macpherson",
       "rear_suspension": "trailing_arm",
@@ -61,23 +34,23 @@
         "added": "2026-09-28"
       },
       "en": {
-        "make": "Peugeot",
-        "model": "405",
+        "make": "Citroën",
+        "model": "Xsara",
         "notes": "MacPherson struts at the front, trailing arms with transverse torsion bars at the rear.",
         "reference": "Design description. No tolerances entered."
       }
     },
     {
-      "id": "peugeot-307",
-      "make": "Peugeot",
-      "model": "307",
+      "id": "citroen-c4-1",
+      "make": "Citroën",
+      "model": "C4 I",
       "tags": [
-        "peugeot",
-        "пежо",
-        "307"
+        "citroen",
+        "ситроен",
+        "c4"
       ],
-      "year_from": 2001,
-      "year_to": 2008,
+      "year_from": 2004,
+      "year_to": 2010,
       "class": "car",
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
@@ -89,54 +62,24 @@
         "added": "2026-09-28"
       },
       "en": {
-        "make": "Peugeot",
-        "model": "307",
+        "make": "Citroën",
+        "model": "C4 I",
         "notes": "MacPherson struts at the front, twist beam at the rear.",
         "reference": "Design description. No tolerances entered."
       }
     },
     {
-      "id": "peugeot-308-t7",
-      "make": "Peugeot",
-      "model": "308 I (T7)",
+      "id": "citroen-berlingo-1",
+      "make": "Citroën",
+      "model": "Berlingo I",
       "tags": [
-        "peugeot",
-        "пежо",
-        "308"
-      ],
-      "year_from": 2007,
-      "year_to": 2013,
-      "class": "car",
-      "front_suspension": "macpherson",
-      "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
-      "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-28"
-      },
-      "en": {
-        "make": "Peugeot",
-        "model": "308 I (T7)",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
-        "reference": "Design description. No tolerances entered."
-      }
-    },
-    {
-      "id": "peugeot-partner-1",
-      "make": "Peugeot",
-      "model": "Partner I / Partner Origin",
-      "tags": [
-        "peugeot",
-        "пежо",
-        "partner",
-        "партнер",
-        "партнёр",
-        "origin"
+        "citroen",
+        "ситроен",
+        "berlingo",
+        "берлинго"
       ],
       "year_from": 1996,
-      "year_to": 2012,
+      "year_to": 2011,
       "class": "lcv",
       "front_suspension": "macpherson",
       "rear_suspension": "trailing_arm",
@@ -148,8 +91,8 @@
         "added": "2026-09-28"
       },
       "en": {
-        "make": "Peugeot",
-        "model": "Partner I / Partner Origin",
+        "make": "Citroën",
+        "model": "Berlingo I",
         "notes": "MacPherson struts at the front, trailing arms with transverse torsion bars at the rear.",
         "reference": "Design description. No tolerances entered."
       }

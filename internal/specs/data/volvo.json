@@ -39,6 +39,92 @@
         "notes": "Kingpin front beam; the rear axle is on leaf springs or air bags depending on the version (choose yours). Camber and kingpin inclination are not adjustable, toe is set by the cross tie rod.",
         "reference": "Design description. No tolerances entered."
       }
+    },
+    {
+      "id": "volvo-240",
+      "make": "Volvo",
+      "model": "240",
+      "tags": [
+        "volvo",
+        "вольво",
+        "240",
+        "244",
+        "245"
+      ],
+      "year_from": 1974,
+      "year_to": 1993,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "live_axle_links",
+      "notes": "Спереди Макферсон, сзади неразрезной мост на пружинах и тягах.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Volvo",
+        "model": "240",
+        "notes": "MacPherson struts at the front, rigid rear axle on coil springs and links.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "volvo-s40-v50",
+      "make": "Volvo",
+      "model": "S40 II / V50",
+      "tags": [
+        "volvo",
+        "вольво",
+        "s40",
+        "v50"
+      ],
+      "year_from": 2004,
+      "year_to": 2012,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Volvo",
+        "model": "S40 II / V50",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "volvo-xc90-1",
+      "make": "Volvo",
+      "model": "XC90 I",
+      "tags": [
+        "volvo",
+        "вольво",
+        "xc90"
+      ],
+      "year_from": 2002,
+      "year_to": 2014,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Volvo",
+        "model": "XC90 I",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
     }
   ]
 }

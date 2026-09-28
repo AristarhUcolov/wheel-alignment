@@ -12,52 +12,17 @@
   ],
   "specs": [
     {
-      "id": "audi-80-b3-b4",
-      "make": "Audi",
-      "model": "80 (B3 / B4)",
-      "trim": "передний привод",
+      "id": "suzuki-swift-2004",
+      "make": "Suzuki",
+      "model": "Swift (2004–2010)",
       "tags": [
-        "audi",
-        "ауди",
-        "80",
-        "b3",
-        "b4",
-        "бочка"
+        "suzuki",
+        "сузуки",
+        "swift",
+        "свифт"
       ],
-      "year_from": 1986,
-      "year_to": 1996,
-      "class": "car",
-      "front_suspension": "macpherson",
-      "rear_suspension": "twist_beam",
-      "guidance_id": "guidance-fwd-mcpherson",
-      "notes": "Спереди Макферсон, сзади полузависимая балка.",
-      "source": {
-        "kind": "catalog",
-        "reference": "Описание конструкции. Допуски не внесены.",
-        "added": "2026-09-27"
-      },
-      "en": {
-        "make": "Audi",
-        "model": "80 (B3 / B4)",
-        "notes": "MacPherson struts at the front, twist beam at the rear.",
-        "reference": "Design description. No tolerances entered.",
-        "trim": "front-wheel drive"
-      }
-    },
-    {
-      "id": "audi-100-c3",
-      "make": "Audi",
-      "model": "100 (C3)",
-      "trim": "передний привод",
-      "tags": [
-        "audi",
-        "ауди",
-        "100",
-        "c3",
-        "сигара"
-      ],
-      "year_from": 1982,
-      "year_to": 1991,
+      "year_from": 2004,
+      "year_to": 2010,
       "class": "car",
       "front_suspension": "macpherson",
       "rear_suspension": "twist_beam",
@@ -69,71 +34,99 @@
         "added": "2026-09-28"
       },
       "en": {
-        "make": "Audi",
-        "model": "100 (C3)",
+        "make": "Suzuki",
+        "model": "Swift (2004–2010)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "suzuki-sx4-1",
+      "make": "Suzuki",
+      "model": "SX4 I",
+      "trim": "передний привод",
+      "tags": [
+        "suzuki",
+        "сузуки",
+        "sx4"
+      ],
+      "year_from": 2006,
+      "year_to": 2014,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "Suzuki",
+        "model": "SX4 I",
         "notes": "MacPherson struts at the front, twist beam at the rear.",
         "reference": "Design description. No tolerances entered.",
         "trim": "front-wheel drive"
       }
     },
     {
-      "id": "audi-a4-b5",
-      "make": "Audi",
-      "model": "A4 (B5)",
-      "trim": "передний привод",
+      "id": "suzuki-grand-vitara-jt",
+      "make": "Suzuki",
+      "model": "Grand Vitara (JT)",
       "tags": [
-        "audi",
-        "ауди",
-        "a4",
-        "b5"
+        "suzuki",
+        "сузуки",
+        "grand",
+        "vitara",
+        "витара"
       ],
-      "year_from": 1994,
-      "year_to": 2001,
-      "class": "car",
-      "front_suspension": "multilink",
-      "rear_suspension": "twist_beam",
-      "notes": "Спереди четырёхрычажная, сзади полузависимая балка (у quattro — двухрычажная).",
+      "year_from": 2005,
+      "year_to": 2015,
+      "class": "suv",
+      "front_suspension": "macpherson",
+      "rear_suspension": "multilink",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Спереди Макферсон, сзади многорычажная.",
       "source": {
         "kind": "catalog",
         "reference": "Описание конструкции. Допуски не внесены.",
         "added": "2026-09-28"
       },
       "en": {
-        "make": "Audi",
-        "model": "A4 (B5)",
-        "notes": "Four-link front suspension, twist beam at the rear (double wishbones on quattro).",
-        "reference": "Design description. No tolerances entered.",
-        "trim": "front-wheel drive"
+        "make": "Suzuki",
+        "model": "Grand Vitara (JT)",
+        "notes": "MacPherson struts at the front, multi-link at the rear.",
+        "reference": "Design description. No tolerances entered."
       }
     },
     {
-      "id": "audi-a6-c5",
-      "make": "Audi",
-      "model": "A6 (C5)",
-      "trim": "передний привод",
+      "id": "suzuki-jimny-jb23",
+      "make": "Suzuki",
+      "model": "Jimny (JB23 / JB43)",
       "tags": [
-        "audi",
-        "ауди",
-        "a6",
-        "c5"
+        "suzuki",
+        "сузуки",
+        "jimny",
+        "джимни"
       ],
-      "year_from": 1997,
-      "year_to": 2004,
-      "class": "car",
-      "front_suspension": "multilink",
-      "rear_suspension": "twist_beam",
-      "notes": "Спереди четырёхрычажная, сзади полузависимая балка (у quattro — двухрычажная).",
+      "year_from": 1998,
+      "year_to": 2018,
+      "class": "suv",
+      "front_suspension": "beam_kingpin",
+      "rear_suspension": "live_axle_links",
+      "guidance_id": "guidance-suv-4x4",
+      "notes": "Передний и задний неразрезные мосты на пружинах и тягах; кулаки переднего моста поворачиваются на шкворнях. Развал задан мостом и штатно не регулируется.",
       "source": {
         "kind": "catalog",
         "reference": "Описание конструкции. Допуски не внесены.",
         "added": "2026-09-28"
       },
       "en": {
-        "make": "Audi",
-        "model": "A6 (C5)",
-        "notes": "Four-link front suspension, twist beam at the rear (double wishbones on quattro).",
-        "reference": "Design description. No tolerances entered.",
-        "trim": "front-wheel drive"
+        "make": "Suzuki",
+        "model": "Jimny (JB23 / JB43)",
+        "notes": "Rigid front and rear axles on coil springs and links; the front knuckles turn on kingpins. Camber is set by the axle and is not adjustable as standard.",
+        "reference": "Design description. No tolerances entered."
       }
     }
   ]

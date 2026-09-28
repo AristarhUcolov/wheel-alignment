@@ -1,0 +1,75 @@
+{
+  "_comment": [
+    "Записи по марке. У каждой записи указан источник (source). Допуски есть только там, где источник назван:",
+    "«unverified» — один открытый источник, не сверено постранично с заводским изданием; «catalog» — только",
+    "конструкция подвески, без единого допуска. Выдумывать цифры нельзя. Как добавить или проверить данные —",
+    "docs/CONTRIBUTING-SPECS.md.",
+    "",
+    "Entries of one make. Every entry names its source. Tolerances appear only where a source is given:",
+    "“unverified” — one open source, not checked page by page against the factory edition; “catalog” — the",
+    "suspension design only, no tolerances at all. Figures must never be made up. How to add or check data —",
+    "docs/CONTRIBUTING-SPECS.md."
+  ],
+  "specs": [
+    {
+      "id": "seat-ibiza-6l",
+      "make": "SEAT",
+      "model": "Ibiza III (6L)",
+      "tags": [
+        "seat",
+        "сеат",
+        "ibiza",
+        "ибица"
+      ],
+      "year_from": 2002,
+      "year_to": 2008,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "SEAT",
+        "model": "Ibiza III (6L)",
+        "notes": "MacPherson struts at the front, twist beam at the rear.",
+        "reference": "Design description. No tolerances entered."
+      }
+    },
+    {
+      "id": "seat-leon-1m",
+      "make": "SEAT",
+      "model": "Leon I (1M)",
+      "trim": "передний привод",
+      "tags": [
+        "seat",
+        "сеат",
+        "leon",
+        "леон"
+      ],
+      "year_from": 1999,
+      "year_to": 2006,
+      "class": "car",
+      "front_suspension": "macpherson",
+      "rear_suspension": "twist_beam",
+      "guidance_id": "guidance-fwd-mcpherson",
+      "notes": "Спереди Макферсон, сзади полузависимая балка. У полноприводных версий сзади многорычажная.",
+      "source": {
+        "kind": "catalog",
+        "reference": "Описание конструкции. Допуски не внесены.",
+        "added": "2026-09-28"
+      },
+      "en": {
+        "make": "SEAT",
+        "model": "Leon I (1M)",
+        "notes": "MacPherson struts at the front, twist beam at the rear. Four-wheel-drive versions have a multi-link rear.",
+        "reference": "Design description. No tolerances entered.",
+        "trim": "front-wheel drive"
+      }
+    }
+  ]
+}
