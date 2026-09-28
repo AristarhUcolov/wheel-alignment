@@ -102,11 +102,18 @@ go build -ldflags "-H=windowsgui" -o wheelalign.exe ./cmd/wheelalign
 |---|---|---|
 | **Струна и угломер** | Леска, рулетка, угломер | Развал, схождение, угол тяги; с поворотными кругами — кастер |
 | **Телефон на колесе** | Любой смартфон с браузером | Развал в реальном времени по Wi-Fi; кастер по гироскопу |
-| **Камера и мишени** | Фотоаппарат или телефон, распечатанные мишени | Развал, схождение, угол тяги |
+| **Камера и мишени** | Фотоаппарат или телефон, распечатанные мишени | Развал, схождение, угол тяги — по серии снимков |
+| **Живой режим камерой** | Телефон на штативе, распечатанные мишени | Развал и схождение вживую, 3–4 раза в секунду, пока крутите тягу |
 | **Свой датчик** | ESP32, лазерный указатель — что угодно с JSON | Что умеет датчик — [протокол](docs/SENSORS.md) |
 
 Способы сочетаются: развал и кастер телефоном, схождение струной — программа
 сведёт всё на одном экране.
+
+Приложенный к ободу телефон **схождение не меряет**: схождение — поворот колеса
+вокруг вертикали, а акселерометр чувствует только наклон; гироскоп поворот
+чувствует, но за минуту накапливает ошибку больше всего допуска. Схождение даёт
+струна — или тот же телефон, поставленный на штатив как камера в [живом
+режиме](docs/OPTICAL.md#живой-режим-телефон-как-камера).
 
 ### Телефон как датчик
 
@@ -168,10 +175,13 @@ Scania, Volvo, DAF.
 на двух языках и **источник**.
 
 Допуски (не «ориентир по классу», а цифры конкретной модели) сейчас есть у
-ГАЗ-3110, ГАЗели, УАЗ-469, ВАЗ-2101…2107, 2108/2109, 2110, «Нивы» 2121 и
-Chevrolet Niva. Все они помечены **«не проверено»**: взяты из открытых
-пересказов руководств по ремонту, у каждой есть ссылка на страницу, которую
-можно открыть прямо из программы. Остальные модели — **только конструкция**:
+21 модели: ГАЗ-21, ГАЗ-24, ГАЗ-3110, ГАЗель, ГАЗель NEXT, УАЗ-469, УАЗ-452,
+ВАЗ-2101…2107, 2108/2109, 2110, 2113–2115, Приора, Калина, Ларгус, «Нива» 2121,
+Chevrolet Niva, «Москвич-2141»; у ЗИЛ-130, КамАЗ-5320, ГАЗ-53 и «Урала-4320» —
+схождение. Все они помечены **«не проверено»**: взяты из открытых пересказов
+руководств по ремонту и книг, у каждой есть ссылка на страницу, которую можно
+открыть прямо из программы. Где источники расходятся (Веста) или читаются
+неоднозначно (Гранта), цифры не внесены, и в записи сказано почему. Остальные модели — **только конструкция**:
 программа знает их подвеску и даёт правильные советы, а углы сравнивает с
 ориентиром по классу, прямо говоря об этом.
 
@@ -316,7 +326,7 @@ internal/server/       HTTP API и интерфейс (встроен в про�
 1. **Проверенные допуски** — инструменты готовы, нужны люди с руководствами по
    ремонту. Это самое ценное, что можно сделать для проекта.
 2. Проверка на реальных автомобилях против профессионального стенда.
-3. Живой замер схождения камерой (сейчас — по сериям снимков).
+3. Кастер камерой в живом режиме (сейчас — телефоном на колесе или струной).
 4. Многоосные грузовики: параллельность мостов задней тележки.
 5. Приложение для телефона, работающее и без компьютера.
 
@@ -448,11 +458,18 @@ be printed or saved as PDF.
 |---|---|---|
 | **Strings and inclinometer** | Fishing line, tape measure, inclinometer | Camber, toe, thrust angle; with turn plates — caster |
 | **Phone on the wheel** | Any smartphone with a browser | Live camber over Wi-Fi; caster with the gyroscope |
-| **Camera and targets** | A camera or phone, printed targets | Camber, toe, thrust angle |
+| **Camera and targets** | A camera or phone, printed targets | Camber, toe, thrust angle — from a photo series |
+| **Live camera mode** | A phone on a tripod, printed targets | Live camber and toe, 3–4 times a second while you turn the tie rod |
 | **Your own sensor** | ESP32, a laser pointer — anything that sends JSON | Whatever the sensor measures — [protocol](docs/SENSORS.md#eng) |
 
 The methods combine: camber and caster by phone, toe by string — the program
 brings it all together on one screen.
+
+A phone held to the rim **does not measure toe**: toe is a rotation about the
+vertical, and the accelerometer senses only tilt; the gyroscope senses the
+rotation but drifts by more than the whole tolerance within a minute. Toe comes
+from the string — or from the same phone on a tripod as a camera in [live
+mode](docs/OPTICAL.md#live-mode-the-phone-as-a-camera).
 
 ### The phone as a sensor
 
@@ -511,10 +528,13 @@ Each make is a file of its own in [`internal/specs/data/`](internal/specs/data):
 both languages and **its source**.
 
 Tolerances (the figures of a particular model, not class guidance) currently
-exist for the GAZ-3110, the GAZelle, UAZ-469, VAZ-2101…2107, 2108/2109, 2110,
-the Niva 2121 and the Chevrolet Niva. All are labelled **“unverified”**: they
-come from open retellings of workshop manuals, and each links to its page,
-which can be opened right from the program. All other models are **design
+exist for 21 models: GAZ-21, GAZ-24, GAZ-3110, GAZelle, GAZelle NEXT, UAZ-469,
+UAZ-452, VAZ-2101…2107, 2108/2109, 2110, 2113–2115, Priora, Kalina, Largus,
+Niva 2121, Chevrolet Niva, Moskvich-2141; toe for the ZIL-130, KAMAZ-5320,
+GAZ-53 and Ural-4320. All are labelled **“unverified”**: they come from open
+retellings of workshop manuals and books, and each links to its page, which can
+be opened right from the program. Where sources disagree (Vesta) or read
+ambiguously (Granta), no figures are entered, and the entry says why. All other models are **design
 only**: the program knows their suspension and gives the right advice, and
 compares the angles with class guidance — saying so plainly.
 
@@ -662,7 +682,7 @@ workshop.
 1. **Verified tolerances** — the tools are ready; people with workshop manuals
    are needed. This is the most valuable thing you can do for the project.
 2. Testing on real cars against a professional aligner.
-3. Live toe measurement by camera (now from photo series).
+3. Caster by camera in live mode (now by phone on the wheel or by string).
 4. Multi-axle trucks: parallelism of the rear bogie axles.
 5. A phone app that works without a computer.
 

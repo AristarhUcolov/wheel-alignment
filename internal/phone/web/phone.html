@@ -34,6 +34,11 @@
   .chip.ok { color: var(--green); border-color: #164d2e; }
   .steer { font: 600 56px/1 var(--num); text-align: center; color: var(--blue); }
   .hide { display: none !important; }
+  video { width: 100%; border-radius: 10px; background: #000; display: block; }
+  .camvals { display: flex; justify-content: space-around; text-align: center; margin: 4px 0 10px; }
+  .camvals .mid { display: block; font: 600 clamp(34px, 11vw, 52px)/1.1 var(--num); font-variant-numeric: tabular-nums; }
+  .camvals small { color: var(--muted); font-size: 13px; }
+  button.on { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue) inset; }
   .muted { color: var(--muted); font-size: 14px; }
   small { color: var(--muted); }
 </style>
@@ -59,6 +64,7 @@
     <div class="card">
       <p class="prompt" data-t>Телефон будет передавать наклон колеса по Wi-Fi. Экран не погаснет, пока открыта эта страница.</p>
       <button class="primary" id="go" style="width:100%;font-size:19px;padding:18px" data-t>Включить датчики</button>
+      <button id="goCam" style="width:100%;margin-top:10px" data-t>Телефон как камера (мишени)</button>
       <p class="muted" id="startErr"></p>
     </div>
   </section>
@@ -89,8 +95,35 @@
       <button data-cmd="caster" id="bCaster" data-t>Кастер</button>
       <button data-cmd="cancel" id="bCancel" class="hide" data-t>Отмена</button>
       <button id="bWheel" data-t>Другое колесо</button>
+      <button id="bCamera" data-t>Камера</button>
     </div>
     <p class="muted" data-t>Телефон прижимайте к ровной планке, лежащей на закраинах обода, экраном наружу. Не к шине.</p>
+  </section>
+
+  <section id="camera" class="hide" style="display:flex;flex-direction:column;gap:12px">
+    <div class="card" style="padding:8px">
+      <video id="vid" playsinline muted autoplay></video>
+      <div class="chips" id="camFound" style="margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <div class="sub" id="camWheel"></div>
+      <div class="camvals">
+        <div><span class="mid" id="camCamber">—</span><small data-t>развал</small></div>
+        <div><span class="mid" id="camToe">—</span><small data-t>схождение</small></div>
+      </div>
+      <div class="prompt" id="camMsg" data-t>Сначала один раз откалибруйте камеру, затем учтите биение каждого колеса, затем включайте замер.</div>
+      <div class="bar"><div id="camBar"></div></div>
+      <p class="muted" id="camWarn"></p>
+    </div>
+    <div class="grid2">
+      <button data-cmode="calib" data-t>Калибровка камеры</button>
+      <button data-cmode="spin" data-t>Биение</button>
+      <button data-cmode="live" class="primary" data-t>Замер</button>
+      <button id="camStop" data-t>Стоп</button>
+      <button id="camWheelBtn" data-t>Другое колесо</button>
+      <button id="camBack" data-t>Датчик наклона</button>
+    </div>
+    <p class="muted" data-t>Держите телефон горизонтально — так же, как при калибровке. Для замера поставьте его на штатив или опору так, чтобы в кадре были мишень на колесе и мишень на полу.</p>
   </section>
 
 <script>
@@ -132,7 +165,25 @@ const EN = {
   "Доступ к датчикам запрещён. Разрешите его в настройках Safari для этого сайта.": "Sensor access denied. Allow it in Safari's settings for this site.",
   "Не удалось запросить доступ к датчикам:": "Could not request sensor access:",
   "Датчики не отвечают. Откройте страницу в Chrome (Android) или Safari (iPhone).": "The sensors are not responding. Open the page in Chrome (Android) or Safari (iPhone).",
-  "Страница открыта не по защищённому адресу — браузер не даёт доступа к датчикам.": "The page is not open over a secure address — the browser blocks the sensors."
+  "Страница открыта не по защищённому адресу — браузер не даёт доступа к датчикам.": "The page is not open over a secure address — the browser blocks the sensors.",
+  "Телефон как камера (мишени)": "Phone as a camera (targets)",
+  "Камера": "Camera",
+  "развал": "camber",
+  "схождение": "toe",
+  "Сначала один раз откалибруйте камеру, затем учтите биение каждого колеса, затем включайте замер.": "First calibrate the camera once, then compensate each wheel's runout, then start measuring.",
+  "Калибровка камеры": "Camera calibration",
+  "Биение": "Runout",
+  "Замер": "Measure",
+  "Стоп": "Stop",
+  "Датчик наклона": "Tilt sensor",
+  "Держите телефон горизонтально — так же, как при калибровке. Для замера поставьте его на штатив или опору так, чтобы в кадре были мишень на колесе и мишень на полу.": "Hold the phone in landscape — the same way as during calibration. For measuring, put it on a tripod or a support so that the wheel target and the floor target are both in the frame.",
+  "Браузер не даёт доступа к камере на этой странице. Откройте её в Chrome (Android) или Safari (iPhone).": "The browser does not give this page access to the camera. Open it in Chrome (Android) or Safari (iPhone).",
+  "Не удалось включить камеру:": "Could not start the camera:",
+  "Для биения и замера выберите колесо.": "Choose the wheel for runout and measuring.",
+  "Показывайте мишень с колеса под разными углами и в разных частях кадра.": "Show the wheel target at different angles and in different parts of the frame.",
+  "Вывесите колесо и медленно поворачивайте его рукой; мишень на колесе и на полу — в кадре.": "Lift the wheel and turn it slowly by hand; keep the wheel target and the floor target in the frame.",
+  "Камера смотрит на колесо — показания идут на экран регулировки.": "The camera is watching the wheel — readings go to the adjustment screen.",
+  "Остановлено.": "Stopped."
 };
 // end EN
 let lang = document.documentElement.lang === 'en' ? 'en' : 'ru';
@@ -280,14 +331,17 @@ function disconnected(why) {
   err.classList.remove('hide');
 }
 
+let inCamera = false;
 function show(which) {
-  for (const s of ['pick', 'start', 'main']) $('#' + s).classList.toggle('hide', s !== which);
+  for (const s of ['pick', 'start', 'main', 'camera']) $('#' + s).classList.toggle('hide', s !== which);
   if (which === 'main') $('#main').style.display = 'flex';
+  if (which === 'camera') $('#camera').style.display = 'flex';
 }
 document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
   wheel = b.dataset.w;
   store.set('wheel', wheel);
   send({ wheel });
+  if (inCamera) { openCamera(); return; }
   show(running ? 'main' : 'start');
 });
 document.querySelectorAll('[data-cmd]').forEach(b => b.onclick = () => send({ cmd: b.dataset.cmd }));
@@ -319,6 +373,111 @@ $('#go').onclick = async () => {
     }
   }, 2500);
 };
+
+// ── Камера ─────────────────────────────────────────────────────────
+// Кадры идут по одному: следующий — только после ответа на предыдущий,
+// так телефон никогда не забивает сеть и компьютер очередью старых кадров.
+let camStream = null, camMode = '', camLoopOn = false;
+const cvs = document.createElement('canvas'), cctx = cvs.getContext('2d');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const camMsg = txt => { $('#camMsg').textContent = txt; };
+function wheelLabel() {
+  const b = document.querySelector(`[data-w="${wheel}"]`);
+  return b ? b.textContent : tr('колесо не выбрано');
+}
+async function openCamera() {
+  inCamera = true;
+  show('camera');
+  $('#camWheel').textContent = wheelLabel();
+  if (camStream) return true;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    camMsg(tr('Браузер не даёт доступа к камере на этой странице. Откройте её в Chrome (Android) или Safari (iPhone).'));
+    return false;
+  }
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+    const v = $('#vid');
+    v.srcObject = camStream;
+    await v.play();
+    keepAwake();
+    return true;
+  } catch (e) {
+    camMsg(tr('Не удалось включить камеру:') + ' ' + e.message);
+    return false;
+  }
+}
+function closeCamera() {
+  setCamMode('');
+  inCamera = false;
+  if (camStream) camStream.getTracks().forEach(t => t.stop());
+  camStream = null;
+}
+function setCamMode(m) {
+  if (m && m !== 'calib' && !wheel) { camMsg(tr('Для биения и замера выберите колесо.')); show('pick'); return; }
+  camMode = m;
+  document.querySelectorAll('[data-cmode]').forEach(b => b.classList.toggle('on', b.dataset.cmode === m));
+  if (m === 'calib') camMsg(tr('Показывайте мишень с колеса под разными углами и в разных частях кадра.'));
+  if (m === 'spin') camMsg(tr('Вывесите колесо и медленно поворачивайте его рукой; мишень на колесе и на полу — в кадре.'));
+  if (m === 'live') camMsg(tr('Камера смотрит на колесо — показания идут на экран регулировки.'));
+  if (!m) camMsg(tr('Остановлено.'));
+  if (m && !camLoopOn) camLoop();
+}
+async function camLoop() {
+  camLoopOn = true;
+  const v = $('#vid');
+  while (camMode && !stopped) {
+    if (!v.videoWidth) { await sleep(200); continue; }
+    // Не больше 1280 точек по длинной стороне: детали мишени это не теряет,
+    // а кадр обрабатывается быстрее. Размер тот же при калибровке и замере.
+    const k = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight));
+    cvs.width = Math.round(v.videoWidth * k);
+    cvs.height = Math.round(v.videoHeight * k);
+    cctx.drawImage(v, 0, 0, cvs.width, cvs.height);
+    const blob = await new Promise(r => cvs.toBlob(r, 'image/jpeg', 0.9));
+    const mode = camMode;
+    try {
+      const q = new URLSearchParams({ d: id, mode, wheel, name: deviceName() });
+      const r = await fetch(`/p/${token}/frame?` + q, { method: 'POST', headers: { 'Content-Type': 'image/jpeg' }, body: blob });
+      if (r.status === 410) { closeCamera(); disconnected(await r.text()); break; }
+      if (r.status === 404) { conn(false, tr('ссылка устарела — отсканируйте код заново')); await sleep(1500); continue; }
+      if (!r.ok) { camMsg((await r.text()).trim()); await sleep(1000); continue; }
+      conn(true);
+      if (mode === camMode) renderCam(await r.json());
+    } catch {
+      conn(false);
+      await sleep(1000);
+    }
+  }
+  camLoopOn = false;
+}
+function renderCam(st) {
+  $('#camFound').innerHTML = '';
+  for (const f of st.found || []) {
+    const c = document.createElement('span');
+    c.className = 'chip ok';
+    c.textContent = f;
+    $('#camFound').append(c);
+  }
+  camMsg(st.message || '');
+  $('#camWarn').textContent = st.warn || '';
+  $('#camBar').style.width = Math.round((st.progress || 0) * 100) + '%';
+  $('#camCamber').textContent = st.camber === undefined || st.camber === null ? '—' : dm(st.camber);
+  $('#camToe').textContent = st.toe === undefined || st.toe === null ? '—' : dm(st.toe);
+  if (st.done && camMode !== 'live') {
+    if (navigator.vibrate) navigator.vibrate(200);
+    camMode = '';
+    document.querySelectorAll('[data-cmode]').forEach(b => b.classList.remove('on'));
+  }
+}
+$('#goCam').onclick = () => openCamera();
+$('#bCamera').onclick = () => openCamera();
+document.querySelectorAll('[data-cmode]').forEach(b => b.onclick = async () => {
+  if (await openCamera()) setCamMode(b.dataset.cmode);
+});
+$('#camStop').onclick = () => setCamMode('');
+$('#camWheelBtn').onclick = () => { setCamMode(''); show('pick'); };
+$('#camBack').onclick = () => { closeCamera(); show(running ? 'main' : 'start'); };
 
 setInterval(() => { if (!stopped && (running || Object.keys(pending).length)) send(); }, 100);
 setInterval(() => { if (!stopped && !running) send(); }, 1500);

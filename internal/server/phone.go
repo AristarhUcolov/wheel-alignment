@@ -41,6 +41,7 @@ func (s *Server) openURL(w http.ResponseWriter, r *http.Request) {
 func (s *Server) SetPhone(l *phone.Link) {
 	s.phone = l
 	l.SetSensorHandler(http.HandlerFunc(s.liveSample))
+	l.SetFrameHandler(http.HandlerFunc(s.opticalFrame))
 }
 
 func (s *Server) phoneInfo(w http.ResponseWriter, r *http.Request) {

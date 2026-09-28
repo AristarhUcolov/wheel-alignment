@@ -7,6 +7,7 @@ import { t } from '../i18n.js';
 import { go } from '../app.js';
 
 let tab = 'calib';
+let livePoll = null;
 
 export function render(body) {
   body.append(h(`<div class="panel">
@@ -15,6 +16,7 @@ export function render(body) {
       <button class="tab" data-tab="calib">${t('1. Калибровка камеры')}</button>
       <button class="tab" data-tab="camber">${t('2. Развал по фото')}</button>
       <button class="tab" data-tab="full">${t('3. Полный замер')}</button>
+      <button class="tab" data-tab="livecam">${t('4. Живой режим')}</button>
     </div>
     <div id="oBody"></div>
   </div>`));
@@ -26,7 +28,8 @@ function draw(body) {
   $$('#oTabs .tab', body).forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   const box = $('#oBody', body);
   box.innerHTML = '';
-  ({ calib, camber, full })[tab](box);
+  clearInterval(livePoll);
+  ({ calib, camber, full, livecam })[tab](box);
 }
 
 function fileZone(label, multiple = true, accept = 'image/png,image/jpeg') {
@@ -240,4 +243,81 @@ function full(box) {
       btn.disabled = false;
     }
   };
+}
+
+// ── Живой режим ──────────────────────────────────────────────────────
+// Телефон на штативе смотрит на колесо и мишень на полу и шлёт кадры по
+// Wi-Fi; каждый кадр обновляет угол на экране регулировки. Здесь — настройка
+// мишеней и состояние: какая камера откалибрована, у каких колёс учтено
+// биение, какие колёса уже видны.
+
+function livecam(box) {
+  box.append(h(`<div>
+    <div class="note">${t('Как на профессиональном 3D-стенде: сначала один раз учитывается биение каждого колеса, потом телефон на штативе смотрит на колесо — и развал со схождением меняются на экране регулировки 3–4 раза в секунду, пока вы крутите тягу.')}</div>
+    <ol class="steps" style="margin-top:12px">
+      <li><b>${t('Включите телефон по Wi-Fi')}</b><div>${t('«Замер → Телефон на колесе», отсканируйте код, на телефоне нажмите «Телефон как камера».')}</div></li>
+      <li><b>${t('Калибровка камеры')}</b><div>${t('Один раз для телефона. Показывайте ему мишень с колеса под разными углами и в разных частях кадра, пока полоска не заполнится. Телефон держите горизонтально — и так же потом при замере.')}</div></li>
+      <li><b>${t('Биение каждого колеса')}</b><div>${t('Вывесите колесо, выберите его на телефоне, режим «Биение», и медленно проверните колесо рукой на четверть оборота и больше. Мишень на колесе и мишень на полу должны быть в кадре.')}</div></li>
+      <li><b>${t('Связь напольных мишеней')}</b><div>${t('Если мишеней на полу две — в режиме «Замер» снимите с поднятых рук два-три кадра, где видны обе.')}</div></li>
+      <li><b>${t('Замер')}</b><div>${t('Машина стоит на месте. Покажите камере по очереди все четыре колеса — после этого появится схождение. Дальше ставьте телефон у колеса, которое регулируете.')}</div></li>
+    </ol>
+    <h3>${t('Мишени')}</h3>
+    <div class="cols3">
+      <label class="f">${t('Мишень на колесе: углы × углы × клетка, мм')}
+        <span class="row" style="gap:6px"><input type="number" id="lwC" style="width:70px"><input type="number" id="lwR" style="width:70px"><input type="number" id="lwS" step="0.1" style="width:90px"></span></label>
+      <label class="f">${t('Передняя')}<span class="row" style="gap:6px"><input type="number" id="l0C" style="width:70px"><input type="number" id="l0R" style="width:70px"><input type="number" id="l0S" step="0.1" style="width:90px"></span></label>
+      <label class="f">${t('Задняя')}<span class="row" style="gap:6px"><input type="number" id="l1C" style="width:70px"><input type="number" id="l1R" style="width:70px"><input type="number" id="l1S" step="0.1" style="width:90px"></span></label>
+    </div>
+    <div class="actions"><button class="btn" id="lSave">${t('Сохранить размеры мишеней')}</button>
+      <button class="btn danger" id="lReset">${t('Начать заново (другая машина)')}</button></div>
+    <h3>${t('Колёса')}</h3>
+    <div id="lWheels"></div>
+    <h3>${t('Камеры')}</h3>
+    <div id="lCams"></div>
+  </div>`));
+
+  let filled = false;
+  const fill = st => {
+    const set = (id, v) => { $(id, box).value = v; };
+    set('#lwC', st.wheel_target.cols); set('#lwR', st.wheel_target.rows); set('#lwS', st.wheel_target.square_mm);
+    const r0 = st.refs[0] || {}, r1 = st.refs[1] || {};
+    set('#l0C', r0.cols || ''); set('#l0R', r0.rows || ''); set('#l0S', r0.square_mm || '');
+    set('#l1C', r1.cols || ''); set('#l1R', r1.rows || ''); set('#l1S', r1.square_mm || '');
+  };
+  const draw = st => {
+    if (!filled) { fill(st); filled = true; }
+    const linked = new Set(st.linked);
+    const rows = WHEELS.map(w => {
+      const x = st.wheels[w.key] || {};
+      const spin = x.clamped ? `<span class="yes">${t('учтено, перекос {v}°', { v: x.runout_deg.toFixed(1) })}</span>`
+        : x.spin_deg ? t('проворот {v}°', { v: Math.round(x.spin_deg) }) : `<span class="no">${t('нужно')}</span>`;
+      const seen = x.seen_ago_s === undefined ? '—'
+        : x.seen_ago_s < 3 ? `<span class="yes">${t('сейчас')}</span>` : t('{s} с назад', { s: Math.round(x.seen_ago_s) });
+      return `<tr><td>${w.name}</td><td>${spin}</td><td>${seen}</td><td class="v">${x.camber === undefined ? '—' : fmtDM(x.camber)}</td></tr>`;
+    }).join('');
+    $('#lWheels', box).innerHTML = `<table class="params"><thead><tr><th>${t('Колесо')}</th><th>${t('Биение')}</th><th>${t('Видно')}</th><th>${t('Развал')}</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="muted" style="font-size:13px">${st.refs.length > 1
+        ? (linked.size > 1 ? t('Напольные мишени связаны.') : t('Напольные мишени ещё не связаны: нужен кадр, где видны обе.'))
+        : ''}</p>`;
+    $('#lCams', box).innerHTML = st.cameras.length
+      ? `<table class="params"><tbody>${st.cameras.map(c => `<tr><td>${esc(c.name)}</td><td>${esc(c.size)}</td>
+          <td class="v">${t('СКО {v} пикс', { v: c.rms_px.toFixed(2) })}</td>
+          <td style="width:1%"><button class="btn small" data-forget-cam="${esc(c.id)}">${t('Забыть')}</button></td></tr>`).join('')}</tbody></table>`
+      : `<p class="muted">${t('Пока ни одной: откалибруйте камеру телефона в режиме «Калибровка камеры».')}</p>`;
+    box.querySelectorAll('[data-forget-cam]').forEach(b => b.onclick = () => post({ forget_camera: b.dataset.forgetCam }));
+  };
+  const load = () => api('/api/optical/live').then(draw).catch(() => {});
+  const post = body => api('/api/optical/live', { method: 'POST', body }).then(draw).catch(e => toast(e.message, true));
+
+  $('#lSave', box).onclick = () => {
+    const n = id => Number($(id, box).value);
+    const refs = [{ cols: n('#l0C'), rows: n('#l0R'), square_mm: n('#l0S') }];
+    if (n('#l1C') && n('#l1R') && n('#l1S')) refs.push({ cols: n('#l1C'), rows: n('#l1R'), square_mm: n('#l1S') });
+    post({ wheel_target: { cols: n('#lwC'), rows: n('#lwR'), square_mm: n('#lwS') }, refs, rim_in: state.session ? state.session.rim_diameter_in : 15 });
+  };
+  $('#lReset', box).onclick = () => {
+    if (confirm(t('Забыть биение колёс, связь мишеней и увиденные колёса? Калибровка камер сохранится.'))) post({ reset: true });
+  };
+  load();
+  livePoll = setInterval(() => { if (document.body.contains(box)) load(); else clearInterval(livePoll); }, 1500);
 }

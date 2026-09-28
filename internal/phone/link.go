@@ -39,6 +39,7 @@ type Link struct {
 	dir  string
 	now  func() time.Time
 	sens http.Handler
+	cam  http.Handler
 
 	mu      sync.Mutex
 	enabled bool
@@ -68,6 +69,9 @@ func NewLink(hub *live.Hub, dir string) *Link {
 // SetSensorHandler lets DIY sensor heads on the network use the same address
 // as the phones, with the open sensor protocol.
 func (l *Link) SetSensorHandler(h http.Handler) { l.sens = h }
+
+// SetFrameHandler receives camera frames from phones used as a camera.
+func (l *Link) SetFrameHandler(h http.Handler) { l.cam = h }
 
 // Enabled reports whether phones can connect.
 func (l *Link) Enabled() bool {
@@ -271,6 +275,20 @@ func (l *Link) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /p/{token}", l.page)
 	mux.HandleFunc("POST /p/{token}/data", l.data)
+	mux.HandleFunc("POST /p/{token}/frame", func(w http.ResponseWriter, r *http.Request) {
+		if !l.authorised(r) || l.cam == nil {
+			http.NotFound(w, r)
+			return
+		}
+		l.mu.Lock()
+		_, blocked := l.blocked[sanitizeID(r.URL.Query().Get("d"))]
+		l.mu.Unlock()
+		if blocked {
+			http.Error(w, ErrForgotten.Error(), http.StatusGone)
+			return
+		}
+		l.cam.ServeHTTP(w, r)
+	})
 	mux.HandleFunc("POST /p/{token}/sample", func(w http.ResponseWriter, r *http.Request) {
 		if !l.authorised(r) || l.sens == nil {
 			http.NotFound(w, r)

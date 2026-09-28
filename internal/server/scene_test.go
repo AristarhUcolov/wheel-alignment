@@ -25,7 +25,14 @@ type sceneBoard struct {
 // the fixed floor reference have to be readable together.
 func renderScenePNG(t *testing.T, cam vision.Camera, boards []sceneBoard, noise float64, rng *rand.Rand) []byte {
 	t.Helper()
-	const bg, super = 0.45, 3
+	return renderScenePNGSuper(t, cam, boards, noise, rng, 3)
+}
+
+// renderScenePNGSuper is renderScenePNG with the supersampling chosen: 2 is
+// plenty for the live tests, which render many frames.
+func renderScenePNGSuper(t *testing.T, cam vision.Camera, boards []sceneBoard, noise float64, rng *rand.Rand, super int) []byte {
+	t.Helper()
+	const bg = 0.45
 	img := image.NewGray(image.Rect(0, 0, cam.Width, cam.Height))
 
 	type prep struct {
@@ -53,8 +60,8 @@ func renderScenePNG(t *testing.T, cam vision.Camera, boards []sceneBoard, noise 
 				for sx := 0; sx < super; sx++ {
 					// Gray.Sample places pixel (px,py)'s value AT (px,py), so the
 					// area it averages is centred there — hence the −0.5.
-					u := float64(px) - 0.5 + (float64(sx)+0.5)/super
-					v := float64(py) - 0.5 + (float64(sy)+0.5)/super
+					u := float64(px) - 0.5 + (float64(sx)+0.5)/float64(super)
+					v := float64(py) - 0.5 + (float64(sy)+0.5)/float64(super)
 					d := cam.Ray(vision.Point2{X: u, Y: v})
 
 					best, bestT := -1, math.Inf(1)
@@ -88,7 +95,7 @@ func renderScenePNG(t *testing.T, cam vision.Camera, boards []sceneBoard, noise 
 					}
 				}
 			}
-			val := sum/(super*super) + rng.NormFloat64()*noise
+			val := sum/float64(super*super) + rng.NormFloat64()*noise
 			img.SetGray(px, py, color.Gray{Y: uint8(math.Max(0, math.Min(255, val*255)))})
 		}
 	}

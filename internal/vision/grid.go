@@ -30,12 +30,80 @@ type cell struct{ i, j int }
 // lattice is a partially grown grid.
 type lattice struct {
 	pts   []Point2
+	idx   *pointIndex
 	at    map[cell]int // lattice coordinate → index into pts
-	taken map[int]bool // which detections are already placed
+	taken []bool       // which detections are already placed
 }
 
-func newLattice(pts []Point2) *lattice {
-	return &lattice{pts: pts, at: map[cell]int{}, taken: map[int]bool{}}
+func newLattice(pts []Point2, idx *pointIndex) *lattice {
+	return &lattice{pts: pts, idx: idx, at: map[cell]int{}, taken: make([]bool, len(pts))}
+}
+
+// pointIndex buckets the detections on a square grid, so that "the nearest
+// unused detection within tol of here" looks at a few buckets instead of every
+// point. Growth asks that question for every frontier cell of every seed, and
+// with a linear scan it was most of the time spent on a frame — the difference
+// between a live camera and one frame a second.
+type pointIndex struct {
+	pts        []Point2
+	size       float64
+	minX, minY float64
+	w, h       int
+	buckets    [][]int
+}
+
+func newPointIndex(pts []Point2, size float64) *pointIndex {
+	ix := &pointIndex{pts: pts, size: math.Max(size, 1)}
+	if len(pts) == 0 {
+		return ix
+	}
+	maxX, maxY := math.Inf(-1), math.Inf(-1)
+	ix.minX, ix.minY = math.Inf(1), math.Inf(1)
+	for _, p := range pts {
+		ix.minX, ix.minY = math.Min(ix.minX, p.X), math.Min(ix.minY, p.Y)
+		maxX, maxY = math.Max(maxX, p.X), math.Max(maxY, p.Y)
+	}
+	ix.w = int((maxX-ix.minX)/ix.size) + 1
+	ix.h = int((maxY-ix.minY)/ix.size) + 1
+	ix.buckets = make([][]int, ix.w*ix.h)
+	for i, p := range pts {
+		b := ix.bucket(p.X, p.Y)
+		ix.buckets[b] = append(ix.buckets[b], i)
+	}
+	return ix
+}
+
+func (ix *pointIndex) bucket(x, y float64) int {
+	bx := min(max(int((x-ix.minX)/ix.size), 0), ix.w-1)
+	by := min(max(int((y-ix.minY)/ix.size), 0), ix.h-1)
+	return by*ix.w + bx
+}
+
+// nearest returns the closest point to p within tol that skip does not
+// exclude, choosing the lowest index among equally near points — exactly what
+// a linear scan with a strict comparison would pick.
+func (ix *pointIndex) nearest(p Point2, tol float64, skip []bool) (int, float64) {
+	best, bestD := -1, math.Inf(1)
+	if ix.w == 0 {
+		return best, bestD
+	}
+	x0 := max(int(math.Floor((p.X-tol-ix.minX)/ix.size)), 0)
+	x1 := min(int(math.Floor((p.X+tol-ix.minX)/ix.size)), ix.w-1)
+	y0 := max(int(math.Floor((p.Y-tol-ix.minY)/ix.size)), 0)
+	y1 := min(int(math.Floor((p.Y+tol-ix.minY)/ix.size)), ix.h-1)
+	for by := y0; by <= y1; by++ {
+		for bx := x0; bx <= x1; bx++ {
+			for _, i := range ix.buckets[by*ix.w+bx] {
+				if skip[i] {
+					continue
+				}
+				if d := ix.pts[i].DistTo(p); d < bestD || (d == bestD && i < best) {
+					best, bestD = i, d
+				}
+			}
+		}
+	}
+	return best, bestD
 }
 
 func (l *lattice) point(c cell) (Point2, bool) {
@@ -72,6 +140,7 @@ func growGridQuads(pts []Point2, cols, rows int) [][4]Point2 {
 		return nil
 	}
 	nbrs := nearestLists(pts, 8)
+	idx := newPointIndex(pts, medianFirstNeighbour(pts, nbrs))
 
 	var quads [][4]Point2
 	seen := map[[4]Point2]bool{}
@@ -85,20 +154,33 @@ func growGridQuads(pts []Point2, cols, rows int) [][4]Point2 {
 	// Seeds are tried strongest-first — the input arrives ordered by response.
 	// An exact-size lattice is the clean case and comes first; windows of a
 	// larger lattice are the fallback for when growth overran.
+	//
+	// A seed that already sits inside a lattice which yielded an outline is
+	// skipped: growing from it again finds the same lattice. Every basis of the
+	// first seed on a board is still tried, so this changes how often the work
+	// is repeated, not what is found — and it is most of the time on a frame.
+	covered := make([]bool, len(pts))
 	for s := range pts {
-		if len(nbrs[s]) < 4 {
+		if len(nbrs[s]) < 4 || covered[s] {
 			continue
 		}
 		for _, basis := range seedBases(pts, nbrs, s) {
-			l := newLattice(pts)
+			l := newLattice(pts, idx)
 			l.place(cell{0, 0}, s)
 			l.place(cell{1, 0}, basis[0])
 			l.place(cell{0, 1}, basis[1])
 			grow(l, nbrs)
 
-			add(latticeQuad(l, cols, rows))
-			for _, q := range windowQuads(l, cols, rows) {
+			q, ok := latticeQuad(l, cols, rows)
+			add(q, ok)
+			wins := windowQuads(l, cols, rows)
+			for _, q := range wins {
 				add(q, true)
+			}
+			if ok || len(wins) > 0 {
+				for _, i := range l.at {
+					covered[i] = true
+				}
 			}
 		}
 		if len(quads) > 24 {
@@ -106,6 +188,22 @@ func growGridQuads(pts []Point2, cols, rows int) [][4]Point2 {
 		}
 	}
 	return quads
+}
+
+// medianFirstNeighbour is the typical corner spacing, used as the index's
+// bucket size.
+func medianFirstNeighbour(pts []Point2, nbrs [][]int) float64 {
+	var ds []float64
+	for i, n := range nbrs {
+		if len(n) > 0 {
+			ds = append(ds, pts[i].DistTo(pts[n[0]]))
+		}
+	}
+	if len(ds) == 0 {
+		return 1
+	}
+	sort.Float64s(ds)
+	return ds[len(ds)/2]
 }
 
 // nearestLists returns each point's k nearest neighbours, closest first.
@@ -235,15 +333,7 @@ func (l *lattice) tryFill(c cell) bool {
 	// lattice site is never a candidate.
 	tol := 0.34 * scale
 
-	best, bestD := -1, math.Inf(1)
-	for i, p := range l.pts {
-		if l.taken[i] {
-			continue
-		}
-		if d := p.DistTo(pred); d < bestD {
-			best, bestD = i, d
-		}
-	}
+	best, bestD := l.idx.nearest(pred, tol, l.taken)
 	if best < 0 || bestD > tol {
 		return false
 	}

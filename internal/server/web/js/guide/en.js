@@ -151,8 +151,12 @@ export default {
   <li><b>Caster:</b> wheels on turn plates, the “Caster” button on the phone. It asks you to set the wheel straight, steer
     out about 20°, then in — it measures the steer angle with its gyroscope.</li>
 </ol>
-<p class="muted">The phone does not measure toe. Combine: camber and caster by phone, toe by string. Two phones measure two
-  wheels at once, four — all four. When you are done, switch Wi-Fi access off.</p>`],
+<p class="muted">A phone held to the rim does not measure toe: toe is a rotation of the wheel about the vertical, and the
+  accelerometer senses only tilt — gravity does not change under such a rotation. The gyroscope does sense it, but drifts —
+  within a minute by more than the whole toe tolerance. So take toe by string or by camera: the same phone on a tripod
+  works as a camera in live mode (see “Camera and targets”). Two phones on the wheels measure two wheels at once, four —
+  all four. When you are done, switch Wi-Fi access off. A phone connected by mistake is removed with “Disconnect” in the
+  list.</p>`],
 
 ['optical', 'Measuring: camera and targets', `
 <p>A printed chessboard on a rigid sheet can be fixed to the wheel as crookedly as you like — the program finds the wheel's
@@ -166,6 +170,17 @@ export default {
   <li><b>Full measurement:</b> every frame must show a floor target as well as the wheel target — it defines the road plane
     and ties the four wheels into one coordinate system. It gives camber, individual toe and the thrust angle. There are
     two floor targets (front and rear) of different sizes; photos showing both link them.</li>
+</ol>
+<p><b>Live mode</b> (tab “4. Live mode”) — as on a professional 3D aligner: a phone on a tripod watches the wheel and the
+  floor target, and camber and toe update on the adjustment screen 3–4 times a second while you turn the tie rod. On the
+  phone — the “Phone as a camera” button:</p>
+<ol>
+  <li><b>Camera calibration</b> — once per phone: show it the wheel target at different angles and in different parts of the
+    frame until the bar fills. Hold the phone in landscape — and the same way later when measuring.</li>
+  <li><b>Runout</b> — for each wheel: lift it and slowly turn it by hand a quarter turn or more. The program remembers how
+    the wheel's axis sits relative to the target, and from then on a single frame is enough.</li>
+  <li><b>Measure</b> — car on the floor. Show the camera all four wheels in turn (and two or three frames showing both floor
+    targets), then toe appears. After that, put the phone by the wheel you are adjusting.</li>
 </ol>
 <p class="muted">Details, target sizes and photography tips are in OPTICAL.md in the repository.</p>`],
 

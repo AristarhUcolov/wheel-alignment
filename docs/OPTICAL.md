@@ -180,6 +180,58 @@ T_реп→колесо = (T_кам→реп)⁻¹ · T_кам→колесо
 ровно тот же `align.Result`, что и замер по струне: способ измерения до слоя
 отчёта не доходит.
 
+## Живой режим: телефон как камера
+
+Серия снимков отвечает на вопрос «где ось колеса» один раз. Для регулировки
+ответ нужен несколько раз в секунду, пока крутится тяга, — и задача делится
+надвое, как на коммерческом 3D-стенде:
+
+1. **Компенсация биения — один раз на установку мишени.** Колесо проворачивают,
+   ось вращения находят, но хранят её **в системе координат самой мишени**
+   (`vision.ClampCalibration`). Мишень зажата на ободе жёстко, поэтому то, как
+   ось стоит относительно мишени, — свойство этой установки и не меняется, пока
+   зажим не переставили.
+2. **Живые кадры.** Дальше хватает одного кадра: поза мишени переносит
+   запомненную ось в мир. Никакой серии, никакого проворота — кадр, ось, углы.
+
+Напольная мишень в том же кадре, как и при съёмке серией, делает камеру
+неважной: положение колеса относится к полу, и телефон на штативе можно задеть —
+показания не сдвинутся.
+
+**Калибровка — по видеокадрам, не по фото.** Приложение «Камера» на телефоне
+кадрирует и масштабирует снимок иначе, чем видеопоток, который отдаёт браузер,
+поэтому калибровка по фотографиям к видео не подходит. Телефон шлёт кадры, пока
+человек показывает мишень под разными углами; кадр засчитывается, только если
+ни один предыдущий не был в той же части изображения с похожим наклоном (±7°).
+Калибровка запоминается для телефона и действует только для того размера кадра,
+при котором сделана: повёрнутый вертикально телефон даёт кадр другой формы, и
+программа об этом говорит, а не считает с чужими параметрами.
+
+**Связь напольных мишеней усредняется.** Кадр, где видны обе мишени на полу,
+издалека и почти с ребра, — самое слабое измерение во всей цепочке, и ошибка его
+поворота поворачивает схождение обоих передних колёс на одну и ту же величину с
+разными знаками. Поэтому каждый такой кадр добавляется в среднее (до 30).
+
+**Скорость.** Распознавание двух мишеней в кадре 1280×720 занимало 1,15 с —
+почти всё время уходило на рост решётки: для каждой клетки фронта перебирались
+все найденные точки, и так от каждой затравки. Сетка-индекс для поиска
+ближайшей точки и пропуск затравок, уже лежащих в найденной решётке, дали
+**0,2 с на кадр** — 3–4 обновления в секунду вместе с передачей по Wi-Fi.
+Результаты распознавания при этом не изменились: все тесты детектора прежние.
+
+Сквозной тест `TestLiveCamera` проходит весь путь через HTTP так же, как телефон:
+биение каждого из четырёх колёс (мишени перекошены на 0,7–2,8°), три связующих
+кадра, по кадру на колесо, затем поворот тяги переднего левого колеса на 0,30°:
+
+```
+развал: ошибка до 0,03°; схождение: ошибка до 0,05°
+схождение переднего левого +0,164° → +0,442° при повороте на 0,30°
+калибровка по 15 видеокадрам: СКО 0,07 пикс, фокус в пределах 2 %
+```
+
+В интерфейсе: «Замер → Камера и мишени → 4. Живой режим», на телефоне — кнопка
+«Телефон как камера».
+
 ---
 ---
 
@@ -370,3 +422,57 @@ per wheel. The result is the usual report with the diagram, the table and the
 adjustment order, because an optical measurement yields exactly the same
 `align.Result` as a string measurement: the measuring method never reaches the
 report layer.
+
+## Live mode: the phone as a camera
+
+A photo series answers "where is the wheel's axis?" once. Adjusting needs the
+answer several times a second while a tie rod is turned, and that splits the
+problem in two, as on a commercial 3D aligner:
+
+1. **Runout compensation — once per clamping.** The wheel is turned and its axis
+   of rotation found, but kept **in the target's own frame**
+   (`vision.ClampCalibration`). The target is clamped rigidly to the rim, so
+   where the axis sits relative to it is a property of that clamping and does not
+   change until the clamp is moved.
+2. **Live frames.** From then on one frame is enough: the target's pose carries
+   the stored axis into the world. No series, no turning — one frame, one axis,
+   the angles.
+
+The floor target in the same frame makes the camera irrelevant, as with a photo
+series: the wheel is referred to the floor, so the phone on its tripod may be
+nudged without the reading moving.
+
+**Calibration from video frames, not photos.** A phone's camera app crops and
+scales pictures differently from the video stream a browser gets, so a
+calibration from photos does not fit the video. The phone streams frames while
+the person shows it the target at varied angles; a frame counts only if no
+earlier one had the target in the same part of the picture at a similar tilt
+(±7°). The calibration is kept per phone and applies only to the frame size it
+was made at: a phone turned upright gives a differently shaped frame, and the
+program says so rather than measuring with the wrong parameters.
+
+**The floor-target link is averaged.** A frame showing both floor targets, far
+away and nearly edge-on, is the weakest measurement in the whole chain, and its
+rotation error turns the toe of both front wheels by the same amount with
+opposite signs. So every such frame is added to an average (up to 30).
+
+**Speed.** Detecting two targets in a 1280×720 frame used to take 1.15 s — nearly
+all of it growing the lattice, where every frontier cell scanned every detected
+point, from every seed. A grid index for the nearest-point query and skipping
+seeds already inside a found lattice brought it to **0.2 s per frame** — 3–4
+updates a second including the Wi-Fi transfer. Detection results did not change:
+the detector's tests are the same as before.
+
+The end-to-end test `TestLiveCamera` goes the whole way over HTTP, as a phone
+does: runout compensation for all four wheels (targets clamped 0.7–2.8° askew),
+three link frames, one frame per wheel, then the front-left tie rod turned by
+0.30°:
+
+```
+camber: error up to 0.03°; toe: error up to 0.05°
+front-left toe +0.164° → +0.442° for a 0.30° turn
+calibration from 15 video frames: RMS 0.07 px, focal length within 2 %
+```
+
+In the interface: "Measurement → Camera and targets → 4. Live mode"; on the
+phone, the "Phone as a camera" button.

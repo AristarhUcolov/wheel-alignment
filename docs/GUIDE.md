@@ -116,7 +116,7 @@
 7. Прижмите телефон к планке экраном наружу — развал идёт на экран регулировки в реальном времени. Метка «стабильно» на телефоне означает, что можно записывать.
 8. **Кастер:** колёса на поворотных кругах, кнопка «Кастер» на телефоне. Телефон попросит поставить колесо прямо, повернуть наружу на ~20°, затем внутрь — угол поворота он меряет гироскопом сам.
 
-Схождение телефон не меряет. Сочетайте: развал и кастер — телефоном, схождение — струной. Два телефона — два колеса сразу, четыре — все четыре. Когда закончите, выключите доступ по Wi-Fi.
+Приложенный к ободу телефон схождение не меряет: схождение — это поворот колеса вокруг вертикали, а акселерометр чувствует только наклон, сила тяжести при таком повороте не меняется. Гироскоп поворот чувствует, но копит ошибку — за минуту больше, чем весь допуск на схождение. Поэтому схождение берите струной или камерой: тот же телефон, поставленный на штатив, работает камерой в живом режиме (раздел «Камера и мишени»). Два телефона на колёсах — два колеса сразу, четыре — все четыре. Когда закончите, выключите доступ по Wi-Fi. Телефон, подключённый по ошибке, отключается кнопкой «Отключить» в списке.
 
 <img src="img/phone.png" width="220" alt="Страница на телефоне">
 
@@ -129,6 +129,12 @@
 1. **Калибровка камеры** (один раз для каждой камеры и зума): 10–20 снимков шахматной доски под разными углами и во всех углах кадра. Размер клетки измерьте штангенциркулем по распечатке — принтеры масштабируют. Сохраните `camera.json`.
 2. **Развал по фото:** вывешенное колесо, мишень на диске, камера строго по уровню сбоку. 4–6 снимков, проворачивая колесо на 10–20° между кадрами.
 3. **Полный замер:** в каждый кадр вместе с мишенью на колесе должна попадать напольная мишень — она задаёт плоскость дороги и связывает четыре колеса в одну систему координат. Даёт развал, схождение каждого колеса и угол тяги. Мишеней на полу две (спереди и сзади), разного размера; их связывают снимки, где видны обе.
+
+**Живой режим** (вкладка «4. Живой режим») — как на профессиональном 3D-стенде: телефон на штативе смотрит на колесо и мишень на полу, и развал со схождением меняются на экране регулировки 3–4 раза в секунду, пока вы крутите тягу. На телефоне — кнопка «Телефон как камера»:
+
+1. **Калибровка камеры** — один раз для телефона: показывайте ему мишень с колеса под разными углами и в разных частях кадра, пока полоска не заполнится. Телефон держите горизонтально — и так же потом при замере.
+2. **Биение** — для каждого колеса: вывесите его и медленно проверните рукой на четверть оборота и больше. Программа запоминает, как ось колеса стоит относительно мишени, и дальше ей хватает одного кадра.
+3. **Замер** — машина на полу. Покажите камере по очереди все четыре колеса (и два-три кадра, где видны обе мишени на полу), после этого появится схождение. Дальше ставьте телефон у колеса, которое регулируете.
 
 Подробности, размеры мишеней и советы по съёмке — в файле OPTICAL.md в репозитории.
 
@@ -392,7 +398,7 @@ Every figure you enter goes straight to the adjustment screen. While working: tu
 7. Press the phone against the bar, screen facing out — camber flows to the adjustment screen in real time. The “steady” tag on the phone means the reading can be trusted.
 8. **Caster:** wheels on turn plates, the “Caster” button on the phone. It asks you to set the wheel straight, steer out about 20°, then in — it measures the steer angle with its gyroscope.
 
-The phone does not measure toe. Combine: camber and caster by phone, toe by string. Two phones measure two wheels at once, four — all four. When you are done, switch Wi-Fi access off.
+A phone held to the rim does not measure toe: toe is a rotation of the wheel about the vertical, and the accelerometer senses only tilt — gravity does not change under such a rotation. The gyroscope does sense it, but drifts — within a minute by more than the whole toe tolerance. So take toe by string or by camera: the same phone on a tripod works as a camera in live mode (see “Camera and targets”). Two phones on the wheels measure two wheels at once, four — all four. When you are done, switch Wi-Fi access off. A phone connected by mistake is removed with “Disconnect” in the list.
 
 <img src="img/phone.png" width="220" alt="The phone page">
 
@@ -405,6 +411,12 @@ A printed chessboard on a rigid sheet can be fixed to the wheel as crookedly as 
 1. **Camera calibration** (once per camera and zoom): 10–20 photos of a chessboard at different angles and in all corners of the frame. Measure the square size on the printout with calipers — printers scale. Save `camera.json`.
 2. **Camber from photos:** wheel lifted, target on the rim, camera strictly level at the side. 4–6 photos, turning the wheel 10–20° between them.
 3. **Full measurement:** every frame must show a floor target as well as the wheel target — it defines the road plane and ties the four wheels into one coordinate system. It gives camber, individual toe and the thrust angle. There are two floor targets (front and rear) of different sizes; photos showing both link them.
+
+**Live mode** (tab “4. Live mode”) — as on a professional 3D aligner: a phone on a tripod watches the wheel and the floor target, and camber and toe update on the adjustment screen 3–4 times a second while you turn the tie rod. On the phone — the “Phone as a camera” button:
+
+1. **Camera calibration** — once per phone: show it the wheel target at different angles and in different parts of the frame until the bar fills. Hold the phone in landscape — and the same way later when measuring.
+2. **Runout** — for each wheel: lift it and slowly turn it by hand a quarter turn or more. The program remembers how the wheel's axis sits relative to the target, and from then on a single frame is enough.
+3. **Measure** — car on the floor. Show the camera all four wheels in turn (and two or three frames showing both floor targets), then toe appears. After that, put the phone by the wheel you are adjusting.
 
 Details, target sizes and photography tips are in OPTICAL.md in the repository.
 

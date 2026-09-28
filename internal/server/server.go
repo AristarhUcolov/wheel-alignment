@@ -57,6 +57,8 @@ type Server struct {
 	sess  *session
 	phone *phone.Link
 
+	optLive *liveOptical
+
 	settingsPath string
 
 	stop context.CancelFunc
@@ -75,7 +77,8 @@ func New(db *specs.DB) (*Server, error) {
 		hub: hub, sim: live.NewSimulator(hub),
 		// 15" is a neutral default until a vehicle is chosen; every
 		// millimetre figure on screen is labelled with the rim it assumes.
-		sess: &session{rimIn: 15},
+		sess:    &session{rimIn: 15},
+		optLive: newLiveOptical(),
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	s.stop = cancel
@@ -96,6 +99,9 @@ func New(db *specs.DB) (*Server, error) {
 	s.mux.HandleFunc("POST /api/optical/calibrate", s.calibrate)
 	s.mux.HandleFunc("POST /api/optical/camber", s.opticalCamber)
 	s.mux.HandleFunc("POST /api/optical/align", s.opticalAlign)
+	s.mux.HandleFunc("POST /api/optical/frame", s.opticalFrame)
+	s.mux.HandleFunc("GET /api/optical/live", s.liveOpticalState)
+	s.mux.HandleFunc("POST /api/optical/live", s.setLiveOptical)
 	s.mux.HandleFunc("GET /api/demo", s.demo)
 
 	s.mux.HandleFunc("GET /api/session", s.getSession)
