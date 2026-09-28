@@ -132,9 +132,11 @@
 
 **Живой режим** (вкладка «4. Живой режим») — как на профессиональном 3D-стенде: телефон на штативе смотрит на колесо и мишень на полу, и развал со схождением меняются на экране регулировки 3–4 раза в секунду, пока вы крутите тягу. На телефоне — кнопка «Телефон как камера»:
 
-1. **Калибровка камеры** — один раз для телефона: показывайте ему мишень с колеса под разными углами и в разных частях кадра, пока полоска не заполнится. Телефон держите горизонтально — и так же потом при замере.
-2. **Биение** — для каждого колеса: вывесите его и медленно проверните рукой на четверть оборота и больше. Программа запоминает, как ось колеса стоит относительно мишени, и дальше ей хватает одного кадра.
-3. **Замер** — машина на полу. Покажите камере по очереди все четыре колеса (и два-три кадра, где видны обе мишени на полу), после этого появится схождение. Дальше ставьте телефон у колеса, которое регулируете.
+1. **Печать мишеней** — на вкладке «4. Живой режим», кнопки «PDF: мишени колёс» и «PDF: напольные мишени». Печатайте в масштабе 100 % и проверьте линейку 100 мм внизу листа. Наклейте мишени на жёсткий ровный лист (фанера, ДСП, композит). На каждом колесе своя мишень разного размера — программа сама узнаёт, какое колесо видит, выбирать его на телефоне не нужно. Напольные мишени большие: их удобнее заказать одним листом в типографии.
+2. **Калибровка камеры** — один раз для телефона: показывайте ему мишень с колеса под разными углами и в разных частях кадра, пока полоска не заполнится. Телефон держите горизонтально — и так же потом при замере.
+3. **Биение** — для каждого колеса: вывесите его и медленно проверните рукой на четверть оборота и больше. Программа запоминает, как ось колеса стоит относительно мишени, и дальше ей хватает одного кадра.
+4. **Замер** — машина на полу. Покажите камере по очереди все четыре колеса (и два-три кадра, где видны обе мишени на полу), после этого появится схождение. Дальше ставьте телефон у колеса, которое регулируете.
+5. **Кастер камерой** — передние колёса на поворотных кругах, педаль тормоза зажата упором, чтобы колесо не проворачивалось. Режим «Кастер камерой» на телефоне, медленно поверните руль на 15–20° в одну сторону, затем в другую. Программа найдёт ось поворота колеса и покажет кастер и поперечный наклон оси.
 
 Подробности, размеры мишеней и советы по съёмке — в файле OPTICAL.md в репозитории.
 
@@ -414,9 +416,11 @@ A printed chessboard on a rigid sheet can be fixed to the wheel as crookedly as 
 
 **Live mode** (tab “4. Live mode”) — as on a professional 3D aligner: a phone on a tripod watches the wheel and the floor target, and camber and toe update on the adjustment screen 3–4 times a second while you turn the tie rod. On the phone — the “Phone as a camera” button:
 
-1. **Camera calibration** — once per phone: show it the wheel target at different angles and in different parts of the frame until the bar fills. Hold the phone in landscape — and the same way later when measuring.
-2. **Runout** — for each wheel: lift it and slowly turn it by hand a quarter turn or more. The program remembers how the wheel's axis sits relative to the target, and from then on a single frame is enough.
-3. **Measure** — car on the floor. Show the camera all four wheels in turn (and two or three frames showing both floor targets), then toe appears. After that, put the phone by the wheel you are adjusting.
+1. **Print the targets** — on the “4. Live mode” tab, the “PDF: wheel targets” and “PDF: floor targets” buttons. Print at 100 % scale and check the 100 mm ruler at the bottom of the sheet. Glue the targets to a rigid flat board (plywood, chipboard, composite). Each wheel has its own target of a different size — the program recognises which wheel it sees, there is no need to choose it on the phone. The floor targets are large: it is easier to order them as one sheet from a print shop.
+2. **Camera calibration** — once per phone: show it the wheel target at different angles and in different parts of the frame until the bar fills. Hold the phone in landscape — and the same way later when measuring.
+3. **Runout** — for each wheel: lift it and slowly turn it by hand a quarter turn or more. The program remembers how the wheel's axis sits relative to the target, and from then on a single frame is enough.
+4. **Measure** — car on the floor. Show the camera all four wheels in turn (and two or three frames showing both floor targets), then toe appears. After that, put the phone by the wheel you are adjusting.
+5. **Caster by camera** — front wheels on turn plates, the brake pedal held down with a prop so the wheel cannot roll. “Caster by camera” mode on the phone, slowly steer 15–20° one way, then the other. The program finds the wheel's steering axis and shows caster and steering axis inclination.
 
 Details, target sizes and photography tips are in OPTICAL.md in the repository.
 

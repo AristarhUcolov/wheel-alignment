@@ -329,16 +329,38 @@ func init() {
 		"этот параметр в демонстрации не регулируется":  "this angle has no adjuster in the demonstration",
 	})
 
+	// Live camera: boards per wheel, caster, printing.
+	add(map[string]string{
+		"%s: кастер %+.2f°, поперечный наклон оси %.1f°. Верните колёса прямо.":                                                                    "%s: caster %+.2f°, steering axis inclination %.1f°. Return the wheels to straight ahead.",
+		"%s: поворачивайте руль в обе стороны — колесо повёрнуто от %+.0f° до %+.0f°, нужно хотя бы на %.0f° наружу и внутрь.":                     "%s: steer both ways — the wheel has turned from %+.0f° to %+.0f°, at least %.0f° out and in is needed.",
+		"%s: получился развал %.0f° — так колесо стоять не может. Проверьте, что мишени на полу лежат на полу, и что мишень колеса видна целиком.": "%s: the camber came out as %.0f° — no wheel stands like that. Check that the floor targets lie on the floor and that the wheel target is fully visible.",
+		"%s: развал %+.2f°.": "%s: camber %+.2f°.",
+		"Кастер меряется на передних колёсах — наведите камеру на переднее колесо.":                                             "Caster is measured on the front wheels — point the camera at a front wheel.",
+		"Колесо, похоже, проворачивалось при повороте руля (разброс %.0f мм) — зафиксируйте педаль тормоза упором и повторите.": "The wheel seems to have rolled while steering (scatter %.0f mm) — hold the brake pedal down with a prop and repeat.",
+		"Мишень на колесе не видна — наведите камеру на колесо.":                                                                "The wheel target is not visible — point the camera at a wheel.",
+		"Покажите камере целиком любую мишень с колеса.":                                                                        "Show the camera any wheel target in full.",
+		"Схождение появится, когда камера увидит все четыре колеса — осталось: %s.":                                             "Toe appears once the camera has seen all four wheels — still to go: %s.",
+		"клетка мишени больше листа — выберите лист больше или печать одним листом":                                             "the target's square is bigger than the sheet — choose a bigger sheet or print on one sheet",
+		"мишени на колёсах должны быть либо все одинаковые, либо все разные":                                                    "the wheel targets must be either all the same or all different",
+		"мишень %d×%d": "target %d×%d",
+		"мишень %s (%d×%d) помещается внутри мишени %s (%d×%d) — если часть второй закроет шина, программа примет её за первую. Возьмите размеры, где одна длиннее, а другая выше, например 11×4, 10×5, 9×6, 8×7.": "target %s (%d×%d) fits inside target %s (%d×%d) — if a tyre hides part of the second, the program takes it for the first. Choose sizes where one is longer and the other taller, e.g. 11×4, 10×5, 9×6, 8×7.",
+		"напольные мишени должны различаться размером": "the floor targets must differ in size",
+		"не выбрано ни одной мишени":                   "no target chosen",
+		"неизвестное колесо %q":                        "unknown wheel %q",
+		"Мишень":                                       "Target",
+		"Все четыре колеса":                            "All four wheels",
+		"Напольная передняя":                           "Floor, front",
+		"Напольная задняя":                             "Floor, rear",
+	})
+
 	// Live camera.
 	add(map[string]string{
 		"%s: биение учтено — мишень стоит с перекосом %.1f°. Опустите колесо, поставьте машину и переходите к замеру.": "%s: runout compensated — the target sits %.1f° askew. Lower the wheel, stand the car and go on to measuring.",
-		"%s: мишень на колесе не видна.":                                                               "%s: the wheel target is not visible.",
-		"%s: поворачивайте колесо — провёрнуто на %.0f° из %.0f°, кадров %d из %d.":                    "%s: keep turning the wheel — turned %.0f° of %.0f°, frames %d of %d.",
-		"%s: развал %+.2f°, схождение %+.2f°.":                                                         "%s: camber %+.2f°, toe %+.2f°.",
-		"%s: развал %+.2f°. Схождение появится, когда камера увидит все четыре колеса — осталось: %s.": "%s: camber %+.2f°. Toe appears once the camera has seen all four wheels — still to go: %s.",
-		"%s: сначала учтите биение — режим «Биение».":                                                  "%s: compensate the runout first — “Runout” mode.",
-		"%w: годных кадров %d — нужно минимум 3":                                                       "%w: %d usable frames — at least 3 are needed",
-		"Кадр принят (%d из %d). Меняйте наклон и ведите мишень по всем краям кадра.":                  "Frame accepted (%d of %d). Vary the tilt and move the target along every edge of the frame.",
+		"%s: поворачивайте колесо — провёрнуто на %.0f° из %.0f°, кадров %d из %d.":                                    "%s: keep turning the wheel — turned %.0f° of %.0f°, frames %d of %d.",
+		"%s: развал %+.2f°, схождение %+.2f°.":                                        "%s: camber %+.2f°, toe %+.2f°.",
+		"%s: сначала учтите биение — режим «Биение».":                                 "%s: compensate the runout first — “Runout” mode.",
+		"%w: годных кадров %d — нужно минимум 3":                                      "%w: %d usable frames — at least 3 are needed",
+		"Кадр принят (%d из %d). Меняйте наклон и ведите мишень по всем краям кадра.": "Frame accepted (%d of %d). Vary the tilt and move the target along every edge of the frame.",
 		"Камера": "Camera",
 		"Камера откалибрована для кадра %d×%d, а сейчас кадр %d×%d. Держите телефон так же, как при калибровке, или откалибруйте заново.":      "The camera was calibrated for a %d×%d frame, but this frame is %d×%d. Hold the phone the same way as during calibration, or calibrate again.",
 		"Камера откалибрована: СКО %.2f пикс по %d кадрам. Калибровка сохранена для этого телефона.":                                           "Camera calibrated: RMS %.2f px from %d frames. The calibration is saved for this phone.",

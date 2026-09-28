@@ -175,12 +175,20 @@ export default {
   floor target, and camber and toe update on the adjustment screen 3–4 times a second while you turn the tie rod. On the
   phone — the “Phone as a camera” button:</p>
 <ol>
+  <li><b>Print the targets</b> — on the “4. Live mode” tab, the “PDF: wheel targets” and “PDF: floor targets” buttons. Print
+    at 100 % scale and check the 100 mm ruler at the bottom of the sheet. Glue the targets to a rigid flat board (plywood,
+    chipboard, composite). Each wheel has its own target of a different size — the program recognises which wheel it sees,
+    there is no need to choose it on the phone. The floor targets are large: it is easier to order them as one sheet from a
+    print shop.</li>
   <li><b>Camera calibration</b> — once per phone: show it the wheel target at different angles and in different parts of the
     frame until the bar fills. Hold the phone in landscape — and the same way later when measuring.</li>
   <li><b>Runout</b> — for each wheel: lift it and slowly turn it by hand a quarter turn or more. The program remembers how
     the wheel's axis sits relative to the target, and from then on a single frame is enough.</li>
   <li><b>Measure</b> — car on the floor. Show the camera all four wheels in turn (and two or three frames showing both floor
     targets), then toe appears. After that, put the phone by the wheel you are adjusting.</li>
+  <li><b>Caster by camera</b> — front wheels on turn plates, the brake pedal held down with a prop so the wheel cannot
+    roll. “Caster by camera” mode on the phone, slowly steer 15–20° one way, then the other. The program finds the wheel's
+    steering axis and shows caster and steering axis inclination.</li>
 </ol>
 <p class="muted">Details, target sizes and photography tips are in OPTICAL.md in the repository.</p>`],
 

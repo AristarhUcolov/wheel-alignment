@@ -255,37 +255,73 @@ function livecam(box) {
   box.append(h(`<div>
     <div class="note">${t('Как на профессиональном 3D-стенде: сначала один раз учитывается биение каждого колеса, потом телефон на штативе смотрит на колесо — и развал со схождением меняются на экране регулировки 3–4 раза в секунду, пока вы крутите тягу.')}</div>
     <ol class="steps" style="margin-top:12px">
+      <li><b>${t('Напечатайте мишени')}</b><div>${t('Ниже — кнопка печати. На каждом колесе своя мишень: программа сама узнаёт, какое колесо видит. Проверьте линейку 100 мм на листе и наклейте мишени на жёсткий ровный лист.')}</div></li>
       <li><b>${t('Включите телефон по Wi-Fi')}</b><div>${t('«Замер → Телефон на колесе», отсканируйте код, на телефоне нажмите «Телефон как камера».')}</div></li>
       <li><b>${t('Калибровка камеры')}</b><div>${t('Один раз для телефона. Показывайте ему мишень с колеса под разными углами и в разных частях кадра, пока полоска не заполнится. Телефон держите горизонтально — и так же потом при замере.')}</div></li>
-      <li><b>${t('Биение каждого колеса')}</b><div>${t('Вывесите колесо, выберите его на телефоне, режим «Биение», и медленно проверните колесо рукой на четверть оборота и больше. Мишень на колесе и мишень на полу должны быть в кадре.')}</div></li>
+      <li><b>${t('Биение каждого колеса')}</b><div>${t('Вывесите колесо, режим «Биение», и медленно проверните колесо рукой на четверть оборота и больше. Мишень на колесе и мишень на полу должны быть в кадре.')}</div></li>
       <li><b>${t('Связь напольных мишеней')}</b><div>${t('Если мишеней на полу две — в режиме «Замер» снимите с поднятых рук два-три кадра, где видны обе.')}</div></li>
       <li><b>${t('Замер')}</b><div>${t('Машина стоит на месте. Покажите камере по очереди все четыре колеса — после этого появится схождение. Дальше ставьте телефон у колеса, которое регулируете.')}</div></li>
+      <li><b>${t('Кастер')}</b><div>${t('Передние колёса на поворотных кругах, педаль тормоза зажата упором. Режим «Кастер камерой»: медленно поверните руль на 15–20° в одну сторону, потом в другую.')}</div></li>
     </ol>
+
     <h3>${t('Мишени')}</h3>
-    <div class="cols3">
-      <label class="f">${t('Мишень на колесе: углы × углы × клетка, мм')}
-        <span class="row" style="gap:6px"><input type="number" id="lwC" style="width:70px"><input type="number" id="lwR" style="width:70px"><input type="number" id="lwS" step="0.1" style="width:90px"></span></label>
-      <label class="f">${t('Передняя')}<span class="row" style="gap:6px"><input type="number" id="l0C" style="width:70px"><input type="number" id="l0R" style="width:70px"><input type="number" id="l0S" step="0.1" style="width:90px"></span></label>
-      <label class="f">${t('Задняя')}<span class="row" style="gap:6px"><input type="number" id="l1C" style="width:70px"><input type="number" id="l1R" style="width:70px"><input type="number" id="l1S" step="0.1" style="width:90px"></span></label>
-    </div>
+    <div id="lTargets"></div>
     <div class="actions"><button class="btn" id="lSave">${t('Сохранить размеры мишеней')}</button>
+      <button class="btn" id="lOne">${t('Одна мишень на все колёса')}</button>
+      <button class="btn" id="lFour">${t('Разные мишени (по умолчанию)')}</button>
       <button class="btn danger" id="lReset">${t('Начать заново (другая машина)')}</button></div>
+    <p class="muted" id="lMode" style="font-size:13px"></p>
+
+    <h3>${t('Печать мишеней')}</h3>
+    <div class="row" style="gap:10px;align-items:flex-end;flex-wrap:wrap">
+      <label class="f" style="min-width:180px">${t('Бумага')}<select id="lPaper">
+        <option value="a4">A4</option><option value="a3">A3</option><option value="letter">Letter</option>
+        <option value="single">${t('Один лист по размеру мишени (типография, плоттер)')}</option></select></label>
+      <a class="btn primary" id="lPrintWheels" download="wheel-targets.pdf">${t('PDF: мишени колёс')}</a>
+      <a class="btn" id="lPrintFloor" download="floor-targets.pdf">${t('PDF: напольные мишени')}</a>
+    </div>
+    <div id="lPlan"></div>
+    <ul class="plain muted" style="font-size:13px;margin-top:8px">
+      <li>${t('Печатайте в масштабе 100 % («Фактический размер»), без «Вписать в страницу». Затем измерьте линейку внизу листа: ровно 100 мм. Если нет — принтер масштабирует, измерьте клетку штангенциркулем и впишите настоящий размер выше.')}</li>
+      <li>${t('Мишень должна быть плоской: наклейте на фанеру, ДСП, стекло или композитную панель. Изогнутая бумага даёт ошибку сильнее кривого крепления.')}</li>
+      <li>${t('Мишень из нескольких листов: обрежьте листы по меткам у краёв и сложите встык — узор продолжается с листа на лист. Напольную мишень проще заказать одним листом в типографии.')}</li>
+    </ul>
+
     <h3>${t('Колёса')}</h3>
     <div id="lWheels"></div>
     <h3>${t('Камеры')}</h3>
     <div id="lCams"></div>
   </div>`));
 
-  let filled = false;
-  const fill = st => {
-    const set = (id, v) => { $(id, box).value = v; };
-    set('#lwC', st.wheel_target.cols); set('#lwR', st.wheel_target.rows); set('#lwS', st.wheel_target.square_mm);
-    const r0 = st.refs[0] || {}, r1 = st.refs[1] || {};
-    set('#l0C', r0.cols || ''); set('#l0R', r0.rows || ''); set('#l0S', r0.square_mm || '');
-    set('#l1C', r1.cols || ''); set('#l1R', r1.rows || ''); set('#l1S', r1.square_mm || '');
+  let st = null, filled = false;
+  const inputs3 = (id, tg) => `<span class="row" style="gap:6px">
+    <input type="number" id="${id}C" value="${tg ? tg.cols : ''}" style="width:64px">
+    <input type="number" id="${id}R" value="${tg ? tg.rows : ''}" style="width:64px">
+    <input type="number" id="${id}S" value="${tg ? tg.square_mm : ''}" step="0.1" style="width:80px"></span>`;
+  const readT = id => ({ cols: Number($(`#${id}C`, box).value), rows: Number($(`#${id}R`, box).value), square_mm: Number($(`#${id}S`, box).value) });
+  const fill = () => {
+    const wheels = WHEELS.map(w => `<label class="f">${w.name}: ${t('углы × углы × клетка, мм')}${inputs3('lw' + w.key, st.wheel_targets[w.key])}</label>`).join('');
+    const r0 = st.refs[0], r1 = st.refs[1];
+    $('#lTargets', box).innerHTML = `<div class="cols3">${wheels}
+      <label class="f">${t('Напольная передняя')}${inputs3('l0', r0)}</label>
+      <label class="f">${t('Напольная задняя')}${inputs3('l1', r1)}</label></div>`;
   };
-  const draw = st => {
-    if (!filled) { fill(st); filled = true; }
+  const planLink = () => {
+    const paper = $('#lPaper', box).value;
+    $('#lPrintWheels', box).href = `/api/targets/pdf?which=wheels&paper=${paper}`;
+    $('#lPrintFloor', box).href = `/api/targets/pdf?which=floor&paper=${paper}`;
+    api(`/api/targets/plan?paper=${paper}`).then(plans => {
+      $('#lPlan', box).innerHTML = `<table class="params" style="margin-top:8px"><thead><tr><th>${t('Мишень')}</th><th>${t('Размер')}</th><th>${t('Листов')}</th></tr></thead><tbody>
+        ${plans.map(pl => `<tr><td>${esc(pl.name || pl.label)}</td><td>${pl.target.cols}×${pl.target.rows}, ${pl.target.square_mm} ${t('мм')} — ${Math.round(pl.plan.board_w_mm)}×${Math.round(pl.plan.board_h_mm)} ${t('мм')}</td>
+          <td class="v">${pl.error ? `<span class="no">${esc(pl.error)}</span>` : pl.plan.pages}</td></tr>`).join('')}</tbody></table>`;
+    }).catch(() => {});
+  };
+  const draw = s2 => {
+    st = s2;
+    if (!filled) { fill(); filled = true; }
+    $('#lMode', box).textContent = st.distinct
+      ? t('Мишени на колёсах разные — программа сама узнаёт колесо по мишени.')
+      : t('На всех колёсах одна и та же мишень — на телефоне выбирайте, какое колесо он видит.');
     const linked = new Set(st.linked);
     const rows = WHEELS.map(w => {
       const x = st.wheels[w.key] || {};
@@ -293,9 +329,10 @@ function livecam(box) {
         : x.spin_deg ? t('проворот {v}°', { v: Math.round(x.spin_deg) }) : `<span class="no">${t('нужно')}</span>`;
       const seen = x.seen_ago_s === undefined ? '—'
         : x.seen_ago_s < 3 ? `<span class="yes">${t('сейчас')}</span>` : t('{s} с назад', { s: Math.round(x.seen_ago_s) });
-      return `<tr><td>${w.name}</td><td>${spin}</td><td>${seen}</td><td class="v">${x.camber === undefined ? '—' : fmtDM(x.camber)}</td></tr>`;
+      const caster = x.caster === undefined ? '—' : `${fmtDM(x.caster)}<br><span class="dim" style="font-size:12px">SAI ${fmtDM(x.sai)}</span>`;
+      return `<tr><td>${w.name}</td><td>${spin}</td><td>${seen}</td><td class="v">${x.camber === undefined ? '—' : fmtDM(x.camber)}</td><td class="v">${w.front ? caster : ''}</td></tr>`;
     }).join('');
-    $('#lWheels', box).innerHTML = `<table class="params"><thead><tr><th>${t('Колесо')}</th><th>${t('Биение')}</th><th>${t('Видно')}</th><th>${t('Развал')}</th></tr></thead><tbody>${rows}</tbody></table>
+    $('#lWheels', box).innerHTML = `<table class="params"><thead><tr><th>${t('Колесо')}</th><th>${t('Биение')}</th><th>${t('Видно')}</th><th>${t('Развал')}</th><th>${t('Кастер')}</th></tr></thead><tbody>${rows}</tbody></table>
       <p class="muted" style="font-size:13px">${st.refs.length > 1
         ? (linked.size > 1 ? t('Напольные мишени связаны.') : t('Напольные мишени ещё не связаны: нужен кадр, где видны обе.'))
         : ''}</p>`;
@@ -307,17 +344,25 @@ function livecam(box) {
     box.querySelectorAll('[data-forget-cam]').forEach(b => b.onclick = () => post({ forget_camera: b.dataset.forgetCam }));
   };
   const load = () => api('/api/optical/live').then(draw).catch(() => {});
-  const post = body => api('/api/optical/live', { method: 'POST', body }).then(draw).catch(e => toast(e.message, true));
+  const post = body => api('/api/optical/live', { method: 'POST', body })
+    .then(s2 => { filled = false; draw(s2); planLink(); }).catch(e => toast(e.message, true));
 
   $('#lSave', box).onclick = () => {
-    const n = id => Number($(id, box).value);
-    const refs = [{ cols: n('#l0C'), rows: n('#l0R'), square_mm: n('#l0S') }];
-    if (n('#l1C') && n('#l1R') && n('#l1S')) refs.push({ cols: n('#l1C'), rows: n('#l1R'), square_mm: n('#l1S') });
-    post({ wheel_target: { cols: n('#lwC'), rows: n('#lwR'), square_mm: n('#lwS') }, refs, rim_in: state.session ? state.session.rim_diameter_in : 15 });
+    const wheel_targets = Object.fromEntries(WHEELS.map(w => [w.key, readT('lw' + w.key)]));
+    const refs = [readT('l0')];
+    const r1 = readT('l1');
+    if (r1.cols && r1.rows && r1.square_mm) refs.push(r1);
+    post({ wheel_targets, refs, rim_in: state.session ? state.session.rim_diameter_in : 15 });
   };
+  $('#lOne', box).onclick = () => post({ wheel_target: { cols: 8, rows: 5, square_mm: 25 } });
+  $('#lFour', box).onclick = () => post({ wheel_targets: {
+    FL: { cols: 11, rows: 4, square_mm: 22 }, FR: { cols: 10, rows: 5, square_mm: 24 },
+    RL: { cols: 9, rows: 6, square_mm: 24 }, RR: { cols: 8, rows: 7, square_mm: 21 } } });
   $('#lReset', box).onclick = () => {
     if (confirm(t('Забыть биение колёс, связь мишеней и увиденные колёса? Калибровка камер сохранится.'))) post({ reset: true });
   };
+  $('#lPaper', box).onchange = planLink;
   load();
+  planLink();
   livePoll = setInterval(() => { if (document.body.contains(box)) load(); else clearInterval(livePoll); }, 1500);
 }

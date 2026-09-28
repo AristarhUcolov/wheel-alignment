@@ -96,38 +96,49 @@ func (c ClampCalibration) Place(target geom.Pose) (axis, center geom.Vec3) {
 	return target.R.MulVec(c.Axis).Unit(), target.Apply(c.Center)
 }
 
-// LiveFrame is what one image of a wheel and the floor says.
+// LiveFrame is what one image of the wheels and the floor says.
 type LiveFrame struct {
-	// Wheel is the wheel target's pose in the camera frame.
-	Wheel PnPResult
+	// Wheels holds the pose, in the camera frame, of every wheel target
+	// found — by index into the list of wheel targets searched for.
+	Wheels map[int]PnPResult
 	// Refs holds the pose of every floor target found, by index.
 	Refs map[int]PnPResult
-	// Ref is the floor target the wheel is referred to (the best-fitting of
-	// those found), or −1 when none was found.
+	// Ref is the best-fitting floor target found, or −1 when none was.
 	Ref int
-	// InRef is the wheel target in that floor target's frame.
-	InRef geom.Pose
+}
+
+// InRef is wheel target w in floor target r's frame.
+func (f LiveFrame) InRef(w, r int) geom.Pose {
+	return f.Refs[r].Pose.Inverse().Mul(f.Wheels[w].Pose)
 }
 
 // ErrNoWheelTarget is a frame without a readable wheel target.
 var ErrNoWheelTarget = i18n.Err("мишень на колесе не найдена в кадре")
 
-// DetectLive finds the wheel target and any floor targets in one image.
+// DetectLive finds wheel targets and floor targets in one image.
 //
-// Floor targets are reported even when the wheel target is missing: a frame
+// With a different target on each wheel the list holds all four, and which
+// were found says which wheels are in view — the camera needs no telling. The
+// layouts are chosen so that no board is a part of another, so a board half
+// hidden behind a tyre cannot pass for a different wheel's; and every wheel
+// board has more corners than a floor board, so it is found first and its
+// corners taken out before a floor board is looked for.
+//
+// Floor targets are reported even when no wheel target is found: a frame
 // showing two floor targets and no wheel is exactly how the floor targets get
-// tied to one another. The error then says the wheel was not found, and Refs
-// still holds what was.
-func DetectLive(cam Camera, wheel Target, refs []Target, img *Gray, opt DetectOptions) (LiveFrame, error) {
-	targets := append([]Target{wheel}, refs...)
+// tied to one another. The error then says no wheel was found, and Refs still
+// holds what was.
+func DetectLive(cam Camera, wheels, refs []Target, img *Gray, opt DetectOptions) (LiveFrame, error) {
+	targets := append(append([]Target{}, wheels...), refs...)
 	dets, errs := DetectBoards(img, targets, opt)
-	f := LiveFrame{Refs: map[int]PnPResult{}, Ref: -1}
+	f := LiveFrame{Wheels: map[int]PnPResult{}, Refs: map[int]PnPResult{}, Ref: -1}
 	best := math.Inf(1)
 	for i := range refs {
-		if errs[i+1] != nil {
+		k := len(wheels) + i
+		if errs[k] != nil {
 			continue
 		}
-		r, err := solveBoard(cam, refs[i], dets[i+1])
+		r, err := solveBoard(cam, refs[i], dets[k])
 		if err != nil {
 			continue
 		}
@@ -136,16 +147,25 @@ func DetectLive(cam Camera, wheel Target, refs []Target, img *Gray, opt DetectOp
 			best, f.Ref = r.RMSPx, i
 		}
 	}
-	if errs[0] != nil {
-		return f, fmt.Errorf("%w: %v", ErrNoWheelTarget, errs[0])
+	var firstErr error
+	for i := range wheels {
+		if errs[i] != nil {
+			if firstErr == nil {
+				firstErr = errs[i]
+			}
+			continue
+		}
+		w, err := solveBoard(cam, wheels[i], dets[i])
+		if err != nil {
+			if firstErr == nil {
+				firstErr = err
+			}
+			continue
+		}
+		f.Wheels[i] = w
 	}
-	w, err := solveBoard(cam, wheel, dets[0])
-	if err != nil {
-		return f, fmt.Errorf("%w: %v", ErrNoWheelTarget, err)
-	}
-	f.Wheel = w
-	if f.Ref >= 0 {
-		f.InRef = f.Refs[f.Ref].Pose.Inverse().Mul(w.Pose)
+	if len(f.Wheels) == 0 {
+		return f, fmt.Errorf("%w: %v", ErrNoWheelTarget, firstErr)
 	}
 	return f, nil
 }

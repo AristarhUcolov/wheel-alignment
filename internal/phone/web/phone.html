@@ -110,6 +110,7 @@
       <div class="camvals">
         <div><span class="mid" id="camCamber">—</span><small data-t>развал</small></div>
         <div><span class="mid" id="camToe">—</span><small data-t>схождение</small></div>
+        <div id="camCasterBox" class="hide"><span class="mid" id="camCaster">—</span><small data-t>кастер</small></div>
       </div>
       <div class="prompt" id="camMsg" data-t>Сначала один раз откалибруйте камеру, затем учтите биение каждого колеса, затем включайте замер.</div>
       <div class="bar"><div id="camBar"></div></div>
@@ -119,6 +120,7 @@
       <button data-cmode="calib" data-t>Калибровка камеры</button>
       <button data-cmode="spin" data-t>Биение</button>
       <button data-cmode="live" class="primary" data-t>Замер</button>
+      <button data-cmode="caster" data-t>Кастер камерой</button>
       <button id="camStop" data-t>Стоп</button>
       <button id="camWheelBtn" data-t>Другое колесо</button>
       <button id="camBack" data-t>Датчик наклона</button>
@@ -179,11 +181,13 @@ const EN = {
   "Держите телефон горизонтально — так же, как при калибровке. Для замера поставьте его на штатив или опору так, чтобы в кадре были мишень на колесе и мишень на полу.": "Hold the phone in landscape — the same way as during calibration. For measuring, put it on a tripod or a support so that the wheel target and the floor target are both in the frame.",
   "Браузер не даёт доступа к камере на этой странице. Откройте её в Chrome (Android) или Safari (iPhone).": "The browser does not give this page access to the camera. Open it in Chrome (Android) or Safari (iPhone).",
   "Не удалось включить камеру:": "Could not start the camera:",
-  "Для биения и замера выберите колесо.": "Choose the wheel for runout and measuring.",
   "Показывайте мишень с колеса под разными углами и в разных частях кадра.": "Show the wheel target at different angles and in different parts of the frame.",
   "Вывесите колесо и медленно поворачивайте его рукой; мишень на колесе и на полу — в кадре.": "Lift the wheel and turn it slowly by hand; keep the wheel target and the floor target in the frame.",
   "Камера смотрит на колесо — показания идут на экран регулировки.": "The camera is watching the wheel — readings go to the adjustment screen.",
-  "Остановлено.": "Stopped."
+  "Остановлено.": "Stopped.",
+  "кастер": "caster",
+  "Кастер камерой": "Caster by camera",
+  "Колёса на поворотных кругах, педаль тормоза зажата упором. Медленно поворачивайте руль на 15–20° в одну сторону, затем в другую.": "Wheels on turn plates, brake pedal held down with a prop. Slowly steer 15–20° one way, then the other."
 };
 // end EN
 let lang = document.documentElement.lang === 'en' ? 'en' : 'ru';
@@ -414,12 +418,12 @@ function closeCamera() {
   camStream = null;
 }
 function setCamMode(m) {
-  if (m && m !== 'calib' && !wheel) { camMsg(tr('Для биения и замера выберите колесо.')); show('pick'); return; }
   camMode = m;
   document.querySelectorAll('[data-cmode]').forEach(b => b.classList.toggle('on', b.dataset.cmode === m));
   if (m === 'calib') camMsg(tr('Показывайте мишень с колеса под разными углами и в разных частях кадра.'));
   if (m === 'spin') camMsg(tr('Вывесите колесо и медленно поворачивайте его рукой; мишень на колесе и на полу — в кадре.'));
   if (m === 'live') camMsg(tr('Камера смотрит на колесо — показания идут на экран регулировки.'));
+  if (m === 'caster') camMsg(tr('Колёса на поворотных кругах, педаль тормоза зажата упором. Медленно поворачивайте руль на 15–20° в одну сторону, затем в другую.'));
   if (!m) camMsg(tr('Остановлено.'));
   if (m && !camLoopOn) camLoop();
 }
@@ -437,11 +441,19 @@ async function camLoop() {
     const blob = await new Promise(r => cvs.toBlob(r, 'image/jpeg', 0.9));
     const mode = camMode;
     try {
-      const q = new URLSearchParams({ d: id, mode, wheel, name: deviceName() });
+      const q = new URLSearchParams({ d: id, mode, name: deviceName() });
+      if (wheel) q.set('wheel', wheel);
       const r = await fetch(`/p/${token}/frame?` + q, { method: 'POST', headers: { 'Content-Type': 'image/jpeg' }, body: blob });
       if (r.status === 410) { closeCamera(); disconnected(await r.text()); break; }
       if (r.status === 404) { conn(false, tr('ссылка устарела — отсканируйте код заново')); await sleep(1500); continue; }
-      if (!r.ok) { camMsg((await r.text()).trim()); await sleep(1000); continue; }
+      if (!r.ok) {
+        const why = (await r.text()).trim();
+        // With one board on every wheel the computer needs to be told which.
+        if (r.status === 400 && !wheel) { setCamMode(''); camMsg(why); show('pick'); break; }
+        camMsg(why);
+        await sleep(1000);
+        continue;
+      }
       conn(true);
       if (mode === camMode) renderCam(await r.json());
     } catch {
@@ -464,6 +476,13 @@ function renderCam(st) {
   $('#camBar').style.width = Math.round((st.progress || 0) * 100) + '%';
   $('#camCamber').textContent = st.camber === undefined || st.camber === null ? '—' : dm(st.camber);
   $('#camToe').textContent = st.toe === undefined || st.toe === null ? '—' : dm(st.toe);
+  const hasCaster = st.caster !== undefined && st.caster !== null;
+  $('#camCasterBox').classList.toggle('hide', !hasCaster);
+  if (hasCaster) $('#camCaster').textContent = dm(st.caster);
+  if (st.wheel) {
+    const b = document.querySelector(`[data-w="${st.wheel}"]`);
+    if (b) $('#camWheel').textContent = b.textContent;
+  }
   if (st.done && camMode !== 'live') {
     if (navigator.vibrate) navigator.vibrate(200);
     camMode = '';

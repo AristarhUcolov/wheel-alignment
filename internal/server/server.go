@@ -102,6 +102,8 @@ func New(db *specs.DB) (*Server, error) {
 	s.mux.HandleFunc("POST /api/optical/frame", s.opticalFrame)
 	s.mux.HandleFunc("GET /api/optical/live", s.liveOpticalState)
 	s.mux.HandleFunc("POST /api/optical/live", s.setLiveOptical)
+	s.mux.HandleFunc("GET /api/targets/pdf", s.targetsPDF)
+	s.mux.HandleFunc("GET /api/targets/plan", s.targetsPlan)
 	s.mux.HandleFunc("GET /api/demo", s.demo)
 
 	s.mux.HandleFunc("GET /api/session", s.getSession)

@@ -219,18 +219,56 @@ T_реп→колесо = (T_кам→реп)⁻¹ · T_кам→колесо
 **0,2 с на кадр** — 3–4 обновления в секунду вместе с передачей по Wi-Fi.
 Результаты распознавания при этом не изменились: все тесты детектора прежние.
 
-Сквозной тест `TestLiveCamera` проходит весь путь через HTTP так же, как телефон:
-биение каждого из четырёх колёс (мишени перекошены на 0,7–2,8°), три связующих
-кадра, по кадру на колесо, затем поворот тяги переднего левого колеса на 0,30°:
+**Своя мишень на каждом колесе.** По умолчанию на колёсах четыре разные доски
+(в углах × углах × клетке): переднее левое 11 × 4 × 22 мм, переднее правое
+10 × 5 × 24 мм, заднее левое 9 × 6 × 24 мм, заднее правое 8 × 7 × 21 мм; на
+полу — 7 × 6 и 6 × 5 по 100 мм. Размеры подобраны так, что ни одна решётка
+углов не помещается в другую ни в каком повороте: иначе детектор, увидевший
+часть большой доски, принял бы её за меньшую. Тогда размер найденной решётки
+однозначно называет колесо — на телефоне его не выбирают, программа узнаёт
+колесо сама и пишет, какое видит. Можно вернуться к одной доске на все колёса,
+тогда колесо выбирают на телефоне; набор, где одна доска помещается в другую
+или напольная совпадает с колёсной, программа сохранить не даст.
+
+**Кастер камерой.** Передние колёса на поворотных кругах, педаль тормоза
+зажата упором. Пока руль поворачивают на 15–20° в одну сторону и в другую,
+мишень на колесе поворачивается вокруг оси поворота колеса — эту ось и находят
+как ось жёсткого вращения по позам мишени (`geom.FitRotationAxis`). Её наклон
+вперёд-назад от вертикали — кастер, вбок — поперечный наклон оси (SAI);
+направление «вперёд» берётся из оси колеса в положении «прямо», довёрнутой на
+измеренное схождение. Сначала пробовали вписывать конус, который описывает ось
+колеса: при повороте на ±20° поперечный наклон из него получался с ошибкой
+больше 3°, а жёсткое вращение даёт десятые доли градуса. Тормоз обязателен:
+если колесо ещё и провернётся вокруг своей оси, точки перестают ложиться на
+одно вращение, и при разбросе больше 5 мм программа об этом предупреждает.
+Кастер и SAI уходят на экран регулировки, как от телефона на колесе.
+
+**Печать мишеней.** Программа сама делает PDF: мишени колёс или напольные, на
+A4, A3, Letter или одним листом по размеру мишени — для типографии или
+плоттера. Мишень, которая не помещается на лист, режется на части по краям
+клеток, с метками обреза: листы складывают встык, и узор продолжается. Внизу
+каждого листа — линейка 100 мм: если принтер масштабирует, это видно сразу, а
+настоящий размер клетки вписывают в программу. Для напольной мишени 7 × 6 по
+100 мм на A4 выходит 28 листов, поэтому её проще заказать одним листом. Тест
+`TestPrintedTargetIsReadable` растрирует нарисованную в PDF доску и находит её
+тем же детектором, что и кадры с камеры.
+
+Сквозной тест `TestLiveCamera` проходит весь путь через HTTP так же, как телефон,
+с разными мишенями на колёсах и без указания колеса: биение каждого из четырёх
+колёс (мишени перекошены на 0,7–2,8°), три связующих кадра, по кадру на колесо,
+поворот тяги переднего левого колеса на 0,30°, затем кастер — поворот руля от
+−21° до +15°:
 
 ```
-развал: ошибка до 0,03°; схождение: ошибка до 0,05°
-схождение переднего левого +0,164° → +0,442° при повороте на 0,30°
+развал: ошибка до 0,02°; схождение: ошибка до 0,05°
+схождение переднего левого +0,146° → +0,486° при повороте на 0,30°
+кастер +3,14° (истинный +3,10°), поперечный наклон оси 12,62° (истинный 12,50°)
 калибровка по 15 видеокадрам: СКО 0,07 пикс, фокус в пределах 2 %
 ```
 
-В интерфейсе: «Замер → Камера и мишени → 4. Живой режим», на телефоне — кнопка
-«Телефон как камера».
+В интерфейсе: «Замер → Камера и мишени → 4. Живой режим» (там же печать мишеней),
+на телефоне — кнопка «Телефон как камера», режимы «Калибровка камеры», «Биение»,
+«Замер» и «Кастер камерой».
 
 ---
 ---
@@ -463,16 +501,53 @@ seeds already inside a found lattice brought it to **0.2 s per frame** — 3–4
 updates a second including the Wi-Fi transfer. Detection results did not change:
 the detector's tests are the same as before.
 
+**Its own target on every wheel.** By default the wheels carry four different
+boards (corners × corners × square): front left 11 × 4 × 22 mm, front right
+10 × 5 × 24 mm, rear left 9 × 6 × 24 mm, rear right 8 × 7 × 21 mm; on the floor,
+7 × 6 and 6 × 5 at 100 mm. The sizes are chosen so that no corner lattice fits
+inside another in any orientation: otherwise the detector, seeing part of a big
+board, could take it for a smaller one. The size of the lattice found then names
+the wheel — nobody chooses it on the phone; the program recognises the wheel and
+says which one it sees. One board on all wheels is still possible, and then the
+wheel is chosen on the phone; a set where one board fits inside another, or a
+floor target equals a wheel target, is refused.
+
+**Caster by camera.** Front wheels on turn plates, the brake pedal held down with
+a prop. While the steering is turned 15–20° one way and the other, the wheel
+target turns about the wheel's steering axis — and that axis is found as the axis
+of a rigid rotation of the target poses (`geom.FitRotationAxis`). Its fore-aft
+tilt from vertical is caster, its sideways tilt steering axis inclination (SAI);
+"forward" is the wheel's axis in the straight-ahead position turned by the
+measured toe. Fitting the cone traced by the wheel's axis was tried first: over
+±20° of steer it gave SAI more than 3° off, while the rigid rotation gives tenths
+of a degree. The brake is essential: if the wheel also rolls about its own axis,
+the points no longer fit one rotation, and the program warns when they scatter
+by more than 5 mm. Caster and SAI go to the adjustment screen, just as from a
+phone on the wheel.
+
+**Printing the targets.** The program makes the PDF itself: wheel or floor
+targets, on A4, A3, Letter or one sheet the size of the target — for a print shop
+or a plotter. A target that does not fit a sheet is split along square edges,
+with crop marks: the sheets are butted together and the pattern continues. Each
+sheet has a 100 mm ruler at the bottom: if the printer scales, it shows at once,
+and the real square size is entered in the program. The 7 × 6 floor target at
+100 mm comes to 28 A4 sheets, so it is easier to order as one sheet. The test
+`TestPrintedTargetIsReadable` rasterises the board drawn in the PDF and finds it
+with the same detector as the camera frames.
+
 The end-to-end test `TestLiveCamera` goes the whole way over HTTP, as a phone
-does: runout compensation for all four wheels (targets clamped 0.7–2.8° askew),
-three link frames, one frame per wheel, then the front-left tie rod turned by
-0.30°:
+does, with a different target on each wheel and no wheel named: runout
+compensation for all four wheels (targets clamped 0.7–2.8° askew), three link
+frames, one frame per wheel, the front-left tie rod turned by 0.30°, then caster
+— steering from −21° to +15°:
 
 ```
-camber: error up to 0.03°; toe: error up to 0.05°
-front-left toe +0.164° → +0.442° for a 0.30° turn
+camber: error up to 0.02°; toe: error up to 0.05°
+front-left toe +0.146° → +0.486° for a 0.30° turn
+caster +3.14° (true +3.10°), steering axis inclination 12.62° (true 12.50°)
 calibration from 15 video frames: RMS 0.07 px, focal length within 2 %
 ```
 
-In the interface: "Measurement → Camera and targets → 4. Live mode"; on the
-phone, the "Phone as a camera" button.
+In the interface: "Measurement → Camera and targets → 4. Live mode" (target
+printing is there too); on the phone, the "Phone as a camera" button with the
+"Camera calibration", "Runout", "Measure" and "Caster by camera" modes.
