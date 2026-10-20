@@ -15,12 +15,14 @@
 
 Одна программа, без установки и без интернета — на любом ноутбуке в гараже.
 Интерфейс на русском и английском: переключатель **RU / EN** в верхнем углу.
+Три темы, крупный шрифт, палитра для дальтонизма, подсказки звуком и голосом —
+[удобно каждому](#удобно-каждому).
 
 ![Экран регулировки](docs/img/live-overview.png)
 
 **Разделы:** [Зачем](#зачем) · [Скачать](#скачать-и-запустить) ·
 [Как выглядит](#как-это-выглядит) · [Чем мерить](#чем-мерить) ·
-[Типы подвески](#любая-машина-типы-подвески) · [База автомобилей](#база-автомобилей) ·
+[Типы подвески](#любая-машина-типы-подвески) · [Удобно каждому](#удобно-каждому) · [База автомобилей](#база-автомобилей) ·
 [Честно о допусках](#честно-о-допусках) · [Документация](#документация) ·
 [Поддержать проект](#поддержать-проект) · [Лицензия](#лицензия)
 
@@ -158,6 +160,35 @@ go build -ldflags "-H=windowsgui" -o wheelalign.exe ./cmd/wheelalign
 прокладками, а поперечная тяга задаёт только суммарное схождение.
 
 ![Выбор автомобиля](docs/img/vehicle.png)
+
+---
+
+## Удобно каждому
+
+Программой должен суметь пользоваться любой — и тот, кто впервые слышит слово
+«кастер», и мастер, и человек, который плохо видит или работает один под
+машиной.
+
+- **Приветствие при первом запуске**: язык, тема и размер — и сразу подсказка,
+  с чего начать и чем мерить. Пропустить можно одной клавишей.
+- **Три темы**: тёмная, как экран стенда; светлая — для яркого гаража и солнца;
+  высокий контраст — для слабого зрения. **Крупный и очень крупный** размер
+  увеличивает весь интерфейс.
+- **Цвет — не единственный сигнал.** Рядом с цветом всегда знак: ✓ в допуске,
+  ! у границы, ✕ вне допуска — и на экране, и на чёрно-белой печати. Для
+  дальтонизма — палитра «синий и оранжевый» вместо «зелёного и красного».
+- **Регулировка на слух** (F7, F8): выберите угол — программа пищит, тем чаще,
+  чем ближе он к допуску, звенит, когда вошёл в допуск, и может читать значение
+  голосом Windows. Экрана из-под машины не видно — а слышно всё.
+- **Без мыши**: всё делается с клавиатуры — Tab, Enter, Esc и F-клавиши, с
+  видимой рамкой фокуса. Экранный диктор читает показания и итог.
+- **Марки по регионам**: не знаете, как пишется название, — выберите марку из
+  списка «СССР и Россия · Европа · США · Азия»; недавние машины — сверху.
+- **Мастерская в протоколе**: название, адрес и исполнитель — в шапке отчёта.
+
+Все настройки хранятся программой в её файле настроек и переживают обновление.
+
+![Светлая тема](docs/img/live-light.png)
 
 ---
 
@@ -372,13 +403,14 @@ joint, car, truck or bus.
 
 One program, no installation and no internet needed — on any laptop in the
 garage. The interface is in Russian and English: the **RU / EN** switch in the
-top corner.
+top corner. Three themes, large text, a colour-blind palette, guidance by sound
+and voice — [for everyone](#for-everyone).
 
 ![The adjustment screen](docs/img/live-overview-en.png)
 
 **Sections:** [Why](#why) · [Download](#download-and-run) ·
 [What it looks like](#what-it-looks-like) · [What to measure with](#what-to-measure-with) ·
-[Suspension types](#any-vehicle-suspension-types) · [Vehicle database](#vehicle-database) ·
+[Suspension types](#any-vehicle-suspension-types) · [For everyone](#for-everyone) · [Vehicle database](#vehicle-database) ·
 [Honestly about tolerances](#honestly-about-tolerances) · [Documentation](#documentation) ·
 [Support the project](#support-the-project) · [Licence](#licence)
 
@@ -517,6 +549,39 @@ and buses — that a beam's camber is not adjustable, caster is corrected with
 taper shims, and the cross tie rod sets only the total toe.
 
 ![Choosing a vehicle](docs/img/vehicle-en.png)
+
+---
+
+## For everyone
+
+Anyone should be able to use the program — someone who has never heard the word
+"caster", a mechanic, and a person who sees poorly or works under the car alone.
+
+- **A welcome on first start**: language, theme and size, then where to begin
+  and what to measure with. One key skips it.
+- **Three themes**: dark, like an aligner's screen; light, for a bright garage
+  and sunlight; high contrast, for low vision. **Large and extra large** sizes
+  enlarge the whole interface.
+- **Colour is never the only signal.** A sign always stands next to it: ✓ in
+  tolerance, ! near the limit, ✕ out of tolerance — on screen and on a
+  black-and-white printout. For colour blindness there is a "blue and orange"
+  palette instead of "green and red".
+- **Adjusting by ear** (F7, F8): choose an angle and the program beeps, faster
+  the closer it is to tolerance, chimes when it gets there, and can read the
+  value aloud with a Windows voice. You cannot see the screen from under the
+  car — but you can hear it.
+- **No mouse needed**: everything works from the keyboard — Tab, Enter, Esc and
+  the F-keys, with a visible focus frame. A screen reader reads the readings and
+  the result.
+- **Makes by region**: not sure how a name is spelt — pick the make from "USSR
+  and Russia · Europe · USA · Asia"; recent vehicles are at the top.
+- **Your workshop on the report**: name, address and who did the job in the
+  report header.
+
+The program keeps all settings in its own settings file, and they survive
+updates.
+
+![The light theme](docs/img/live-light.png)
 
 ---
 

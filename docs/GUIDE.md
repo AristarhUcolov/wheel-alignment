@@ -8,7 +8,7 @@
 
 Та же инструкция есть в программе — клавиша **F1**. Подробности о методе и точности — в [PROCEDURE.md](PROCEDURE.md).
 
-**Содержание:** [Коротко: пять шагов](#ru-start) · [Установка и первый запуск](#ru-install) · [Углы простыми словами](#ru-angles) · [Шаг 1. Автомобиль](#ru-vehicle) · [Шаг 2. Подготовка](#ru-prep) · [Инструмент и площадка](#ru-tools) · [Замер: струна и угломер](#ru-string) · [Замер: телефон на колесе](#ru-phone) · [Замер: камера и мишени](#ru-optical) · [Замер: свой датчик](#ru-sensor) · [Шаг 4. Экран регулировки](#ru-live) · [Порядок регулировки — не переставляйте](#ru-order) · [Шаг 5. Отчёт](#ru-report) · [Типы подвески](#ru-susp) · [Грузовики, автобусы, фургоны](#ru-trucks) · [Когда регулировка не поможет](#ru-bent) · [Откуда берутся допуски](#ru-data) · [Если что-то не работает](#ru-trouble) · [Безопасность](#ru-safety) · [Клавиши](#ru-keys)
+**Содержание:** [Коротко: пять шагов](#ru-start) · [Установка и первый запуск](#ru-install) · [Настройки и доступность](#ru-access) · [Углы простыми словами](#ru-angles) · [Шаг 1. Автомобиль](#ru-vehicle) · [Шаг 2. Подготовка](#ru-prep) · [Инструмент и площадка](#ru-tools) · [Замер: струна и угломер](#ru-string) · [Замер: телефон на колесе](#ru-phone) · [Замер: камера и мишени](#ru-optical) · [Замер: свой датчик](#ru-sensor) · [Шаг 4. Экран регулировки](#ru-live) · [Порядок регулировки — не переставляйте](#ru-order) · [Шаг 5. Отчёт](#ru-report) · [Типы подвески](#ru-susp) · [Грузовики, автобусы, фургоны](#ru-trucks) · [Когда регулировка не поможет](#ru-bent) · [Откуда берутся допуски](#ru-data) · [Если что-то не работает](#ru-trouble) · [Безопасность](#ru-safety) · [Клавиши](#ru-keys)
 
 <a id="ru-start"></a>
 
@@ -35,6 +35,23 @@
 
 Ключи запуска: `-browser` — открыть в браузере вместо окна; `-data <папка>` — хранить данные в другом месте (например, рядом с программой на флешке). Полный список — `wheelalign -h`.
 
+<a id="ru-access"></a>
+
+## Настройки и доступность
+
+Программа должна быть удобна каждому: тому, кто работает в ярком гараже, кто плохо видит или не различает цвета, кто лежит под машиной один или пользуется только клавиатурой. Всё это — в «Настройках» (значок ⚙ вверху справа): применяется сразу и хранится в файле настроек программы.
+
+- **Тема.** Тёмная — как экран стенда; светлая — для яркого гаража и солнца; высокий контраст — чёрное и белое, яркие цвета и толстые рамки.
+- **Размер интерфейса** — обычный, крупный, очень крупный: увеличивается всё сразу — текст, кнопки, цифры.
+- **Цвета состояний.** Если красный и зелёный трудно различить, включите «Синий и оранжевый». Рядом с цветом всегда стоит знак: **✓** — в допуске, **!** — у границы, **✕** — вне допуска; знаки видны и на чёрно-белой распечатке протокола.
+- **Без анимации** — для тех, кому мешает мигание. По умолчанию программа следует настройке Windows «Показывать анимацию».
+- **Регулировка на слух.** Выберите угол на экране регулировки и включите звук (<kbd>F7</kbd>): вне допуска программа пищит — тем чаще, чем ближе к допуску, — при входе в допуск звучит перезвон, при выходе — низкий тон. Голос (<kbd>F8</kbd>) читает выбранный угол вслух, говорит, когда он вошёл в допуск и когда в допуске всё. Голос — системный, Windows; если для вашего языка его нет: Параметры → Время и язык → Речь → «Добавить голоса».
+- **Без мыши.** Всё доступно с клавиатуры: <kbd>Tab</kbd> — к следующему элементу, <kbd>Enter</kbd> или пробел — нажать, <kbd>Esc</kbd> — закрыть панель; F-клавиши подписаны внизу экрана. Рамка показывает, где фокус. Экранный диктор (встроенный в Windows или NVDA) читает показания, итог и сообщения программы.
+- **Мастерская.** Название, адрес и исполнитель попадают в шапку протокола.
+- **Приветствие** при первом запуске проводит по этим настройкам и помогает выбрать способ замера. Открыть его снова — «Настройки → Показать приветствие снова».
+
+![Настройки](img/settings.png)
+
 <a id="ru-angles"></a>
 
 ## Углы простыми словами
@@ -53,6 +70,7 @@
 ## Шаг 1. Автомобиль
 
 - **Поиск** — по марке и модели, по-русски или латиницей: «Волга 3110», «ГАЗель», «2107», «Hilux». Фильтры сверху сужают список до легковых, внедорожников, фургонов, грузовых или автобусов; поле «Год» отсекает другие поколения.
+- **Не знаете, как пишется?** Пока поле поиска пустое, ниже — все марки по регионам (СССР и Россия, Европа, США, Азия) с числом моделей и недавно выбранные машины. Нажмите на марку — останутся только её модели.
 - У каждой записи есть **метка источника**: заводское руководство, сообщество, «не проверено», «только конструкция». Чем метка слабее, тем внимательнее относитесь к цифрам — подробно в разделе «Откуда берутся допуски».
 - **Модели нет в базе?** Выберите ориентир по классу («легковой с McPherson», «грузовик с балкой на шкворнях»…). Это типичные значения для конструкции, а не для вашей модели: программа покажет, насколько углы далеки от типичных, и будет честно предупреждать об этом на всех экранах.
 - **Подвеска.** Программа подставляет тип подвески из базы; если его нет — выберите сами. Кнопка «Как узнать, какая у меня?» подскажет, по каким признакам отличить шкворень от шаровой опоры, McPherson от двух рычагов.
@@ -150,13 +168,14 @@
 
 ## Шаг 4. Экран регулировки
 
-- **Цифры.** Зелёная — в допуске, жёлтая — в допуске, но у границы, красная — вне допуска, белая — допуск не задан, серая — показаний нет. Над цифрой — шкала допуска: зелёная зона, стрелка — текущее значение.
+- **Цифры.** Зелёная — в допуске (**✓**), жёлтая — в допуске, но у границы (**!**), красная — вне допуска (**✕**), белая — допуск не задан, серая — показаний нет. Над цифрой — шкала допуска: зелёная зона, стрелка — текущее значение.
 - **Виды.** F2 переключает общий вид и крупные виды передней и задней оси; F3 и F4 — сразу нужная ось. Для работы под машиной удобнее крупный вид: цифры видно с двух-трёх метров.
 - **Единицы** — градусы с минутами, десятичные градусы; схождение можно показывать в миллиметрах (по диаметру обода с шага «Автомобиль»).
 - **«Показания стабильны».** Пока значения меняются, внизу написано «показания меняются…». Записывать и затягивать контргайки — только когда стабильно.
 - **Нажмите на любой угол** — справа откроется панель: что это за угол, чем он регулируется на вашей подвеске, что написано для этой модели.
 - **Помощник «сколько крутить».** В той же панели: нажмите «Запомнить положение», поверните тягу или эксцентрик на известную величину (¼, ½, 1 оборот) и нажмите, на сколько повернули. Программа посчитает, сколько даёт один оборот на вашей машине, и дальше будет подсказывать: «до номинала ≈ 1¼ оборота, в ту же сторону».
 - **Строка источников** вверху показывает, откуда идут данные: телефон, датчик, камера, ручной ввод, демо.
+- **Звук и голос** — кнопки рядом с единицами, клавиши <kbd>F7</kbd> и <kbd>F8</kbd>: подсказки, когда экрана не видно (подробно — «Настройки и доступность»).
 
 ![Экран регулировки](img/live-overview.png)
 
@@ -276,9 +295,13 @@
 | <kbd>F3</kbd> / <kbd>F4</kbd> | Передняя / задняя ось крупно |
 | <kbd>F5</kbd> | Снимок «до», затем «после» |
 | <kbd>F6</kbd> | Отчёт |
-| <kbd>F9</kbd> / <kbd>F10</kbd> | Демонстрация / показать регулировку по шагам |
+| <kbd>F7</kbd> / <kbd>F8</kbd> | Звуковые сигналы / голос для выбранного угла |
+| <kbd>F9</kbd> / <kbd>F10</kbd> | Демонстрация / авторегулировка: программа сама выставляет углы по шагам |
 | <kbd>←</kbd> <kbd>→</kbd> | В демонстрации — «крутить» выбранный угол (с Shift — крупнее) |
 | <kbd>Esc</kbd> | Закрыть боковую панель |
+| **Везде:** |  |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | К следующему / предыдущему элементу |
+| <kbd>Enter</kbd>, пробел | Нажать кнопку, открыть выбранный угол |
 
 ---
 
@@ -292,7 +315,7 @@ Wheel alignment is neither magic nor a workshop secret. It is four wheels, a few
 
 The same guide is inside the program — press **F1**. Method and accuracy in depth — [PROCEDURE.md](PROCEDURE.md#eng).
 
-**Contents:** [In short: five steps](#en-start) · [Installing and first start](#en-install) · [The angles in plain words](#en-angles) · [Step 1. Vehicle](#en-vehicle) · [Step 2. Preparation](#en-prep) · [Tools and floor](#en-tools) · [Measuring: strings and an inclinometer](#en-string) · [Measuring: a phone on the wheel](#en-phone) · [Measuring: camera and targets](#en-optical) · [Measuring: a sensor of your own](#en-sensor) · [Step 4. The adjustment screen](#en-live) · [Adjustment order — do not change it](#en-order) · [Step 5. The report](#en-report) · [Suspension types](#en-susp) · [Trucks, buses, vans](#en-trucks) · [When adjustment will not help](#en-bent) · [Where the specifications come from](#en-data) · [If something does not work](#en-trouble) · [Safety](#en-safety) · [Keys](#en-keys)
+**Contents:** [In short: five steps](#en-start) · [Installing and first start](#en-install) · [Settings and accessibility](#en-access) · [The angles in plain words](#en-angles) · [Step 1. Vehicle](#en-vehicle) · [Step 2. Preparation](#en-prep) · [Tools and floor](#en-tools) · [Measuring: strings and an inclinometer](#en-string) · [Measuring: a phone on the wheel](#en-phone) · [Measuring: camera and targets](#en-optical) · [Measuring: a sensor of your own](#en-sensor) · [Step 4. The adjustment screen](#en-live) · [Adjustment order — do not change it](#en-order) · [Step 5. The report](#en-report) · [Suspension types](#en-susp) · [Trucks, buses, vans](#en-trucks) · [When adjustment will not help](#en-bent) · [Where the specifications come from](#en-data) · [If something does not work](#en-trouble) · [Safety](#en-safety) · [Keys](#en-keys)
 
 <a id="en-start"></a>
 
@@ -319,6 +342,23 @@ Where your data lives: `%APPDATA%\wheelalign` (on Linux `~/.config/wheelalign`).
 
 Start options: `-browser` — open in the browser instead of a window; `-data <folder>` — keep the data elsewhere (for example next to the program on a USB stick). Full list: `wheelalign -h`.
 
+<a id="en-access"></a>
+
+## Settings and accessibility
+
+The program should suit everyone: whoever works in a bright garage, sees poorly or cannot tell colours apart, lies under the car alone or uses only a keyboard. All of it is in “Settings” (the ⚙ icon at the top right): it applies at once and is kept in the program's settings file.
+
+- **Theme.** Dark — like an aligner's screen; light — for a bright garage and sunlight; high contrast — black and white, bright colours and thick borders.
+- **Interface size** — normal, large, extra large: everything grows at once — text, buttons, figures.
+- **Status colours.** If red and green are hard to tell apart, choose “Blue and orange”. A sign always stands next to the colour: **✓** — in tolerance, **!** — near the limit, **✕** — out of tolerance; the signs show on a black-and-white printout of the report too.
+- **No animation** — for those bothered by blinking. By default the program follows the Windows “Show animations” setting.
+- **Adjusting by ear.** Choose an angle on the adjustment screen and turn the sound on (<kbd>F7</kbd>): out of tolerance the program beeps — faster the closer it gets — a chime sounds on entering the tolerance and a low tone on leaving it. The voice (<kbd>F8</kbd>) reads the chosen angle aloud and says when it is in tolerance and when everything is. The voice is the system one, from Windows; if there is none for your language: Settings → Time & language → Speech → “Add voices”.
+- **No mouse needed.** Everything works from the keyboard: <kbd>Tab</kbd> — to the next element, <kbd>Enter</kbd> or Space — press, <kbd>Esc</kbd> — close the panel; the F-keys are labelled at the bottom of the screen. A frame shows where the focus is. A screen reader (the one built into Windows, or NVDA) reads the readings, the result and the program's messages.
+- **Workshop.** Its name, address and the person doing the job go into the report header.
+- **The welcome** on first start walks through these settings and helps choose a way to measure. To open it again — “Settings → Show the welcome again”.
+
+![Settings](img/settings-en.png)
+
 <a id="en-angles"></a>
 
 ## The angles in plain words
@@ -337,6 +377,7 @@ Start options: `-browser` — open in the browser instead of a window; `-data <f
 ## Step 1. Vehicle
 
 - **Search** by make and model, in Latin or Cyrillic letters: “Volga 3110”, “GAZelle”, “2107”, “Hilux”. The filters at the top narrow the list to cars, SUVs, vans, trucks or buses; the “Year” box drops other generations.
+- **Not sure of the spelling?** While the search box is empty, every make is listed below by region (USSR and Russia, Europe, USA, Asia) with its number of models, along with recently chosen vehicles. Click a make to keep only its models.
 - Every entry carries a **source badge**: factory manual, community, unverified, design only. The weaker the badge, the more carefully treat the figures — see “Where the specifications come from”.
 - **Model not in the database?** Choose the guidance for its class (“car with MacPherson struts”, “truck with a kingpin beam axle”…). These are typical values for the design, not for your model: the program shows how far the angles are from typical and says so honestly on every screen.
 - **Suspension.** The program fills in the suspension type from the database; if it is missing, choose it yourself. “How do I tell which one I have?” explains how to tell a kingpin from a ball joint, MacPherson from double wishbones.
@@ -434,13 +475,14 @@ Any device on your network — a home-made ESP32 head, a laser sensor, another p
 
 ## Step 4. The adjustment screen
 
-- **Figures.** Green — in spec, amber — in spec but near the limit, red — out of spec, white — no specification, grey — no reading. Above the figure is the tolerance scale: the green zone and a pointer at the current value.
+- **Figures.** Green — in spec (**✓**), amber — in spec but near the limit (**!**), red — out of spec (**✕**), white — no specification, grey — no reading. Above the figure is the tolerance scale: the green zone and a pointer at the current value.
 - **Views.** F2 cycles between the overview and large front- and rear-axle views; F3 and F4 jump straight to an axle. Under the car the large view is easier: the figures are readable from two or three metres.
 - **Units** — degrees and minutes or decimal degrees; toe can be shown in millimetres (at the rim diameter from the Vehicle step).
 - **“Readings steady”.** While values are changing the screen says “readings changing…”. Record figures and tighten lock nuts only when steady.
 - **Tap any angle** — a panel opens on the right: what the angle is, what adjusts it on your suspension, what the data says for this model.
 - **The “how far to turn” helper.** In the same panel: press “Remember position”, turn the tie rod or eccentric by a known amount (¼, ½, 1 turn) and press how far you turned it. The program works out what one turn does on your car and from then on tells you: “to nominal ≈ 1¼ turns, the same way”.
 - **The source bar** at the top shows where data comes from: phone, sensor, camera, manual entry, demo.
+- **Sound and voice** — the buttons next to the units, keys <kbd>F7</kbd> and <kbd>F8</kbd>: guidance when you cannot see the screen (see “Settings and accessibility”).
 
 ![The adjustment screen](img/live-overview-en.png)
 
@@ -560,7 +602,10 @@ Have a workshop manual? The “Enter specs” button on the left: the program ch
 | <kbd>F3</kbd> / <kbd>F4</kbd> | Front / rear axle, large |
 | <kbd>F5</kbd> | “Before” snapshot, then “after” |
 | <kbd>F6</kbd> | Report |
-| <kbd>F9</kbd> / <kbd>F10</kbd> | Demonstration / show the adjustment step by step |
+| <kbd>F7</kbd> / <kbd>F8</kbd> | Sound signals / voice for the chosen angle |
+| <kbd>F9</kbd> / <kbd>F10</kbd> | Demonstration / auto-adjust: the program sets the angles itself, step by step |
 | <kbd>←</kbd> <kbd>→</kbd> | In the demonstration — “turn” the selected angle (with Shift — in bigger steps) |
 | <kbd>Esc</kbd> | Close the side panel |
-
+| **Everywhere:** |  |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | To the next / previous element |
+| <kbd>Enter</kbd>, Space | Press a button, open the chosen angle |
