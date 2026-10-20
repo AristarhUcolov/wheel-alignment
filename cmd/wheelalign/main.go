@@ -137,6 +137,7 @@ func run(addr string, open, forceBrowser bool, dataFlag string) error {
 	defer srv.Close()
 	srv.SetSettingsFile(settingsPath)
 	srv.SetDataDir(data)
+	srv.SetVersion(programVersion())
 
 	// The phone link: a separate HTTPS listener on the local network, off
 	// until the person switches it on from the interface.

@@ -18,8 +18,8 @@ export function t(ru, vars) {
   return s;
 }
 
-// Статичный текст страницы: элементы с data-t переводятся целиком, а
-// data-t-title — только подсказка.
+// Статичный текст страницы: элементы с data-t переводятся целиком,
+// data-t-title — только подсказка, data-t-aria — подпись для экранного диктора.
 export function translateStatic(root = document) {
   root.querySelectorAll('[data-t]').forEach(el => {
     if (!el.dataset.tRu) el.dataset.tRu = el.textContent.trim();
@@ -28,5 +28,9 @@ export function translateStatic(root = document) {
   root.querySelectorAll('[data-t-title]').forEach(el => {
     if (!el.dataset.tTitleRu) el.dataset.tTitleRu = el.getAttribute('title') || '';
     el.setAttribute('title', t(el.dataset.tTitleRu));
+  });
+  root.querySelectorAll('[data-t-aria]').forEach(el => {
+    if (!el.dataset.tAriaRu) el.dataset.tAriaRu = el.getAttribute('aria-label') || '';
+    el.setAttribute('aria-label', t(el.dataset.tAriaRu));
   });
 }

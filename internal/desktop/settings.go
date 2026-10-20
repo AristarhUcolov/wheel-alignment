@@ -11,6 +11,13 @@ import (
 // or a vehicle lives elsewhere.
 type Settings struct {
 	Lang string `json:"lang,omitempty"`
+
+	// UI is the interface's own preferences — theme, text size, sounds,
+	// workshop details for the report. The interface owns its shape; the
+	// program only keeps it. It lives here rather than in the browser's
+	// storage, which is tied to the port the interface happens to get and
+	// is lost whenever that port changes.
+	UI json.RawMessage `json:"ui,omitempty"`
 }
 
 // LoadSettings reads the settings file; a missing or damaged file gives the

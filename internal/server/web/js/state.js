@@ -104,6 +104,9 @@ export function connectStream() {
 let toastTimer;
 export function toast(msg, bad = false) {
   const t = document.getElementById('toast');
+  // Ошибку экранный диктор зачитывает сразу, обычное сообщение — в паузе.
+  t.setAttribute('role', bad ? 'alert' : 'status');
+  t.setAttribute('aria-live', bad ? 'assertive' : 'polite');
   t.textContent = msg;
   t.classList.toggle('bad', bad);
   t.classList.add('show');

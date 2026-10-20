@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+<a class="skip" href="#main" data-t>Перейти к содержимому</a>
 <div class="app">
 
   <header class="top">
@@ -27,16 +28,19 @@
       <span class="muted" data-t>Автомобиль не выбран</span>
     </div>
     <div class="top-right">
-      <div class="sources" id="topSources" data-t-title title="Подключённые датчики"></div>
-      <div class="langs" id="langs">
-        <button data-lang="ru" title="Русский">RU</button>
-        <button data-lang="en" title="English">EN</button>
+      <div class="sources" id="topSources" data-t-title title="Подключённые датчики" role="status"></div>
+      <div class="langs" id="langs" role="group" aria-label="Язык / Language">
+        <button data-lang="ru" title="Русский" lang="ru">RU</button>
+        <button data-lang="en" title="English" lang="en">EN</button>
       </div>
-      <div class="clock" id="clock">--:--</div>
+      <button class="icon-btn" id="topSettings" data-t-title title="Настройки: тема, размер текста, звук">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.7 7.7 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1l-.4-2.6h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L4.6 11a7.7 7.7 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+      </button>
+      <div class="clock" id="clock" aria-hidden="true">--:--</div>
     </div>
   </header>
 
-  <nav class="side" id="side">
+  <nav class="side" id="side" data-t-aria aria-label="Шаги">
     <div class="side-steps">
       <button data-screen="vehicle"><i>1</i><span data-t>Автомобиль</span></button>
       <button data-screen="prep"><i>2</i><span data-t>Подготовка</span></button>
@@ -47,12 +51,13 @@
     <div class="side-extra">
       <button data-screen="guide"><i>?</i><span data-t>Инструкция</span></button>
       <button data-screen="contrib"><i>+</i><span data-t>Внести допуски</span></button>
+      <button data-screen="settings"><i>⚙</i><span data-t>Настройки</span></button>
       <button data-screen="support" class="support-btn"><i>♥</i><span data-t>Поддержать проект</span></button>
     </div>
     <div class="side-foot" data-t>Свободная программа, AGPL-3.0. Формулы открыты и проверены тестами.</div>
   </nav>
 
-  <main id="main">
+  <main id="main" tabindex="-1">
     <section class="screen" id="screen-vehicle"></section>
     <section class="screen" id="screen-prep"></section>
     <section class="screen" id="screen-measure"></section>
@@ -60,18 +65,19 @@
     <section class="screen" id="screen-report"></section>
     <section class="screen" id="screen-guide"></section>
     <section class="screen" id="screen-contrib"></section>
+    <section class="screen" id="screen-settings"></section>
     <section class="screen" id="screen-support"></section>
   </main>
 
   <footer class="fkeys" id="fkeys"></footer>
 </div>
 
-<aside class="drawer" id="drawer" aria-hidden="true">
-  <button class="drawer-close" data-close-drawer aria-label="✕">✕</button>
+<aside class="drawer" id="drawer" role="dialog" aria-labelledby="dTitle" aria-hidden="true">
+  <button class="drawer-close" data-close-drawer data-t-title title="Закрыть (Esc)" data-t-aria aria-label="Закрыть">✕</button>
   <div class="drawer-body" id="drawerBody"></div>
 </aside>
 
-<div class="toast" id="toast" role="status"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script type="module" src="/js/app.js"></script>
 </body>

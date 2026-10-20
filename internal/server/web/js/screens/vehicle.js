@@ -1,11 +1,12 @@
 // Шаг 1: автомобиль — поиск, тип подвески, обод и колея.
 
 import { state, on, api, updateSession, toast, h, $, $$ } from '../state.js';
-import { esc, fmtDM } from '../fmt.js';
+import { esc, fmtDM, parseNum } from '../fmt.js';
 import { t } from '../i18n.js';
 import { go } from '../app.js';
+import { prefs, rememberVehicle } from '../prefs.js';
 
-let root, suspList = null, klass = '', timer;
+let root, suspList = null, klass = '', make = null, makes = null, guidance = null, timer;
 
 const CLASSES = () => [
   ['', t('Все')], ['car', t('Легковые')], ['suv', t('Внедорожники')], ['lcv', t('Фургоны, LCV')], ['truck', t('Грузовые')], ['bus', t('Автобусы')],
@@ -18,12 +19,14 @@ export function mount(el) {
       <div>
         <h1>${t('Выберите автомобиль')}</h1>
         <p class="lede">${t('Введите марку и модель — по-русски или латиницей. Если модели нет, возьмите ориентир по классу ниже и укажите тип подвески: советы по регулировке зависят прежде всего от конструкции.')}</p>
-        <div class="search-row">
-          <input type="search" id="vq" placeholder="${esc(t('например: Волга 3110, ГАЗель, ВАЗ 2107, Нива'))}" autocomplete="off">
-          <input type="number" id="vy" class="year" placeholder="${esc(t('Год'))}" min="1900" max="2100">
+        <div class="search-row" role="search">
+          <input type="search" id="vq" placeholder="${esc(t('например: Волга 3110, ГАЗель, ВАЗ 2107, Нива'))}" aria-label="${esc(t('Марка и модель'))}" autocomplete="off">
+          <input type="text" inputmode="numeric" data-num id="vy" class="year" placeholder="${esc(t('Год'))}" aria-label="${esc(t('Год выпуска'))}" min="1900" max="2100">
         </div>
-        <div class="chips" id="vclass">${CLASSES().map(([k, n]) => `<button class="chip${k === '' ? ' on' : ''}" data-c="${k}">${n}</button>`).join('')}</div>
-        <div class="cards" id="vres"></div>
+        <div class="chips" id="vclass" role="group" aria-label="${esc(t('Класс'))}">${CLASSES().map(([k, n]) => `<button class="chip" data-c="${k}" aria-pressed="${k === '' ? 'true' : 'false'}">${n}</button>`).join('')}</div>
+        <div class="chips hidden" id="vmake"></div>
+        <div id="vbrowse"></div>
+        <div class="cards" id="vres" aria-live="polite"></div>
         <h2>${t('Модели нет в базе?')}</h2>
         <p class="lede" style="margin-bottom:6px">${t('Возьмите ориентир по классу — программа покажет, насколько углы далеки от разумных для такой конструкции. Это не заводские данные: найдя их в руководстве, внесите их кнопкой «Внести допуски».')}</p>
         <div class="cards" id="vguid"></div>
@@ -34,7 +37,7 @@ export function mount(el) {
   q.oninput = y.oninput = () => { clearTimeout(timer); timer = setTimeout(search, 160); };
   $$('#vclass .chip', root).forEach(b => b.onclick = () => {
     klass = b.dataset.c;
-    $$('#vclass .chip', root).forEach(x => x.classList.toggle('on', x === b));
+    $$('#vclass .chip', root).forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
     search();
   });
   on('session', renderDetail);
@@ -44,7 +47,8 @@ export function mount(el) {
 
 export function show() {
   renderDetail();
-  setTimeout(() => $('#vq', root).focus(), 50);
+  // Поле поиска — сразу в фокус, если поверх не открыто приветствие.
+  setTimeout(() => { if (!document.querySelector('.modal-back')) $('#vq', root).focus(); }, 50);
 }
 
 async function loadSusp() {
@@ -69,7 +73,7 @@ function card(s) {
   const title = s.source_kind === 'class_guidance' ? s.model : s.title;
   const susp = [s.front_suspension && t('перед: {name}', { name: suspName(s.front_suspension) }),
     s.rear_suspension && t('зад: {name}', { name: suspName(s.rear_suspension) })].filter(Boolean).join(' · ');
-  const el = h(`<button class="vcard">
+  const el = h(`<button class="vcard" aria-pressed="${state.session && state.session.vehicle && state.session.vehicle.id === s.id ? 'true' : 'false'}">
       <span class="t">${esc(title)}</span>
       <span class="badges">${badgeFor(s)}</span>
       <span class="m">${esc(susp || s.notes || '')}</span>
@@ -79,28 +83,92 @@ function card(s) {
   return el;
 }
 
+// Фильтр по марке — плашкой над списком, с крестиком.
+function setMake(m) {
+  make = m;
+  const box = $('#vmake', root);
+  box.classList.toggle('hidden', !m);
+  box.innerHTML = m ? `<button class="chip make-on" id="vmakeX" aria-label="${esc(t('Убрать фильтр по марке {name}', { name: m.name }))}">${esc(t('Марка: {name}', { name: m.name }))} ✕</button>` : '';
+  if (m) $('#vmakeX', box).onclick = () => { setMake(null); search(); $('#vq', root).focus(); };
+  search();
+}
+
+// Без запроса — не случайный список, а марки по регионам и недавние машины:
+// так находит свою машину и тот, кто не знает, как пишется её название.
+async function browse(my) {
+  const box = $('#vbrowse', root);
+  if (!makes) {
+    try { makes = await api('/api/specs/makes'); } catch { makes = []; }
+  }
+  let recentList = [];
+  if (prefs.recent && prefs.recent.length) {
+    try { recentList = (await api('/api/specs/search?ids=' + encodeURIComponent(prefs.recent.join(',')))).results; } catch { /* без недавних */ }
+  }
+  await loadSusp();
+  if (my !== seq) return; // пока грузили, человек уже начал вводить
+  const regions = [];
+  for (const m of makes) {
+    let r = regions.find(x => x.id === m.region);
+    if (!r) { r = { id: m.region, name: m.region_name, list: [] }; regions.push(r); }
+    r.list.push(m);
+  }
+  const recent = recentList.length ? `<h3>${t('Недавние')}</h3><div class="cards" id="vrecent"></div>` : '';
+  box.innerHTML = `<div class="makes">${recent}
+    <h3>${t('Марки — выберите или начните вводить название')}</h3>
+    ${regions.map(r => `<h3>${esc(r.name)}</h3><div class="make-grid">${r.list.map(m =>
+      `<button class="make-btn" data-make="${esc(m.key)}" aria-label="${esc(t('{name}: записей {n}', { name: m.name, n: m.count }))}">${esc(m.name)}<span>${m.count}</span></button>`).join('')}</div>`).join('')}
+  </div>`;
+  const rb = $('#vrecent', box);
+  if (rb) recentList.forEach(s => rb.append(card(s)));
+  $$('[data-make]', box).forEach(b => b.onclick = () => {
+    const m = makes.find(x => x.key === b.dataset.make);
+    setMake(m);
+  });
+}
+
+let seq = 0;
+
 async function search() {
+  const my = ++seq;
   const q = $('#vq', root).value.trim();
   const y = $('#vy', root).value.trim();
+  const res = $('#vres', root);
+  const br = $('#vbrowse', root);
+  if (!q && !y && !klass && !make) {
+    res.replaceChildren();
+    await browse(my);
+    if (!guidance) {
+      try { guidance = (await api('/api/specs/search?q=')).guidance || []; } catch { guidance = []; }
+    }
+    if (my === seq) showGuidance(guidance);
+    return;
+  }
   let data;
   try {
-    data = await api(`/api/specs/search?q=${encodeURIComponent(q)}&year=${encodeURIComponent(y)}&class=${encodeURIComponent(klass)}`);
+    data = await api(`/api/specs/search?q=${encodeURIComponent(q)}&year=${encodeURIComponent(y)}&class=${encodeURIComponent(klass)}&make=${encodeURIComponent(make ? make.key : '')}`);
   } catch (e) { toast(e.message, true); return; }
   await loadSusp();
-  const res = $('#vres', root);
+  if (my !== seq) return;
+  br.innerHTML = '';
   res.replaceChildren();
   if (!data.results.length) {
     res.append(h(`<p class="muted">${q ? t('Ничего не найдено. Попробуйте другое написание — или возьмите ориентир по классу ниже.') : t('В базе нет записей этого класса.')}</p>`));
   }
   data.results.forEach(s => res.append(card(s)));
+  guidance = data.guidance || [];
+  showGuidance(guidance);
+}
+
+function showGuidance(list) {
   const g = $('#vguid', root);
   g.replaceChildren();
-  (data.guidance || []).forEach(s => g.append(card(s)));
+  list.forEach(s => g.append(card(s)));
 }
 
 async function choose(id) {
   try {
     await updateSession({ spec_id: id });
+    rememberVehicle(id);
     $$('.vcard', root).forEach(c => c.classList.remove('sel'));
     search();
   } catch (e) { toast(e.message, true); }
@@ -172,11 +240,11 @@ function renderDetail() {
 
       <h3>${t('Размеры')}</h3>
       <div class="cols3">
-        <label class="f">${t('Обод, дюймы')} <input type="number" id="vRim" step="0.5" min="8" max="30" value="${ss.rim_diameter_in}">
+        <label class="f">${t('Обод, дюймы')} <input type="text" inputmode="decimal" data-num id="vRim" min="8" max="30" value="${ss.rim_diameter_in}">
           <small>${t('По нему схождение переводится в мм.')}</small></label>
-        <label class="f">${t('Колея перед, мм')} <input type="number" id="vTF" step="1" value="${ss.track_front_mm || ''}" placeholder="1400">
+        <label class="f">${t('Колея перед, мм')} <input type="text" inputmode="decimal" data-num id="vTF" value="${ss.track_front_mm || ''}" placeholder="1400">
           <small>${t('Нужна для проверки струн.')}</small></label>
-        <label class="f">${t('Колея зад, мм')} <input type="number" id="vTR" step="1" value="${ss.track_rear_mm || ''}" placeholder="1380"></label>
+        <label class="f">${t('Колея зад, мм')} <input type="text" inputmode="decimal" data-num id="vTR" value="${ss.track_rear_mm || ''}" placeholder="1380"></label>
       </div>
 
       ${lim ? `<h3>${lim.id !== v.id ? t('Допуски (ориентир)') : t('Допуски')}</h3>${specTable(ss.spec)}` : ''}
@@ -191,7 +259,7 @@ function renderDetail() {
 
   $('#vFront', box).onchange = e => updateSession({ front_suspension: e.target.value }).catch(err => toast(err.message, true));
   $('#vRear', box).onchange = e => updateSession({ rear_suspension: e.target.value }).catch(err => toast(err.message, true));
-  const num = id => { const x = parseFloat($(id, box).value); return Number.isFinite(x) ? x : 0; };
+  const num = id => { const x = parseNum($(id, box).value); return Number.isFinite(x) ? x : 0; };
   $('#vRim', box).onchange = () => updateSession({ rim_diameter_in: num('#vRim') }).catch(err => toast(err.message, true));
   $('#vTF', box).onchange = () => updateSession({ track_front_mm: num('#vTF') }).catch(err => toast(err.message, true));
   $('#vTR', box).onchange = () => updateSession({ track_rear_mm: num('#vTR') }).catch(err => toast(err.message, true));

@@ -2,7 +2,7 @@
 // Вся обработка снимков — в Go, без OpenCV.
 
 import { state, api, toast, h, $, $$ } from '../state.js';
-import { WHEELS, esc, fmtDM } from '../fmt.js';
+import { WHEELS, esc, fmtDM, parseNum } from '../fmt.js';
 import { t } from '../i18n.js';
 import { go } from '../app.js';
 
@@ -54,11 +54,11 @@ function calib(box) {
   box.append(h(`<div>
     <p class="muted">${t('Нужна один раз для каждой камеры. Снимите шахматную мишень 10–20 раз под разными углами и по всем углам кадра, затем загрузите снимки. Программа посчитает параметры камеры и даст сохранить их в файл.')}</p>
     <div class="cols3">
-      <label class="f">${t('Углов по горизонтали')}<input type="number" id="cCols" value="9" min="3">
+      <label class="f">${t('Углов по горизонтали')}<input type="text" inputmode="decimal" data-num id="cCols" value="9" min="3">
         <small>${t('Внутренних углов, не клеток: доска 10×7 клеток — это 9×6 углов.')}</small></label>
-      <label class="f">${t('Углов по вертикали')}<input type="number" id="cRows" value="6" min="3">
+      <label class="f">${t('Углов по вертикали')}<input type="text" inputmode="decimal" data-num id="cRows" value="6" min="3">
         <small>${t('Сумма сторон нечётная (9+6=15) — иначе ориентация неоднозначна.')}</small></label>
-      <label class="f">${t('Клетка, мм')}<input type="number" id="cSq" value="30" step="0.1">
+      <label class="f">${t('Клетка, мм')}<input type="text" inputmode="decimal" data-num id="cSq" value="30">
         <small>${t('Измерьте штангенциркулем по распечатке — принтеры масштабируют.')}</small></label>
     </div>
     <div id="cZone"></div>
@@ -169,14 +169,14 @@ function full(box) {
     <div class="cols3">
       <label class="f">${t('Файл калибровки камеры')}<span id="fCam"></span></label>
       <label class="f">${t('Мишень на колесе: углы × углы × клетка, мм')}
-        <span class="row" style="gap:6px"><input type="number" id="wC" value="8" style="width:70px"><input type="number" id="wR" value="5" style="width:70px"><input type="number" id="wS" value="32" step="0.1" style="width:90px"></span></label>
-      <label class="f">${t('Обод, дюймы')}<input type="number" id="fRim" value="${rim}" step="0.5"></label>
+        <span class="row" style="gap:6px"><input type="text" inputmode="decimal" data-num id="wC" value="8" style="width:70px"><input type="text" inputmode="decimal" data-num id="wR" value="5" style="width:70px"><input type="text" inputmode="decimal" data-num id="wS" value="32" style="width:90px"></span></label>
+      <label class="f">${t('Обод, дюймы')}<input type="text" inputmode="decimal" data-num id="fRim" value="${rim}"></label>
     </div>
     <h3>${t('Напольные мишени')}</h3>
     <p class="muted" style="font-size:13px">${t('Одну мишень не видно от всех колёс — мешает машина. Поэтому их две, спереди и сзади, и они должны различаться размером. Клетку берите крупной (80–100 мм).')}</p>
     <div class="cols3">
-      <label class="f">${t('Передняя')}<span class="row" style="gap:6px"><input type="number" id="r0C" value="7" style="width:70px"><input type="number" id="r0R" value="6" style="width:70px"><input type="number" id="r0S" value="100" step="0.1" style="width:90px"></span></label>
-      <label class="f">${t('Задняя')}<span class="row" style="gap:6px"><input type="number" id="r1C" value="6" style="width:70px"><input type="number" id="r1R" value="5" style="width:70px"><input type="number" id="r1S" value="100" step="0.1" style="width:90px"></span></label>
+      <label class="f">${t('Передняя')}<span class="row" style="gap:6px"><input type="text" inputmode="decimal" data-num id="r0C" value="7" style="width:70px"><input type="text" inputmode="decimal" data-num id="r0R" value="6" style="width:70px"><input type="text" inputmode="decimal" data-num id="r0S" value="100" style="width:90px"></span></label>
+      <label class="f">${t('Задняя')}<span class="row" style="gap:6px"><input type="text" inputmode="decimal" data-num id="r1C" value="6" style="width:70px"><input type="text" inputmode="decimal" data-num id="r1R" value="5" style="width:70px"><input type="text" inputmode="decimal" data-num id="r1S" value="100" style="width:90px"></span></label>
       <label class="chk" style="margin-top:22px"><input type="checkbox" id="oneRef"><span>${t('Одна напольная мишень (связующие снимки не нужны)')}</span></label>
     </div>
     <div id="linkRow"></div>
@@ -295,10 +295,10 @@ function livecam(box) {
 
   let st = null, filled = false;
   const inputs3 = (id, tg) => `<span class="row" style="gap:6px">
-    <input type="number" id="${id}C" value="${tg ? tg.cols : ''}" style="width:64px">
-    <input type="number" id="${id}R" value="${tg ? tg.rows : ''}" style="width:64px">
-    <input type="number" id="${id}S" value="${tg ? tg.square_mm : ''}" step="0.1" style="width:80px"></span>`;
-  const readT = id => ({ cols: Number($(`#${id}C`, box).value), rows: Number($(`#${id}R`, box).value), square_mm: Number($(`#${id}S`, box).value) });
+    <input type="text" inputmode="decimal" data-num id="${id}C" value="${tg ? tg.cols : ''}" style="width:64px">
+    <input type="text" inputmode="decimal" data-num id="${id}R" value="${tg ? tg.rows : ''}" style="width:64px">
+    <input type="text" inputmode="decimal" data-num id="${id}S" value="${tg ? tg.square_mm : ''}" style="width:80px"></span>`;
+  const readT = id => ({ cols: parseNum($(`#${id}C`, box).value) || 0, rows: parseNum($(`#${id}R`, box).value) || 0, square_mm: parseNum($(`#${id}S`, box).value) || 0 });
   const fill = () => {
     const wheels = WHEELS.map(w => `<label class="f">${w.name}: ${t('углы × углы × клетка, мм')}${inputs3('lw' + w.key, st.wheel_targets[w.key])}</label>`).join('');
     const r0 = st.refs[0], r1 = st.refs[1];

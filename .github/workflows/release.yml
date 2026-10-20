@@ -29,10 +29,11 @@ jobs:
           CGO_ENABLED: '0'
         run: |
           mkdir dist
-          GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-s -w -H=windowsgui" -o dist/wheelalign.exe ./cmd/wheelalign
-          GOOS=linux   GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o dist/wheelalign-linux-amd64 ./cmd/wheelalign
-          GOOS=darwin  GOARCH=arm64 go build -trimpath -ldflags "-s -w" -o dist/wheelalign-macos-arm64 ./cmd/wheelalign
-          GOOS=darwin  GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o dist/wheelalign-macos-amd64 ./cmd/wheelalign
+          V="-X main.version=${GITHUB_REF_NAME#v}"
+          GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-s -w -H=windowsgui $V" -o dist/wheelalign.exe ./cmd/wheelalign
+          GOOS=linux   GOARCH=amd64 go build -trimpath -ldflags "-s -w $V" -o dist/wheelalign-linux-amd64 ./cmd/wheelalign
+          GOOS=darwin  GOARCH=arm64 go build -trimpath -ldflags "-s -w $V" -o dist/wheelalign-macos-arm64 ./cmd/wheelalign
+          GOOS=darwin  GOARCH=amd64 go build -trimpath -ldflags "-s -w $V" -o dist/wheelalign-macos-amd64 ./cmd/wheelalign
 
       - name: Релиз
         env:

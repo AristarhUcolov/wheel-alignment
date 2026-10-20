@@ -47,10 +47,23 @@ function keyOf(group, item) {
   return v + '|' + group + '|' + item;
 }
 
-function render() {
-  const gs = groups();
+function counts(gs) {
   const total = gs.reduce((n, [, , items]) => n + items.length, 0);
   const done = gs.reduce((n, [g, , items]) => n + items.filter(([k]) => state.checks[keyOf(g, k)]).length, 0);
+  return { total, done };
+}
+
+function progress(gs) {
+  const { total, done } = counts(gs);
+  const bar = $('.progress', root);
+  bar.setAttribute('aria-valuenow', done);
+  bar.firstElementChild.style.width = `${total ? (done / total * 100).toFixed(0) : 0}%`;
+  $('#pCount', root).textContent = t('Выполнено {done} из {total}', { done, total });
+}
+
+function render() {
+  const gs = groups();
+  const { total, done } = counts(gs);
   const ss = state.session || {};
   const fs = ss.front_suspension;
 
@@ -58,8 +71,8 @@ function render() {
     <div style="max-width:980px">
       <h1>${t('Подготовка')}</h1>
       <p class="lede">${t('Изношенную подвеску регулировать бесполезно: в статике выставите одно, в движении будет другое. Пройдите список — он составлен под тип подвески вашей машины.')}</p>
-      <div class="progress"><div style="width:${total ? (done / total * 100).toFixed(0) : 0}%"></div></div>
-      <p class="muted" style="font-size:13px">${t('Выполнено {done} из {total}', { done, total })}</p>
+      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}" aria-label="${esc(t('Подготовка'))}"><div style="width:${total ? (done / total * 100).toFixed(0) : 0}%"></div></div>
+      <p class="muted" style="font-size:13px" id="pCount">${t('Выполнено {done} из {total}', { done, total })}</p>
       ${fs && fs.id && fs.id.includes('kingpin') ? `<div class="warn" style="margin:12px 0">
         <b>${t('Шкворневая подвеска.')}</b> ${t('Её чаще всего и отказываются регулировать — потому что без исправных шкворней регулировка не держится. Проверьте люфт шкворней и втулок, прошприцуйте шарниры. Если люфт есть — сначала ремонт.')}</div>` : ''}
       <div id="pgroups"></div>
@@ -77,10 +90,12 @@ function render() {
     for (const [id, text] of items) {
       const k = keyOf(g, id);
       const lab = h(`<label class="chk"><input type="checkbox"${state.checks[k] ? ' checked' : ''}><span>${esc(text)}</span></label>`);
+      // Только счётчик и полоска — без перерисовки списка, иначе фокус
+      // с клавиатуры уходил бы в начало страницы после каждой отметки.
       lab.querySelector('input').onchange = e => {
         if (e.target.checked) state.checks[k] = 1; else delete state.checks[k];
         save('checks', state.checks);
-        render();
+        progress(gs);
       };
       list.append(lab);
     }
@@ -91,6 +106,7 @@ function render() {
     for (const [g, , items] of gs) for (const [id] of items) { if (on) state.checks[keyOf(g, id)] = 1; else delete state.checks[keyOf(g, id)]; }
     save('checks', state.checks);
     render();
+    $(on ? '#pAll' : '#pNone', root).focus();
   };
   $('#pAll', root).onclick = () => setAll(true);
   $('#pNone', root).onclick = () => setAll(false);

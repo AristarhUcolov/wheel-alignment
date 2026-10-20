@@ -9,9 +9,12 @@ import (
 	"github.com/AristarhUcolov/wheel-alignment/internal/i18n"
 )
 
-// SetSettingsFile tells the server where to keep the person's preferences —
-// for now, the interface language.
-func (s *Server) SetSettingsFile(path string) { s.settingsPath = path }
+// SetSettingsFile tells the server where to keep the person's preferences:
+// the interface language and the interface's own settings.
+func (s *Server) SetSettingsFile(path string) {
+	s.settingsPath = path
+	s.loadUIPrefs()
+}
 
 func (s *Server) getLang(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"lang": string(i18n.Current())})

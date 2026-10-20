@@ -411,6 +411,17 @@ func init() {
 		"ваши данные":     "your data",
 	})
 
+	// Browsing by region; interface settings.
+	add(map[string]string{
+		"СССР, Россия и СНГ": "USSR, Russia and the CIS",
+		"США":                "USA",
+		"Европа":             "Europe",
+		"Азия":               "Asia",
+		"Другие":             "Other",
+		"настройки слишком большие":                      "the settings are too large",
+		"настройки интерфейса должны быть объектом JSON": "the interface settings must be a JSON object",
+	})
+
 	add(map[string]string{
 		`Сход-развал — открытый стенд.
 

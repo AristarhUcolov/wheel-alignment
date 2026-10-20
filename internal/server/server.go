@@ -60,6 +60,9 @@ type Server struct {
 	optLive *liveOptical
 
 	settingsPath string
+	ui           uiPrefs
+	version      string
+	dataPath     string
 
 	stop context.CancelFunc
 }
@@ -90,6 +93,7 @@ func New(db *specs.DB) (*Server, error) {
 	s.mux.Handle("GET /", noCache(http.FileServerFS(sub)))
 	s.mux.HandleFunc("GET /api/health", s.health)
 	s.mux.HandleFunc("GET /api/specs/search", s.searchSpecs)
+	s.mux.HandleFunc("GET /api/specs/makes", s.makes)
 	s.mux.HandleFunc("GET /api/specs/{id}", s.getSpec)
 	s.mux.HandleFunc("POST /api/specs/check", s.checkSpec)
 	s.mux.HandleFunc("POST /api/specs/save", s.saveSpec)
@@ -121,6 +125,9 @@ func New(db *specs.DB) (*Server, error) {
 	s.mux.HandleFunc("POST /api/open", s.openURL)
 	s.mux.HandleFunc("GET /api/lang", s.getLang)
 	s.mux.HandleFunc("POST /api/lang", s.setLang)
+	s.mux.HandleFunc("GET /api/settings", s.getSettings)
+	s.mux.HandleFunc("POST /api/settings", s.setSettings)
+	s.mux.HandleFunc("GET /api/about", s.about)
 	return s, nil
 }
 
@@ -236,6 +243,20 @@ func (s *Server) summarise(sp specs.Spec) specSummary {
 }
 
 func (s *Server) searchSpecs(w http.ResponseWriter, r *http.Request) {
+	// ids=a,b,c: exactly these entries, in this order — the recent vehicles.
+	if ids := r.URL.Query().Get("ids"); ids != "" {
+		out := []specSummary{}
+		for i, id := range strings.Split(ids, ",") {
+			if i >= 20 {
+				break
+			}
+			if sp, ok := s.db.Get(strings.TrimSpace(id)); ok {
+				out = append(out, s.summarise(sp))
+			}
+		}
+		writeJSON(w, http.StatusOK, map[string]any{"results": out, "guidance": []specSummary{}})
+		return
+	}
 	q := specs.Query{
 		Text:            r.URL.Query().Get("q"),
 		Make:            r.URL.Query().Get("make"),

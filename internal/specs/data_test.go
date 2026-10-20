@@ -134,3 +134,53 @@ func TestIsSourceURL(t *testing.T) {
 		}
 	}
 }
+
+// Every built-in make is filed under a region, so browsing by region never
+// hides one under "other".
+func TestBuiltinMakesHaveRegion(t *testing.T) {
+	for path, list := range builtinFiles(t) {
+		for _, s := range list {
+			if s.Source.Kind == SourceClassGuidance {
+				continue
+			}
+			if RegionOf(s.Make) == RegionOther {
+				t.Errorf("%s: make %q has no region in makes.go", path, s.Make)
+			}
+		}
+	}
+}
+
+func TestMakeCounts(t *testing.T) {
+	db, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	mc := db.MakeCounts()
+	total, last := 0, -1
+	order := map[Region]int{}
+	for i, r := range Regions {
+		order[r] = i
+	}
+	for _, m := range mc {
+		if m.Count <= 0 || m.Key == "" || m.Name == "" {
+			t.Errorf("bad entry %+v", m)
+		}
+		if order[m.Region] < last {
+			t.Errorf("%s is out of region order", m.Key)
+		}
+		last = order[m.Region]
+		total += m.Count
+		if n := len(db.Search(Query{Make: m.Key})); n != m.Count {
+			t.Errorf("%s: %d entries counted, the make filter finds %d", m.Key, m.Count, n)
+		}
+	}
+	guidance := 0
+	for _, s := range db.All() {
+		if s.Source.Kind == SourceClassGuidance {
+			guidance++
+		}
+	}
+	if total != db.Count()-guidance {
+		t.Errorf("makes add up to %d entries, the database has %d", total, db.Count()-guidance)
+	}
+}

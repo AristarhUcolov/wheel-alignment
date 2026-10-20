@@ -1,7 +1,7 @@
 // Внести допуски из руководства: проверка, сохранение у себя, файл для проекта.
 
 import { state, api, toast, updateSession, h, $, $$ } from '../state.js';
-import { esc, fmtDM } from '../fmt.js';
+import { esc, fmtDM, parseNum } from '../fmt.js';
 import { t } from '../i18n.js';
 import { go } from '../app.js';
 
@@ -69,13 +69,13 @@ function render() {
           <label class="f">${t('Марка')}<input type="text" id="cMake" value="${esc(pre.make)}" placeholder="${esc(t('ГАЗ'))}"></label>
           <label class="f">${t('Модель')}<input type="text" id="cModel" value="${esc(pre.model)}" placeholder="${esc(t('3110 «Волга»'))}"></label>
           <label class="f">${t('Модификация')}<input type="text" id="cTrim" placeholder="${esc(t('необязательно'))}"></label>
-          <label class="f">${t('Год начала выпуска')}<input type="number" id="cFrom" placeholder="1997" value="${pre.from}"></label>
-          <label class="f">${t('Год окончания')}<input type="number" id="cTo" placeholder="${esc(t('пусто — выпускается'))}" value="${pre.to}"></label>
+          <label class="f">${t('Год начала выпуска')}<input type="text" inputmode="numeric" data-num id="cFrom" placeholder="1997" value="${pre.from}"></label>
+          <label class="f">${t('Год окончания')}<input type="text" inputmode="numeric" data-num id="cTo" placeholder="${esc(t('пусто — выпускается'))}" value="${pre.to}"></label>
           <label class="f">${t('Класс')}<select id="cClass">
             ${classes.map(([k, n]) => `<option value="${k}"${k === pre.cls ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
           <label class="f">${t('Передняя подвеска')}${sel('cFront', susp.front, pre.front)}</label>
           <label class="f">${t('Задняя подвеска')}${sel('cRear', susp.rear, pre.rear)}</label>
-          <label class="f">${t('Диаметр обода, дюймы')}<input type="number" id="cRim" step="0.5" value="${pre.rim}">
+          <label class="f">${t('Диаметр обода, дюймы')}<input type="text" inputmode="decimal" data-num id="cRim" value="${pre.rim}">
             <small>${t('Обязателен, если схождение в миллиметрах: «3 мм» на 13″ и на 17″ — разные углы.')}</small></label>
         </div>
       </div>
@@ -94,8 +94,8 @@ function render() {
                   <span class="dim num" data-show="${ax}-${a.k}"></span>
                 </span></label>`).join('')}
             <label class="f">${t('Суммарное схождение в мм, если в документе так')}
-              <span class="row" style="gap:6px"><input type="number" step="0.1" data-mm="${ax}" data-b="min" placeholder="${esc(t('от, мм'))}" style="width:110px">
-              <input type="number" step="0.1" data-mm="${ax}" data-b="max" placeholder="${esc(t('до, мм'))}" style="width:110px"></span></label>
+              <span class="row" style="gap:6px"><input type="text" inputmode="decimal" data-num data-mm="${ax}" data-b="min" placeholder="${esc(t('от, мм'))}" style="width:110px">
+              <input type="text" inputmode="decimal" data-num data-mm="${ax}" data-b="max" placeholder="${esc(t('до, мм'))}" style="width:110px"></span></label>
           </div>
           <div class="cols3" style="margin-top:8px">
             ${['camber', ...(ax === 'front' ? ['caster'] : []), 'toe'].map(k => `
@@ -190,14 +190,14 @@ function draft() {
     id, make, model, trim: g('#cTrim'), notes: g('#cNotes'),
     year_from: from, year_to: parseInt(g('#cTo'), 10) || 0,
     class: g('#cClass'), front_suspension: g('#cFront'), rear_suspension: g('#cRear'),
-    rim_diameter_in: parseFloat(g('#cRim')) || 0,
+    rim_diameter_in: parseNum(g('#cRim')) || 0,
     front: axle('front'), rear: axle('rear'),
     conditions: { load: g('#cLoad'), pressure: g('#cPress'), settle: g('#cSettle') },
     source: { kind: g('#cKind'), reference: g('#cRef'), contributor: g('#cWho'), added: new Date().toISOString().slice(0, 10) },
   };
   for (const ax of ['front', 'rear']) {
-    const lo = parseFloat($(`[data-mm="${ax}"][data-b="min"]`, root).value);
-    const hi = parseFloat($(`[data-mm="${ax}"][data-b="max"]`, root).value);
+    const lo = parseNum($(`[data-mm="${ax}"][data-b="min"]`, root).value);
+    const hi = parseNum($(`[data-mm="${ax}"][data-b="max"]`, root).value);
     if (Number.isFinite(lo) && Number.isFinite(hi)) spec[ax + '_total_toe_mm'] = { min: lo, max: hi };
   }
   const xc = parseAngle(g('#cXCam')), xk = parseAngle(g('#cXCas')), th = parseAngle(g('#cThr'));

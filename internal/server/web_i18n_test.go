@@ -20,9 +20,11 @@ var (
 	// t('…'), t("…") and t(`…`) without ${}: the forms the screens use. The
 	// look-behind is emulated by the leading group, so get('x') is not a call.
 	jsCall = regexp.MustCompile("(?:^|[^\\w$.])t\\(\\s*(?:'((?:[^'\\\\\\n]|\\\\.)*)'|\"((?:[^\"\\\\\\n]|\\\\.)*)\"|`([^`$]*)`)")
-	// <tag … data-t …>text<  and  data-t-title … title="text".
+	// <tag … data-t …>text<,  data-t-title … title="text"  and
+	// data-t-aria … aria-label="text".
 	htmlText  = regexp.MustCompile(`<\w+(?:\s[^>]*)?\sdata-t(?:\s[^>]*)?>([^<]*)<`)
 	htmlTitle = regexp.MustCompile(`<\w+[^>]*\sdata-t-title[^>]*\stitle="([^"]*)"`)
+	htmlAria  = regexp.MustCompile(`<\w+[^>]*\sdata-t-aria[^>]*\saria-label="([^"]*)"`)
 	holder    = regexp.MustCompile(`\{\w+\}`)
 	// Examples in comments are not calls.
 	lineComment = regexp.MustCompile(`(?m)^\s*//.*$`)
@@ -76,6 +78,9 @@ func webKeys(t *testing.T) map[string]string {
 				add(m[1])
 			}
 			for _, m := range htmlTitle.FindAllStringSubmatch(src, -1) {
+				add(m[1])
+			}
+			for _, m := range htmlAria.FindAllStringSubmatch(src, -1) {
 				add(m[1])
 			}
 		}

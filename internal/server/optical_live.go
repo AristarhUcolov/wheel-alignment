@@ -182,8 +182,10 @@ func insideBoard(a, b vision.Target) bool {
 	return (a.Cols <= b.Cols && a.Rows <= b.Rows) || (a.Cols <= b.Rows && a.Rows <= b.Cols)
 }
 
-// SetDataDir is where camera calibrations are kept between runs.
+// SetDataDir is the user data directory: camera calibrations are kept there
+// between runs, and the interface shows it so a person knows where their data is.
 func (s *Server) SetDataDir(dir string) {
+	s.dataPath = dir
 	lo := s.optLive
 	lo.mu.Lock()
 	defer lo.mu.Unlock()
@@ -1360,6 +1362,6 @@ func formIntQ(s string) int {
 
 func formFloatQ(s string) float64 {
 	var v float64
-	fmt.Sscanf(strings.ReplaceAll(s, ",", "."), "%g", &v)
+	fmt.Sscanf(normNum(s), "%g", &v)
 	return v
 }

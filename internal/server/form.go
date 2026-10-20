@@ -20,13 +20,17 @@ func formValue(f *multipart.Form, key string) string {
 	return ""
 }
 
+// normNum accepts numbers the way people type them: "0,5" as well as "0.5",
+// and a typographic minus or dash as well as a hyphen.
+var normNum = strings.NewReplacer(",", ".", "−", "-", "–", "-", " ", "", "\u00a0", "").Replace
+
 func formInt(f *multipart.Form, key string) int {
 	n, _ := strconv.Atoi(formValue(f, key))
 	return n
 }
 
 func formFloat(f *multipart.Form, key string) float64 {
-	v, _ := strconv.ParseFloat(formValue(f, key), 64)
+	v, _ := strconv.ParseFloat(normNum(formValue(f, key)), 64)
 	return v
 }
 
@@ -37,7 +41,7 @@ func formFloatOK(f *multipart.Form, key string) (float64, bool) {
 	if s == "" {
 		return 0, false
 	}
-	v, err := strconv.ParseFloat(s, 64)
+	v, err := strconv.ParseFloat(normNum(s), 64)
 	return v, err == nil
 }
 

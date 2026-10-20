@@ -43,6 +43,33 @@ export default {
 <p class="muted">Start options: <code>-browser</code> — open in the browser instead of a window; <code>-data &lt;folder&gt;</code> —
   keep the data elsewhere (for example next to the program on a USB stick). Full list: <code>wheelalign -h</code>.</p>`],
 
+['access', 'Settings and accessibility', `
+<p>The program should suit everyone: whoever works in a bright garage, sees poorly or cannot tell colours apart, lies
+  under the car alone or uses only a keyboard. All of it is in “Settings” (the ⚙ icon at the top right): it applies at
+  once and is kept in the program's settings file.</p>
+<ul>
+  <li><b>Theme.</b> Dark — like an aligner's screen; light — for a bright garage and sunlight; high contrast — black and
+    white, bright colours and thick borders.</li>
+  <li><b>Interface size</b> — normal, large, extra large: everything grows at once — text, buttons, figures.</li>
+  <li><b>Status colours.</b> If red and green are hard to tell apart, choose “Blue and orange”. A sign always stands next
+    to the colour: <b>✓</b> — in tolerance, <b>!</b> — near the limit, <b>✕</b> — out of tolerance; the signs show on a
+    black-and-white printout of the report too.</li>
+  <li><b>No animation</b> — for those bothered by blinking. By default the program follows the Windows “Show
+    animations” setting.</li>
+  <li><b>Adjusting by ear.</b> Choose an angle on the adjustment screen and turn the sound on (<kbd>F7</kbd>): out of
+    tolerance the program beeps — faster the closer it gets — a chime sounds on entering the tolerance and a low tone on
+    leaving it. The voice (<kbd>F8</kbd>) reads the chosen angle aloud and says when it is in tolerance and when
+    everything is. The voice is the system one, from Windows; if there is none for your language: Settings → Time &amp;
+    language → Speech → “Add voices”.</li>
+  <li><b>No mouse needed.</b> Everything works from the keyboard: <kbd>Tab</kbd> — to the next element, <kbd>Enter</kbd>
+    or Space — press, <kbd>Esc</kbd> — close the panel; the F-keys are labelled at the bottom of the screen. A frame
+    shows where the focus is. A screen reader (the one built into Windows, or NVDA) reads the readings, the result and
+    the program's messages.</li>
+  <li><b>Workshop.</b> Its name, address and the person doing the job go into the report header.</li>
+  <li><b>The welcome</b> on first start walks through these settings and helps choose a way to measure. To open it
+    again — “Settings → Show the welcome again”.</li>
+</ul>`],
+
 ['angles', 'The angles in plain words', `
 <table class="params"><thead><tr><th>Angle</th><th>What it is</th><th>When it is off</th></tr></thead><tbody>
   <tr><td><b>Camber</b></td><td>Tilt of the wheel across the car, seen from the front. “Plus” — the top of the wheel leans out.</td>
@@ -68,6 +95,9 @@ export default {
 <ul>
   <li><b>Search</b> by make and model, in Latin or Cyrillic letters: “Volga 3110”, “GAZelle”, “2107”, “Hilux”. The filters
     at the top narrow the list to cars, SUVs, vans, trucks or buses; the “Year” box drops other generations.</li>
+  <li><b>Not sure of the spelling?</b> While the search box is empty, every make is listed below by region (USSR and
+    Russia, Europe, USA, Asia) with its number of models, along with recently chosen vehicles. Click a make to keep only
+    its models.</li>
   <li>Every entry carries a <b>source badge</b>: factory manual, community, unverified, design only. The weaker the badge,
     the more carefully treat the figures — see “Where the specifications come from”.</li>
   <li><b>Model not in the database?</b> Choose the guidance for its class (“car with MacPherson struts”, “truck with a
@@ -199,8 +229,8 @@ export default {
 
 ['live', 'Step 4. The adjustment screen', `
 <ul>
-  <li><b>Figures.</b> Green — in spec, amber — in spec but near the limit, red — out of spec, white — no specification,
-    grey — no reading. Above the figure is the tolerance scale: the green zone and a pointer at the current value.</li>
+  <li><b>Figures.</b> Green — in spec (<b>✓</b>), amber — in spec but near the limit (<b>!</b>), red — out of spec
+    (<b>✕</b>), white — no specification, grey — no reading. Above the figure is the tolerance scale: the green zone and a pointer at the current value.</li>
   <li><b>Views.</b> F2 cycles between the overview and large front- and rear-axle views; F3 and F4 jump straight to an
     axle. Under the car the large view is easier: the figures are readable from two or three metres.</li>
   <li><b>Units</b> — degrees and minutes or decimal degrees; toe can be shown in millimetres (at the rim diameter from the
@@ -213,6 +243,8 @@ export default {
     a known amount (¼, ½, 1 turn) and press how far you turned it. The program works out what one turn does on your car
     and from then on tells you: “to nominal ≈ 1¼ turns, the same way”.</li>
   <li><b>The source bar</b> at the top shows where data comes from: phone, sensor, camera, manual entry, demo.</li>
+  <li><b>Sound and voice</b> — the buttons next to the units, keys <kbd>F7</kbd> and <kbd>F8</kbd>: guidance when you
+    cannot see the screen (see “Settings and accessibility”).</li>
 </ul>`],
 
 ['order', 'Adjustment order — do not change it', `
@@ -318,9 +350,13 @@ export default {
   <tr><td><kbd>F3</kbd> / <kbd>F4</kbd></td><td>Front / rear axle, large</td></tr>
   <tr><td><kbd>F5</kbd></td><td>“Before” snapshot, then “after”</td></tr>
   <tr><td><kbd>F6</kbd></td><td>Report</td></tr>
-  <tr><td><kbd>F9</kbd> / <kbd>F10</kbd></td><td>Demonstration / show the adjustment step by step</td></tr>
+  <tr><td><kbd>F7</kbd> / <kbd>F8</kbd></td><td>Sound signals / voice for the chosen angle</td></tr>
+  <tr><td><kbd>F9</kbd> / <kbd>F10</kbd></td><td>Demonstration / auto-adjust: the program sets the angles itself, step by step</td></tr>
   <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>In the demonstration — “turn” the selected angle (with Shift — in bigger steps)</td></tr>
   <tr><td><kbd>Esc</kbd></td><td>Close the side panel</td></tr>
+  <tr><td colspan="2" class="muted">Everywhere:</td></tr>
+  <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>To the next / previous element</td></tr>
+  <tr><td><kbd>Enter</kbd>, Space</td><td>Press a button, open the chosen angle</td></tr>
 </tbody></table>`],
 
   ],

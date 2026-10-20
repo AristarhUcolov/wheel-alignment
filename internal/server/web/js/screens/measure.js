@@ -1,7 +1,7 @@
 // Шаг 3: замер — выбор способа и ввод данных.
 
 import { state, on, api, save, toast, refreshSession, h, $, $$ } from '../state.js';
-import { WHEELS, esc, fmtParam } from '../fmt.js';
+import { WHEELS, esc, fmtParam, parseNum } from '../fmt.js';
 import { t } from '../i18n.js';
 import { go, snapshot } from '../app.js';
 import * as optical from './optical.js';
@@ -18,6 +18,13 @@ const METHODS = () => [
   { id: 'sensor', name: t('Свой датчик'), desc: t('Самодельная голова на ESP32 или любой прибор, умеющий отправить JSON.'), gets: t('что умеет датчик') },
   { id: 'demo', name: t('Демонстрация'), desc: t('Учебная машина: всё как на настоящей, но без машины.'), gets: t('все углы') },
 ];
+
+// Способ замера по умолчанию — из приветствия.
+export function setMethod(m) {
+  method = m;
+  try { localStorage.setItem('wa.method', JSON.stringify(method)); } catch { /* без сохранения */ }
+  if (root && root.classList.contains('active')) { renderMethods(); renderBody(); }
+}
 
 export function mount(el) {
   root = el;
@@ -98,10 +105,10 @@ function manual(body) {
       <p class="muted" style="margin-top:10px;font-size:13px">${t('Совет «сделайте отступы спереди и сзади одинаковыми» верен только при равных колеях. Введите расстояние от струны до центра ступицы на каждом колесе — программа скажет, как сдвинуть концы струн.')}
         ${t('Колеи — на шаге «Автомобиль» (сейчас: перед {f} мм, зад {r} мм).', { f: ss.track_front_mm || '—', r: ss.track_rear_mm || '—' })}</p>
       <div class="cols4">
-        <label class="f">${t('Левая, у переднего')}<input type="number" step="0.5" data-box="lf"></label>
-        <label class="f">${t('Левая, у заднего')}<input type="number" step="0.5" data-box="lr"></label>
-        <label class="f">${t('Правая, у переднего')}<input type="number" step="0.5" data-box="rf"></label>
-        <label class="f">${t('Правая, у заднего')}<input type="number" step="0.5" data-box="rr"></label>
+        <label class="f">${t('Левая, у переднего')}<input type="text" inputmode="decimal" data-num data-box="lf"></label>
+        <label class="f">${t('Левая, у заднего')}<input type="text" inputmode="decimal" data-num data-box="lr"></label>
+        <label class="f">${t('Правая, у переднего')}<input type="text" inputmode="decimal" data-num data-box="rf"></label>
+        <label class="f">${t('Правая, у заднего')}<input type="text" inputmode="decimal" data-num data-box="rr"></label>
       </div>
       <div id="boxHint" style="margin-top:10px"></div>
     </details>
@@ -116,12 +123,12 @@ function manual(body) {
     grid.append(h(`<div class="wcard" data-w="${w.key}">
       <h3><span>${w.name}</span><span class="live-mini" data-mini="${w.key}"></span></h3>
       <div class="pair">
-        <label class="f">${t('Развал, °')}<input type="number" step="0.01" data-f="camber" value="${v('camber')}"></label>
-        <label class="f">${t('Он же через ½ оборота, °')}<input type="number" step="0.01" data-f="camber_180" value="${v('camber_180')}"></label>
+        <label class="f">${t('Развал, °')}<input type="text" inputmode="decimal" data-num data-f="camber" value="${v('camber')}"></label>
+        <label class="f">${t('Он же через ½ оборота, °')}<input type="text" inputmode="decimal" data-num data-f="camber_180" value="${v('camber_180')}"></label>
       </div>
       <div class="pair">
-        <label class="f">${t('Струна → обод спереди, мм')}<input type="number" step="0.1" data-f="toe_front_mm" value="${v('toe_front_mm')}"></label>
-        <label class="f">${t('Струна → обод сзади, мм')}<input type="number" step="0.1" data-f="toe_rear_mm" value="${v('toe_rear_mm')}"></label>
+        <label class="f">${t('Струна → обод спереди, мм')}<input type="text" inputmode="decimal" data-num data-f="toe_front_mm" value="${v('toe_front_mm')}"></label>
+        <label class="f">${t('Струна → обод сзади, мм')}<input type="text" inputmode="decimal" data-num data-f="toe_rear_mm" value="${v('toe_rear_mm')}"></label>
       </div>
       <label class="chk" style="font-size:13px;color:var(--muted)"><input type="checkbox" data-f="invert_gauge"${d.invert_gauge ? ' checked' : ''}>
         <span>${t('Угломер показывает наоборот (наклон наружу — минус)')}</span></label>
@@ -129,10 +136,10 @@ function manual(body) {
       <details style="margin-top:10px">
         <summary style="cursor:pointer;color:var(--blue);font-size:13.5px">${t('Кастер — развал при повороте колеса')}</summary>
         <div class="pair" style="margin-top:8px">
-          <label class="f">${t('Колесо повёрнуто НАРУЖУ, °')}<input type="number" step="0.01" data-f="sweep_out" value="${v('sweep_out')}"></label>
-          <label class="f">${t('Колесо повёрнуто ВНУТРЬ, °')}<input type="number" step="0.01" data-f="sweep_in" value="${v('sweep_in')}"></label>
+          <label class="f">${t('Колесо повёрнуто НАРУЖУ, °')}<input type="text" inputmode="decimal" data-num data-f="sweep_out" value="${v('sweep_out')}"></label>
+          <label class="f">${t('Колесо повёрнуто ВНУТРЬ, °')}<input type="text" inputmode="decimal" data-num data-f="sweep_in" value="${v('sweep_in')}"></label>
         </div>
-        <label class="f">${t('На сколько градусов поворачивали в каждую сторону')}<input type="number" step="1" data-f="half_sweep" value="${v('half_sweep') || 20}"></label>
+        <label class="f">${t('На сколько градусов поворачивали в каждую сторону')}<input type="text" inputmode="decimal" data-num data-f="half_sweep" value="${v('half_sweep') || 20}"></label>
         <small class="dim">${t('«Наружу» — от центра машины. Поворот руля влево даёт «наружу» для левого колеса и «внутрь» для правого.')}</small>
       </details>` : ''}
     </div>`));
@@ -157,8 +164,7 @@ function manual(body) {
 
 function num(card, f) {
   const el = card.querySelector(`[data-f="${f}"]`);
-  if (!el || el.value.trim() === '') return null;
-  const v = parseFloat(el.value.replace(',', '.'));
+  const v = el ? parseNum(el.value) : null;
   return Number.isFinite(v) ? v : null;
 }
 
@@ -191,7 +197,7 @@ async function sendWheel(card) {
 
 function boxCheck(body) {
   const ss = state.session || {};
-  const g = k => { const v = parseFloat($(`[data-box="${k}"]`, body).value); return Number.isFinite(v) ? v : null; };
+  const g = k => { const v = parseNum($(`[data-box="${k}"]`, body).value); return Number.isFinite(v) ? v : null; };
   const [lf, lr, rf, rr] = ['lf', 'lr', 'rf', 'rr'].map(g);
   const hint = $('#boxHint', body);
   if ([lf, lr, rf, rr].some(v => v === null)) { hint.innerHTML = ''; return; }
@@ -263,7 +269,7 @@ function demo(body) {
     <p>${t('Переднеприводный седан с типичными перекосами: развал по бортам разный, правое колесо смотрит наружу, задняя ось чуть уводит вправо. Показания «шумят» и запаздывают, как у настоящего датчика, а кастер и развал при регулировке тянут за собой схождение — ровно поэтому схождение регулируют последним.')}</p>
     <ul class="plain">
       <li>${t('На экране регулировки нажмите на любой угол — справа откроется, что это и чем регулируется, а кнопки и стрелки ← → «крутят» регулятор.')}</li>
-      <li>${t('F10 «Показать регулировку» — программа сама приведёт углы в допуск в правильном порядке.')}</li>
+      <li>${t('F10 «Авторегулировка» — программа сама приведёт углы в допуск в правильном порядке.')}</li>
       <li>${t('Для оценки «в норме / не в норме» выберите автомобиль или ориентир по классу на шаге 1.')}</li>
     </ul>
     <div class="actions">

@@ -106,3 +106,13 @@ export function esc(s) {
 }
 
 export const inches = d => d * 25.4;
+
+// Число так, как его набирают люди: «-0,5» и «−0.5», с пробелами — одно и то
+// же. Пусто — null, непонятно — NaN. Поля чисел в интерфейсе — текстовые:
+// поле type=number в русской Windows молча отбрасывает «0.5» с точкой.
+export function parseNum(s) {
+  if (s === null || s === undefined) return null;
+  const v = String(s).trim().replace(/[−–—]/g, '-').replace(/[\s\u00a0]/g, '').replace(',', '.');
+  if (v === '') return null;
+  return /^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(v) ? Number(v) : NaN;
+}

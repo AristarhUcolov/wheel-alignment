@@ -1,10 +1,12 @@
 // Экран «Регулировка»: живые показания, как на стенде.
 
 import { state, on, emit, api, save, toast, h, $, $$ } from '../state.js';
-import { ValueBox, CarView, camberPicto, casterPicto, toePicto } from '../widgets.js';
+import { ValueBox, CarView, camberPicto, casterPicto, toePicto, glyphOf } from '../widgets.js';
 import { WHEELS, fmtParam, fmtRangeParam, specValue, shortLabel, paramKind, paramWheel, esc, statusText, inches, fmtDM } from '../fmt.js';
 import { t, lang } from '../i18n.js';
 import { openDrawer, closeDrawer, go, drawerKey } from '../app.js';
+import { prefs, setPref } from '../prefs.js';
+import { announce, wakeAudio, sounds, speak, stopSpeaking, speechAvailable } from '../assist.js';
 
 let root, body, boxes = {}, car = null, pictos = {}, crossEls = {};
 
@@ -17,24 +19,63 @@ const VIEWS = () => [
 export function mount(el) {
   root = el;
   root.innerHTML = `
+    <h1 class="sr-only">${t('Регулировка')}</h1>
     <div class="live-head">
-      <div class="verdict" id="verdict"><span class="dot"></span><span class="txt">${t('Ждём показаний…')}</span><small id="verdictSub"></small></div>
-      <div class="units" id="units">
-        <button data-u="dm" title="${esc(t('Градусы и минуты'))}">° ′</button>
-        <button data-u="deg" title="${esc(t('Десятичные градусы'))}">0.00°</button>
-        <button data-u="mm" title="${esc(t('Схождение в миллиметрах'))}">${t('мм')}</button>
+      <div class="verdict" id="verdict"><span class="dot"></span><span class="txt" role="status" aria-live="polite">${t('Ждём показаний…')}</span><small id="verdictSub"></small></div>
+      <div class="units" id="units" role="group" aria-label="${esc(t('Единицы'))}">
+        <button data-u="dm" title="${esc(t('Градусы и минуты'))}" aria-label="${esc(t('Градусы и минуты'))}">° ′</button>
+        <button data-u="deg" title="${esc(t('Десятичные градусы'))}" aria-label="${esc(t('Десятичные градусы'))}">0.00°</button>
+        <button data-u="mm" title="${esc(t('Схождение в миллиметрах'))}" aria-label="${esc(t('Схождение в миллиметрах'))}">${t('мм')}</button>
       </div>
-      <div class="units" id="views">${VIEWS().map(v => `<button data-v="${v.id}">${v.name}</button>`).join('')}</div>
+      <div class="assist" role="group" aria-label="${esc(t('Регулировка на слух'))}">
+        <button class="icon-btn" id="aSound" title="${esc(t('Звуковые сигналы (F7)'))}" aria-label="${esc(t('Звуковые сигналы'))}">${ICON_SOUND}</button>
+        <button class="icon-btn" id="aVoice" title="${esc(t('Озвучивать выбранный угол (F8)'))}" aria-label="${esc(t('Озвучивать выбранный угол'))}">${ICON_VOICE}</button>
+      </div>
+      <div class="units" id="views" role="group" aria-label="${esc(t('Вид'))}">${VIEWS().map(v => `<button data-v="${v.id}">${v.name}</button>`).join('')}</div>
     </div>
     <div class="live-body" id="liveBody"></div>`;
   body = $('#liveBody', root);
 
   $$('#units button', root).forEach(b => b.onclick = () => setUnits(b.dataset.u));
   $$('#views button', root).forEach(b => b.onclick = () => setView(b.dataset.v));
+  $('#aSound', root).onclick = toggleSound;
+  $('#aVoice', root).onclick = toggleVoice;
 
   on('frame', render);
   on('session', () => { build(); drawerBuiltFor = null; render(); });
+  on('prefs', () => { state.units = prefs.units; renderAssist(); render(); });
   build();
+  renderAssist();
+}
+
+const ICON_SOUND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const ICON_VOICE = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="4" fill="currentColor"/><path d="M2 21c0-4 3.5-6.5 7-6.5s7 2.5 7 6.5" fill="currentColor"/><path d="M17.5 5.5a4 4 0 0 1 0 5.5M20 3a7.5 7.5 0 0 1 0 10.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+function renderAssist() {
+  if (!root) return;
+  for (const [id, on] of [['#aSound', prefs.sound], ['#aVoice', prefs.voice]]) {
+    const b = $(id, root);
+    b.classList.toggle('on', !!on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  $('#aVoice', root).hidden = !speechAvailable();
+}
+
+export function toggleSound() {
+  const on = !prefs.sound;
+  setPref('sound', on);
+  if (on) { wakeAudio(); sounds.inside(); }
+  toast(on ? t('Звуковые сигналы включены: выберите угол — чем ближе к допуску, тем чаще писк; вошли в допуск — перезвон.') : t('Звуковые сигналы выключены'));
+  emit('fkeys');
+}
+
+export function toggleVoice() {
+  const on = !prefs.voice;
+  setPref('voice', on);
+  if (on) speak(t('Голос включён. Выберите угол — я буду его читать.'));
+  else stopSpeaking();
+  toast(on ? t('Голос включён: выбранный угол читается вслух.') : t('Голос выключен'));
+  emit('fkeys');
 }
 
 export function show() {
@@ -44,7 +85,7 @@ export function show() {
 
 export function setUnits(u) {
   state.units = u;
-  save('units', u);
+  setPref('units', u);
   render();
   emit('units', u);
 }
@@ -63,11 +104,18 @@ export function cycleView() {
   setView(views[(i + 1) % views.length].id);
 }
 
+// Откуда открыли панель — туда вернуть фокус, когда её закроют.
+let opener = null;
+
 function pick(key) {
+  opener = document.activeElement;
   state.selected = key;
   drawerBuiltFor = null;
   openParam(key);
   render();
+  announce(key);
+  const hd = $('#drawerBody h2');
+  if (hd) hd.focus({ preventScroll: true });
 }
 
 // ── Построение вида ──────────────────────────────────────────────────
@@ -83,8 +131,15 @@ function build() {
   const mkBox = (key, opts) => {
     const b = new ValueBox(key, opts);
     b.el.onclick = () => pick(key);
+    b.el.setAttribute('aria-haspopup', 'dialog');
     boxes[key] = b;
     return b.el;
+  };
+  const clickable = (el, key) => {
+    el.onclick = () => pick(key);
+    el.tabIndex = 0;
+    el.setAttribute('role', 'button');
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(key); } });
   };
 
   if (state.liveView === 'overview') {
@@ -121,7 +176,7 @@ function build() {
       mid.querySelector('.pic').append(p);
       pictos[kind] = p;
       crossEls[crossKey] = mid.querySelector('.cross');
-      mid.onclick = () => pick(crossKey);
+      clickable(mid, crossKey);
       ax.append(mid);
       ax.append(mkBox(`${kind}_${R}`, { full: true, label: name }));
     }
@@ -134,7 +189,7 @@ function build() {
       ax.append(h('<div></div>'));
       const mid = h(`<div class="axv-mid"><div class="name">${t('Угол тяги')}</div><div class="cross none">— — —</div><div class="xl">${t('куда направлена задняя ось')}</div></div>`);
       crossEls.thrust_angle = mid.querySelector('.cross');
-      mid.onclick = () => pick('thrust_angle');
+      clickable(mid, 'thrust_angle');
       ax.append(mid);
       ax.append(h('<div></div>'));
     }
@@ -177,8 +232,13 @@ function render() {
   if (pictos.caster) pictos.caster.update(val(P, 'caster_FL'));
   for (const [key, el] of Object.entries(crossEls)) {
     const p = P[key];
-    el.textContent = fmtParam(key, p, state.units);
+    const g = glyphOf(p);
+    const text = fmtParam(key, p, state.units);
+    el.textContent = g ? `${g} ${text}` : text;
     el.className = 'cross ' + (!p || !p.has ? 'none' : p.status === 'no_spec' ? '' : p.status);
+    const mid = el.closest('.axv-mid');
+    const aria = `${shortLabel(key)}: ${p && p.has ? text + (p.spec ? ', ' + statusText(p.status) : '') : t('нет показаний')}`;
+    if (mid && mid.getAttribute('aria-label') !== aria) mid.setAttribute('aria-label', aria);
   }
 
   // Источник данных по колёсам в общем виде.
@@ -206,8 +266,11 @@ function render() {
   }
   if (f && !state.connected) { cls = ''; txt = t('Нет связи с программой — переподключаюсь…'); }
   v.className = 'verdict ' + cls;
-  v.querySelector('.txt').textContent = txt;
-  sub.textContent = subtxt;
+  // Текст меняется, только когда меняется смысл: иначе экранный диктор
+  // повторял бы его десять раз в секунду.
+  const tx = v.querySelector('.txt');
+  if (tx.textContent !== txt) tx.textContent = txt;
+  if (sub.textContent !== subtxt) sub.textContent = subtxt;
 
   const empty = $('#liveEmpty', body);
   if (empty) empty.classList.toggle('hidden', !!(f && f.measured > 0));
@@ -317,7 +380,7 @@ export function openParam(key, refresh = false) {
   const explain = EXPLAIN[kind];
 
   const html = `
-    <h2>${esc(info ? info.label : shortLabel(key))}</h2>
+    <h2 tabindex="-1" id="dTitle">${esc(info ? info.label : shortLabel(key))}</h2>
     <div class="muted" id="dStatus"></div>
     <div class="big" id="dBig"></div>
     <div class="target" id="dTarget"></div>
@@ -398,7 +461,8 @@ function updateParam(key) {
   set('#dStatus', p && p.has ? esc(statusText(p.status)) + ' · ' + (p.stable ? t('показания стабильны') : t('показания меняются')) : t('нет показаний'));
   const big = $('#dBig', b);
   big.className = 'big ' + status;
-  big.textContent = fmtParam(key, p, units);
+  const g = glyphOf(p);
+  big.textContent = (g ? g + ' ' : '') + fmtParam(key, p, units);
   const target = $('#dTarget', b);
   target.className = 'target' + (p && p.spec ? '' : ' muted');
   target.textContent = p && p.spec ? t('норма {range} · номинал {nom}', { range: fmtRangeParam(key, p.spec, units, rimMM), nom: fmt(p.spec.nominal) }) : t('допуск не задан');
@@ -444,8 +508,12 @@ export function simAdjust(key, delta) {
 export function selectedKey() { return state.selected; }
 
 export function closeParam() {
+  const wasOpen = !!state.selected;
   state.selected = null;
   drawerBuiltFor = null;
   closeDrawer();
   render();
+  stopSpeaking();
+  if (wasOpen && opener && document.body.contains(opener)) opener.focus({ preventScroll: true });
+  opener = null;
 }

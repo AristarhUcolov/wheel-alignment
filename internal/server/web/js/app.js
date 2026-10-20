@@ -1,9 +1,10 @@
 // Сход-развал — открытый стенд. Каркас интерфейса: шаги, верхняя строка,
-// строка функциональных клавиш, боковая панель, язык.
+// строка функциональных клавиш, боковая панель, язык, настройки.
 
 import { state, on, emit, api, refreshSession, connectStream, toast, $, $$ } from './state.js';
 import { t, setLang, translateStatic, lang } from './i18n.js';
-import { esc } from './fmt.js';
+import { esc, parseNum } from './fmt.js';
+import { loadPrefs, prefs, flushPrefs } from './prefs.js';
 import * as vehicle from './screens/vehicle.js';
 import * as prep from './screens/prep.js';
 import * as measure from './screens/measure.js';
@@ -11,9 +12,11 @@ import * as live from './screens/live.js';
 import * as report from './screens/report.js';
 import * as guide from './screens/guide.js';
 import * as contrib from './screens/contrib.js';
+import * as settings from './screens/settings.js';
 import * as support from './screens/support.js';
+import { maybeWelcome } from './screens/welcome.js';
 
-const SCREENS = { vehicle, prep, measure, live, report, guide, contrib, support };
+const SCREENS = { vehicle, prep, measure, live, report, guide, contrib, settings, support };
 const mounted = new Set();
 
 export function go(name, arg) {
@@ -26,13 +29,35 @@ export function go(name, arg) {
     mounted.add(name);
   }
   $$('.screen').forEach(s => s.classList.toggle('active', s === el));
-  $$('nav.side button').forEach(b => b.classList.toggle('active', b.dataset.screen === name));
+  $$('nav.side button').forEach(b => {
+    const on = b.dataset.screen === name;
+    b.classList.toggle('active', on);
+    if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
   if (SCREENS[name].show) SCREENS[name].show(arg);
   if (name !== 'live') $('#main').scrollTop = 0;
+  // Фокус остался на элементе скрытого экрана — переносим в начало нового,
+  // иначе клавиатура «теряется».
+  const a = document.activeElement;
+  if (a && a !== document.body && !a.closest('nav.side, header.top, footer.fkeys, .drawer, .modal-back') && !el.contains(a)) {
+    $('#main').focus({ preventScroll: true });
+  }
   renderFkeys();
+  renderSteps();
 }
 
 $$('nav.side button').forEach(b => b.onclick = () => go(b.dataset.screen));
+
+// Поле числа, в котором не число, — сразу красная рамка, а не молча
+// пропавший замер.
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (!el.matches || !el.matches('input[data-num]')) return;
+  const bad = Number.isNaN(parseNum(el.value));
+  el.toggleAttribute('aria-invalid', bad);
+  el.title = bad ? t('Не понял число — например: -0,5 или 0.25') : '';
+});
+$('#topSettings').onclick = () => go('settings');
 
 // ── Ссылки наружу ───────────────────────────────────────────────────
 
@@ -87,6 +112,7 @@ function renderTop() {
       <span class="t">${esc(title)}</span>
       <span class="badge ${esc(lim ? lim.source_kind : 'catalog')}">${limTxt}</span>
       <span class="s">${esc(t('перед: {front} · зад: {rear} · обод {rim}″', { front: ss.front_suspension.name, rear: ss.rear_suspension.name, rim: ss.rim_diameter_in }))}</span>`;
+    el.title = title;
   }
 }
 
@@ -98,8 +124,10 @@ function renderSources() {
     return;
   }
   const src = (f && f.sources) || [];
-  if (!src.length) { el.innerHTML = `<span class="src-pill">${t('датчиков нет')}</span>`; return; }
-  el.innerHTML = src.map(s => `<span class="src-pill ${s.online ? 'on' : 'off'}" title="${esc(s.detail || '')}">${esc(s.name)}${s.wheel ? ' · ' + esc(s.wheel) : ''}</span>`).join('');
+  const html = !src.length
+    ? `<span class="src-pill">${t('датчиков нет')}</span>`
+    : src.map(s => `<span class="src-pill ${s.online ? 'on' : 'off'}" title="${esc(s.detail || '')}">${esc(s.name)}${s.wheel ? ' · ' + esc(s.wheel) : ''}</span>`).join('');
+  if (el.innerHTML !== html) el.innerHTML = html;
 }
 
 function tickClock() {
@@ -108,20 +136,48 @@ function tickClock() {
 }
 setInterval(tickClock, 1000);
 
+// Пройденные шаги отмечаются в списке слева — видно, что сделано и что дальше.
+function renderSteps() {
+  const ss = state.session || {};
+  const f = state.frame;
+  const done = {
+    vehicle: !!ss.vehicle,
+    measure: !!(f && f.measured > 0),
+    live: !!(f && f.measured > 0 && f.has_limits && f.overall === 'good'),
+    report: !!ss.has_after,
+  };
+  $$('nav.side .side-steps button').forEach(b => {
+    const d = !!done[b.dataset.screen];
+    b.classList.toggle('done', d && !b.classList.contains('active'));
+  });
+}
+
+// В узком окне от кнопок шагов остаются номера — подписи уходят в подсказки.
+function navTitles() {
+  $$('nav.side button').forEach(b => {
+    const span = b.querySelector('span');
+    if (span) b.title = span.textContent;
+  });
+}
+
 // ── Язык ────────────────────────────────────────────────────────────
+
+export async function switchLang(l) {
+  if (l === lang) return;
+  try {
+    await flushPrefs();
+    await api('/api/lang', { method: 'POST', body: { lang: l } });
+    // Перезагрузка — самый надёжный способ перевести всё сразу, включая
+    // то, что уже пришло с сервера.
+    location.reload();
+  } catch (e) { toast(e.message, true); }
+}
 
 function renderLangs() {
   $$('#langs button').forEach(b => {
     b.classList.toggle('on', b.dataset.lang === lang);
-    b.onclick = async () => {
-      if (b.dataset.lang === lang) return;
-      try {
-        await api('/api/lang', { method: 'POST', body: { lang: b.dataset.lang } });
-        // Перезагрузка — самый надёжный способ перевести всё сразу, включая
-        // то, что уже пришло с сервера.
-        location.reload();
-      } catch (e) { toast(e.message, true); }
-    };
+    b.setAttribute('aria-pressed', b.dataset.lang === lang ? 'true' : 'false');
+    b.onclick = () => switchLang(b.dataset.lang);
   });
 }
 
@@ -139,8 +195,10 @@ function fkeysFor(screen) {
       { k: 'F4', label: t('Задняя ось'), run: () => live.setView('rear'), on: view === 'rear' },
       { k: 'F5', label: ss.has_before ? t('Снимок «после»') : t('Снимок «до»'), run: () => snapshot(ss.has_before ? 'after' : 'before') },
       { k: 'F6', label: t('Отчёт'), run: () => go('report') },
-      { k: 'F9', label: ss.sim_running ? t('Остановить демо') : t('Демонстрация'), run: toggleSim, on: ss.sim_running },
-      ...(ss.sim_running ? [{ k: 'F10', label: ss.sim_auto ? t('Стоп авторегулировки') : t('Показать регулировку'), run: toggleAuto, on: ss.sim_auto }] : []),
+      { k: 'F7', label: t('Звук'), run: () => live.toggleSound(), on: prefs.sound },
+      { k: 'F8', label: t('Голос'), run: () => live.toggleVoice(), on: prefs.voice },
+      { k: 'F9', label: ss.sim_running ? t('Стоп демо') : t('Демо'), run: toggleSim, on: ss.sim_running },
+      ...(ss.sim_running ? [{ k: 'F10', label: ss.sim_auto ? t('Стоп авторегулировки') : t('Авторегулировка'), run: toggleAuto, on: ss.sim_auto }] : []),
     ];
   }
   const next = { vehicle: 'prep', prep: 'measure', measure: 'live', report: null }[screen];
@@ -160,12 +218,14 @@ let currentFkeys = [];
 export function renderFkeys() {
   currentFkeys = fkeysFor(state.screen);
   const bar = $('#fkeys');
+  bar.classList.toggle('many', currentFkeys.length > 8);
   bar.innerHTML = currentFkeys.map((f, i) =>
-    `<button class="fkey${f.on ? ' on' : ''}" data-i="${i}"><kbd>${f.k}</kbd><span>${esc(f.label)}</span></button>`).join('');
+    `<button class="fkey${f.on ? ' on' : ''}" data-i="${i}" title="${esc(f.k + ' — ' + f.label)}"${f.on !== undefined ? ` aria-pressed="${f.on ? 'true' : 'false'}"` : ''}><kbd>${f.k}</kbd><span>${esc(f.label)}</span></button>`).join('');
   $$('.fkey', bar).forEach(b => b.onclick = () => currentFkeys[+b.dataset.i].run());
 }
 
 document.addEventListener('keydown', e => {
+  if (document.querySelector('.modal-back')) return; // приветствие ведёт себя само
   if (/^F([1-9]|1[0-2])$/.test(e.key)) {
     e.preventDefault(); // F5 не должен перезагружать окно, F3 — открывать поиск
     const f = currentFkeys.find(x => x.k === e.key);
@@ -182,7 +242,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-async function toggleSim() {
+export async function toggleSim() {
   const running = state.session && state.session.sim_running;
   try {
     await api('/api/sim', { method: 'POST', body: { action: running ? 'stop' : 'start' } });
@@ -226,12 +286,16 @@ setInterval(() => {
 
 // ── Запуск ──────────────────────────────────────────────────────────
 
-on('session', () => { renderTop(); renderFkeys(); });
-on('frame', renderSources);
+on('session', () => { renderTop(); renderFkeys(); renderSteps(); });
+on('frame', () => { renderSources(); renderSteps(); });
 on('connection', () => { renderSources(); });
 on('fkeys', renderFkeys);
+on('prefs', () => renderFkeys());
 
 (async function start() {
+  // Настройки — первыми: тема и масштаб применяются до первой отрисовки.
+  await loadPrefs();
+  state.units = prefs.units;
   try {
     await refreshSession();
   } catch (e) {
@@ -241,12 +305,14 @@ on('fkeys', renderFkeys);
   setLang(state.session ? state.session.lang : 'ru');
   document.title = t('Сход-развал — открытый стенд');
   translateStatic();
+  navTitles();
   renderLangs();
   renderTop();
   tickClock();
   connectStream();
   const want = location.hash.replace('#', '');
   go(SCREENS[want] ? want : (state.session && state.session.vehicle ? 'live' : 'vehicle'));
+  maybeWelcome();
 })();
 
 window.addEventListener('hashchange', () => {

@@ -4,8 +4,10 @@ import { state, on, api, save, toast, $, $$ } from '../state.js';
 import { esc, fmtDM, fmtMM, statusText } from '../fmt.js';
 import { t, lang } from '../i18n.js';
 import { go, snapshot } from '../app.js';
+import { prefs } from '../prefs.js';
+import { GLYPH } from '../widgets.js';
 
-let root, data = null;
+let root, data = null, version = '';
 const meta = (() => { try { return JSON.parse(localStorage.getItem('wa.reportMeta')) || {}; } catch { return {}; } })();
 
 export function mount(el) {
@@ -17,6 +19,7 @@ export function show() { load(); }
 
 async function load() {
   try { data = await api('/api/report'); } catch (e) { toast(e.message, true); return; }
+  if (!version) { try { version = (await api('/api/about')).version; } catch { /* без версии */ } }
   render();
 }
 
@@ -25,7 +28,9 @@ const AXLES = () => ({ front: t('Передняя ось'), rear: t('Задня�
 function cell(p, isToe) {
   if (!p) return '<td class="v dim">—</td>';
   const mm = isToe && p.measured_mm !== undefined && p.measured_mm !== null ? `<br><span class="dim" style="font-size:12px">${fmtMM(p.measured_mm)}</span>` : '';
-  return `<td class="v ${p.status === 'no_spec' ? '' : p.status}">${fmtDM(p.measured)}${mm}</td>`;
+  // Знак рядом с цветом: протокол печатают и на чёрно-белом принтере.
+  const g = GLYPH[p.status] ? `<span class="glyph" aria-hidden="true">${GLYPH[p.status]}</span>` : '';
+  return `<td class="v ${p.status === 'no_spec' ? '' : p.status}">${fmtDM(p.measured)}${g}${mm}</td>`;
 }
 
 function table(before, after) {
@@ -75,8 +80,14 @@ function render() {
 
   root.innerHTML = `
     <div style="max-width:1080px">
-      <div class="row no-print" style="justify-content:space-between;align-items:center">
-        <h1>${t('Протокол сход-развала')}</h1>
+      <div class="report-head">
+        <div>
+          <h1>${t('Протокол сход-развала')}</h1>
+          ${version ? `<p class="dim" style="font-size:12px;margin:0">${esc(t('«Сход-развал — открытый стенд», версия {v}', { v: version }))}</p>` : ''}
+        </div>
+        ${prefs.workshop && prefs.workshop.name ? `<div class="ws" style="text-align:right"><b>${esc(prefs.workshop.name)}</b><span>${esc(prefs.workshop.contacts || '')}</span></div>` : ''}
+      </div>
+      <div class="row no-print" style="justify-content:flex-end;align-items:center;margin-top:8px">
         <div class="actions" style="margin:0">
           <button class="btn" id="rBefore">${before ? t('Переснять «до»') : t('Снимок «до»')}</button>
           <button class="btn" id="rAfter">${after ? t('Переснять «после»') : t('Снимок «после»')}</button>
@@ -87,9 +98,9 @@ function render() {
         <div class="kv">
           <div>${t('Дата')}</div><div>${when.toLocaleString(lang === 'en' ? 'en-GB' : 'ru-RU')}</div>
           <div>${t('Автомобиль')}</div><div>${v ? esc(v.source_kind === 'class_guidance' ? t('не указан') : v.title) : t('не указан')}</div>
-          <div>${t('Госномер / VIN')}</div><div><input type="text" data-meta="plate" value="${esc(meta.plate || '')}" style="width:100%;max-width:360px"></div>
-          <div>${t('Пробег, км')}</div><div><input type="text" data-meta="odo" value="${esc(meta.odo || '')}" style="width:100%;max-width:200px"></div>
-          <div>${t('Выполнил')}</div><div><input type="text" data-meta="who" value="${esc(meta.who || '')}" style="width:100%;max-width:360px"></div>
+          <div>${t('Госномер / VIN')}</div><div><input type="text" data-meta="plate" value="${esc(meta.plate || '')}" style="width:100%;max-width:360px" aria-label="${esc(t('Госномер / VIN'))}"></div>
+          <div>${t('Пробег, км')}</div><div><input type="text" data-meta="odo" value="${esc(meta.odo || '')}" style="width:100%;max-width:200px" aria-label="${esc(t('Пробег, км'))}"></div>
+          <div>${t('Выполнил')}</div><div><input type="text" data-meta="who" value="${esc(meta.who || (prefs.workshop && prefs.workshop.who) || '')}" style="width:100%;max-width:360px" aria-label="${esc(t('Выполнил'))}"></div>
           <div>${t('Подвеска')}</div><div>${esc(t('перед: {front}; зад: {rear}', { front: ss.front_suspension.name, rear: ss.rear_suspension.name }))}</div>
           <div>${t('Допуски')}</div><div>${lim ? `${esc(limName)} <span class="badge ${esc(lim.source_kind)}">${esc(lim.source_label)}</span>` : t('не заданы')}</div>
           <div>${t('Обод')}</div><div>${t('{rim}″ — к этому диаметру отнесено схождение в мм', { rim: ss.rim_diameter_in })}</div>
