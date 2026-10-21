@@ -203,8 +203,9 @@ Wi-Fi», отсканировать QR-код телефоном, выбрать
 4. Поверните руль в другую сторону на те же 20°. Снова замерьте оба колеса.
 5. Введите четыре значения.
 
-**Кастер телефоном.** Если телефон на колесе и у него есть гироскоп — кнопка
-«Кастер» на телефоне. Педаль тормоза зафиксировать упором (колесо не должно
+**Кастер телефоном.** Если телефон на переднем колесе и у него есть гироскоп —
+вкладка «Кастер» на телефоне, кнопка «Начать замер кастера». Педаль тормоза
+зафиксировать упором (колесо не должно
 проворачиваться на круге). Телефон попросит поставить колёса прямо (в это время
 он меряет собственный уход гироскопа), повернуть наружу примерно на 20°, затем
 внутрь — угол поворота он измеряет сам, ровно 20° выдерживать не нужно:
@@ -560,8 +561,9 @@ while the wheel is steered**.
 4. Turn the steering the other way by the same 20°. Measure both wheels again.
 5. Enter the four values.
 
-**Caster with a phone.** If the phone is on the wheel and has a gyroscope — the
-“Caster” button on the phone. Lock the brake pedal with a prop (the wheel must not
+**Caster with a phone.** If the phone is on a front wheel and has a gyroscope —
+the “Caster” tab on the phone, the “Measure caster” button. Lock the brake pedal
+with a prop (the wheel must not
 roll on the plate). The phone asks you to set the wheels straight (meanwhile it
 measures its own gyro drift), steer out about 20°, then in — it measures the steer
 angle itself, there is no need to hold exactly 20°: the program solves the problem

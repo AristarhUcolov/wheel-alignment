@@ -6,7 +6,8 @@
 <meta name="theme-color" content="#080d17">
 <title data-t>Датчик — Сход-развал</title>
 <style>
-  :root { --bg:#080d17; --panel:#111a2c; --line:#23324d; --text:#e8eef8; --muted:#93a3bb; --green:#2bd46a; --red:#ff4d4d; --amber:#ffb020; --blue:#4f8cff;
+  :root { --bg:#080d17; --panel:#111a2c; --panel2:#16223a; --line:#23324d; --text:#e8eef8; --muted:#a3b2c9; --dim:#7787a1;
+          --green:#2bd46a; --red:#ff4d4d; --amber:#ffb020; --blue:#4f8cff;
           --num: Bahnschrift, "Roboto Condensed", "DIN Alternate", "Arial Narrow", sans-serif; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -17,30 +18,76 @@
   .dot.on { background: var(--green); box-shadow: 0 0 8px var(--green); }
   button { font: inherit; color: inherit; border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 14px 12px; cursor: pointer; }
   button:active { transform: scale(.98); }
+  button:disabled { opacity: .4; cursor: default; transform: none; }
+  button:focus-visible { outline: 3px solid #9cc0ff; outline-offset: 2px; }
   button.primary { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
-  button.wheel { font-size: 20px; padding: 26px 8px; font-weight: 600; }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  button.wide { width: 100%; }
+  button.small { padding: 9px 12px; font-size: 15px; }
   .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  .card > b:first-child, .card h2 { display: block; font-size: 18px; margin: 0 0 6px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hide { display: none !important; }
+  .muted { color: var(--muted); font-size: 14px; }
+  small { color: var(--muted); }
+  p { margin: 6px 0; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 4px 0; }
+
+  /* Выбор колеса: кнопки там, где колёса у машины. */
+  .carpick { display: grid; grid-template-columns: 1fr 64px 1fr; grid-template-rows: auto 1fr 1fr; gap: 10px; }
+  .carpick .front { grid-column: 1 / -1; text-align: center; color: var(--dim); font-size: 13px; letter-spacing: 2px; }
+  .carpick .body { grid-column: 2; grid-row: 2 / 4; border: 2px solid var(--line); border-radius: 26px 26px 18px 18px; background: linear-gradient(90deg, #16223a, #1c2a46, #16223a); }
+  .carpick button { font-size: 19px; padding: 30px 8px; font-weight: 600; }
+
+  .wheelbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .wheelbar b { font-size: 17px; }
+
+  /* Что меряем: три вкладки. */
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .modes button { padding: 12px 6px; font-weight: 600; font-size: 16px; }
+  .modes button[aria-selected=true] { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .modes button small { display: block; font-weight: 400; font-size: 11.5px; color: inherit; opacity: .8; }
+
   .big { font: 600 clamp(64px, 24vw, 128px)/1 var(--num); text-align: center; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
-  .big.good { color: var(--green); } .big.bad { color: var(--red); } .big.marginal { color: var(--amber); } .big.none { color: #5d6d87; }
+  .big.mid { font-size: clamp(46px, 16vw, 84px); }
+  .big.good { color: var(--green); } .big.bad { color: var(--red); } .big.marginal { color: var(--amber); } .big.none { color: var(--dim); }
   .sub { text-align: center; color: var(--muted); font-family: var(--num); font-size: 18px; min-height: 24px; }
+  .label { text-align: center; color: var(--muted); font-size: 15px; }
   .norm { text-align: center; color: var(--green); font-family: var(--num); font-size: 17px; min-height: 22px; }
+  .stat { text-align: center; font-weight: 600; font-size: 17px; min-height: 24px; }
+  .stat.good { color: var(--green); } .stat.bad { color: var(--red); } .stat.marginal { color: var(--amber); }
   .prompt { font-size: 18px; line-height: 1.35; }
   .err { color: #ffb4b4; background: rgba(255,77,77,.12); border-left: 3px solid var(--red); padding: 10px 12px; border-radius: 0 10px 10px 0; }
+  .note { color: var(--muted); background: var(--panel2); border-left: 3px solid var(--line); padding: 10px 12px; border-radius: 0 10px 10px 0; }
   .bar { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; margin-top: 10px; }
   .bar div { height: 100%; background: var(--green); width: 0; transition: width .15s; }
+  .steer { font: 600 52px/1 var(--num); text-align: center; color: var(--blue); }
+  .proc { border-color: var(--blue); }
+
+  /* Подготовка телефона: шаги с отметками. */
+  .srow { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); }
+  .srow:first-of-type { border-top: none; }
+  .srow b { display: block; font-size: 16px; }
+  .srow small { display: block; font-size: 13px; }
+  .sic { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font: 600 15px var(--num); color: var(--muted); }
+  .sic.ok { border-color: var(--green); background: var(--green); color: #04210f; }
+  .sethead { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .sethead span { color: var(--muted); font-size: 14px; }
+  .setup.done .srow small { display: none; }
+  /* Подготовка пройдена — цифра наверху, подготовка внизу. */
+  #pCamber { display: flex; flex-direction: column; gap: 12px; }
+  #pCamber.ready #setup { order: 2; }
+
   .chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
   .chip { font-size: 13px; padding: 4px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
   .chip.ok { color: var(--green); border-color: #164d2e; }
-  .steer { font: 600 56px/1 var(--num); text-align: center; color: var(--blue); }
-  .hide { display: none !important; }
+  .foot { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
   video { width: 100%; border-radius: 10px; background: #000; display: block; }
   .camvals { display: flex; justify-content: space-around; text-align: center; margin: 4px 0 10px; }
   .camvals .mid { display: block; font: 600 clamp(34px, 11vw, 52px)/1.1 var(--num); font-variant-numeric: tabular-nums; }
   .camvals small { color: var(--muted); font-size: 13px; }
   button.on { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue) inset; }
-  .muted { color: var(--muted); font-size: 14px; }
-  small { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -51,8 +98,10 @@
 
   <section id="pick" class="hide">
     <p class="prompt" data-t>На каком колесе будет телефон?</p>
-    <div class="grid2">
+    <div class="carpick">
+      <div class="front" data-t>ПЕРЁД</div>
       <button class="wheel" data-w="FL" data-t>Переднее левое</button>
+      <div class="body" aria-hidden="true"></div>
       <button class="wheel" data-w="FR" data-t>Переднее правое</button>
       <button class="wheel" data-w="RL" data-t>Заднее левое</button>
       <button class="wheel" data-w="RR" data-t>Заднее правое</button>
@@ -62,42 +111,86 @@
 
   <section id="start" class="hide">
     <div class="card">
-      <p class="prompt" data-t>Телефон будет передавать наклон колеса по Wi-Fi. Экран не погаснет, пока открыта эта страница.</p>
-      <button class="primary" id="go" style="width:100%;font-size:19px;padding:18px" data-t>Включить датчики</button>
-      <button id="goCam" style="width:100%;margin-top:10px" data-t>Телефон как камера (мишени)</button>
+      <h2 data-t>Что умеет телефон</h2>
+      <ul>
+        <li><b data-t>Развал</b> — <span data-t>вживую: телефон на планке, прижатой к ободу.</span></li>
+        <li><b data-t>Кастер</b> — <span data-t>на передних колёсах, с поворотными кругами.</span></li>
+        <li><b data-t>Схождение</b> — <span data-t>только как камера на штативе, с мишенями.</span></li>
+      </ul>
+      <p class="muted" data-t>Экран не погаснет, пока открыта эта страница.</p>
+      <button class="primary wide" id="go" style="font-size:19px;padding:18px" data-t>Включить датчики</button>
+      <button class="wide" id="goCam" style="margin-top:10px" data-t>Телефон как камера (мишени)</button>
       <p class="muted" id="startErr"></p>
     </div>
   </section>
 
   <section id="main" class="hide" style="display:flex;flex-direction:column;gap:12px">
-    <div class="card">
-      <div class="sub" id="wheelName"></div>
-      <div class="big none" id="camber">— — —</div>
-      <div class="sub" id="camberDeg"></div>
-      <div class="norm" id="norm"></div>
-      <div class="steer hide" id="steer"></div>
-      <div class="chips" style="margin-top:8px">
-        <span class="chip" id="cFlat" data-t>калибровка</span>
-        <span class="chip" id="cMount" data-t>крепление</span>
-        <span class="chip" id="cRun">биение</span>
-        <span class="chip" id="cStable" data-t>стабильно</span>
-      </div>
+    <div class="wheelbar">
+      <b id="wheelName"></b>
+      <button class="small" id="bWheel" data-t>Другое колесо</button>
     </div>
-    <div class="card">
-      <div class="prompt" id="prompt"></div>
+    <div class="modes" role="tablist">
+      <button role="tab" data-mode="camber" aria-selected="true"><span data-t>Развал</span></button>
+      <button role="tab" data-mode="caster" aria-selected="false"><span data-t>Кастер</span></button>
+      <button role="tab" data-mode="toe" aria-selected="false"><span data-t>Схождение</span></button>
+    </div>
+
+    <div class="card proc hide" id="proc">
+      <div class="prompt" id="prompt" aria-live="polite"></div>
+      <div class="steer hide" id="steer"></div>
       <div class="bar" id="barWrap"><div id="bar"></div></div>
+      <button class="wide" data-cmd="cancel" style="margin-top:12px" data-t>Отмена</button>
     </div>
     <div class="err hide" id="err"></div>
-    <div class="grid2" id="actions">
-      <button data-cmd="flat" data-t>Калибровка телефона</button>
-      <button data-cmd="mount" data-t>Калибровка крепления</button>
-      <button data-cmd="runout" data-t>Биение диска</button>
-      <button data-cmd="caster" id="bCaster" data-t>Кастер</button>
-      <button data-cmd="cancel" id="bCancel" class="hide" data-t>Отмена</button>
-      <button id="bWheel" data-t>Другое колесо</button>
-      <button id="bCamera" data-t>Камера</button>
+
+    <div id="pCamber">
+      <div class="card setup" id="setup">
+        <div class="sethead"><b data-t>Подготовка телефона</b><span id="setupState"></span></div>
+        <div class="srow"><span class="sic" id="sFlat">1</span>
+          <div><b data-t>Калибровка телефона</b><small data-t>Один раз: на ровном столе экраном вверх, потом вниз. Около минуты.</small></div>
+          <button class="small" data-cmd="flat" data-t>Начать</button></div>
+        <div class="srow"><span class="sic" id="sMount">2</span>
+          <div><b data-t>Калибровка крепления</b><small data-t>Один раз для телефона и планки: прижать к ободу, потом то же вверх ногами.</small></div>
+          <button class="small" data-cmd="mount" data-t>Начать</button></div>
+        <div class="srow"><span class="sic" id="sRun">3</span>
+          <div><b id="runTitle" data-t>Биение диска</b><small data-t>По желанию, для каждого колеса: замер, прокатить машину на пол-оборота, снова замер.</small></div>
+          <button class="small" data-cmd="runout" data-t>Начать</button></div>
+      </div>
+      <div class="card" id="reading">
+        <div class="label" data-t>Развал</div>
+        <div class="big none" id="camber">— — —</div>
+        <div class="sub" id="camberDeg"></div>
+        <div class="stat" id="stat"></div>
+        <div class="norm" id="norm"></div>
+        <div class="chips" style="margin-top:6px"><span class="chip" id="cStable" data-t>стабильно</span></div>
+        <p class="muted" id="liveMsg" style="text-align:center"></p>
+        <p class="muted" data-t>Телефон прижимайте к ровной планке, лежащей на закраинах обода, экраном наружу. Не к шине.</p>
+      </div>
     </div>
-    <p class="muted" data-t>Телефон прижимайте к ровной планке, лежащей на закраинах обода, экраном наружу. Не к шине.</p>
+
+    <div id="pCaster" class="hide">
+      <div class="card">
+        <b data-t>Кастер</b>
+        <p data-t>Передние колёса на поворотных кругах, педаль тормоза зажата упором, телефон на планке. Программа ведёт сама: колесо прямо, наружу примерно на 20°, внутрь примерно на 20°.</p>
+        <div class="big mid none" id="casterVal">— — —</div>
+        <p class="note hide" id="casterWhy"></p>
+        <button class="primary wide" data-cmd="caster" id="bCaster" data-t>Начать замер кастера</button>
+        <button class="wide hide" id="bFront" style="margin-top:10px" data-t>Выбрать переднее колесо</button>
+      </div>
+    </div>
+
+    <div id="pToe" class="hide">
+      <div class="card">
+        <b data-t>Схождение</b>
+        <p data-t>Телефон, приложенный к колесу, схождение не меряет: это поворот колеса вокруг вертикали, а датчик наклона его не чувствует. Гироскоп чувствует, но за минуту накапливает ошибку больше всего допуска.</p>
+        <p><b data-t>Чем мерить схождение:</b></p>
+        <ul>
+          <li><b data-t>Этим телефоном как камерой</b> — <span data-t>на штативе у колеса, мишени на колёсах и на полу. Покажет развал, схождение и кастер вживую.</span></li>
+          <li><b data-t>Струной</b> — <span data-t>на компьютере: «Замер → Струна и угломер».</span></li>
+        </ul>
+        <button class="primary wide" id="toeCam" data-t>Телефон как камера (мишени)</button>
+      </div>
+    </div>
   </section>
 
   <section id="camera" class="hide" style="display:flex;flex-direction:column;gap:12px">
@@ -139,55 +232,81 @@ const EN = {
   "нет связи": "offline",
   "на связи": "connected",
   "На каком колесе будет телефон?": "Which wheel is the phone on?",
+  "ПЕРЁД": "FRONT",
   "Переднее левое": "Front left",
   "Переднее правое": "Front right",
   "Заднее левое": "Rear left",
   "Заднее правое": "Rear right",
   "Левое и правое — если смотреть с места водителя.": "Left and right as seen from the driver's seat.",
-  "Телефон будет передавать наклон колеса по Wi-Fi. Экран не погаснет, пока открыта эта страница.": "The phone will send the wheel's tilt over Wi-Fi. The screen stays on while this page is open.",
-  "Включить датчики": "Start sensors",
-  "калибровка": "calibration",
-  "крепление": "mount",
-  "биение": "runout",
-  "стабильно": "steady",
-  "Калибровка телефона": "Phone calibration",
-  "Калибровка крепления": "Mount calibration",
-  "Биение диска": "Rim runout",
+  "Что умеет телефон": "What the phone can do",
+  "Развал": "Camber",
   "Кастер": "Caster",
-  "Отмена": "Cancel",
+  "Схождение": "Toe",
+  "вживую: телефон на планке, прижатой к ободу.": "live: the phone on a bar pressed against the rim.",
+  "на передних колёсах, с поворотными кругами.": "on the front wheels, with turn plates.",
+  "только как камера на штативе, с мишенями.": "only as a camera on a tripod, with targets.",
+  "Экран не погаснет, пока открыта эта страница.": "The screen stays on while this page is open.",
+  "Включить датчики": "Start sensors",
+  "Телефон как камера (мишени)": "Phone as a camera (targets)",
   "Другое колесо": "Other wheel",
+  "Отмена": "Cancel",
+  "Подготовка телефона": "Preparing the phone",
+  "Калибровка телефона": "Phone calibration",
+  "Один раз: на ровном столе экраном вверх, потом вниз. Около минуты.": "Once: on a level table screen up, then screen down. About a minute.",
+  "Начать": "Start",
+  "Повторить": "Redo",
+  "Калибровка крепления": "Mount calibration",
+  "Один раз для телефона и планки: прижать к ободу, потом то же вверх ногами.": "Once for the phone and the bar: press it to the rim, then the same upside down.",
+  "Биение диска": "Rim runout",
+  "По желанию, для каждого колеса: замер, прокатить машину на пол-оборота, снова замер.": "Optional, for each wheel: a reading, roll the car half a wheel turn, another reading.",
+  "стабильно": "steady",
   "Телефон прижимайте к ровной планке, лежащей на закраинах обода, экраном наружу. Не к шине.": "Press the phone, screen facing out, against a straight bar resting on the rim flanges. Not against the tyre.",
+  "Передние колёса на поворотных кругах, педаль тормоза зажата упором, телефон на планке. Программа ведёт сама: колесо прямо, наружу примерно на 20°, внутрь примерно на 20°.": "Front wheels on turn plates, brake pedal held down with a prop, the phone on the bar. The program leads the way: wheel straight, out about 20°, in about 20°.",
+  "Начать замер кастера": "Measure caster",
+  "Выбрать переднее колесо": "Choose a front wheel",
+  "Телефон, приложенный к колесу, схождение не меряет: это поворот колеса вокруг вертикали, а датчик наклона его не чувствует. Гироскоп чувствует, но за минуту накапливает ошибку больше всего допуска.": "A phone held to the wheel does not measure toe: toe is a turn of the wheel about the vertical, and the tilt sensor cannot feel it. The gyroscope can, but within a minute it drifts by more than the whole tolerance.",
+  "Чем мерить схождение:": "What to measure toe with:",
+  "Этим телефоном как камерой": "This phone as a camera",
+  "на штативе у колеса, мишени на колёсах и на полу. Покажет развал, схождение и кастер вживую.": "on a tripod by the wheel, targets on the wheels and the floor. It shows camber, toe and caster live.",
+  "Струной": "With strings",
+  "на компьютере: «Замер → Струна и угломер».": "on the computer: “Measurement → Strings and inclinometer”.",
+  "развал": "camber",
+  "схождение": "toe",
+  "кастер": "caster",
+  "Сначала один раз откалибруйте камеру, затем учтите биение каждого колеса, затем включайте замер.": "First calibrate the camera once, then compensate each wheel's runout, then start measuring.",
+  "Калибровка камеры": "Camera calibration",
+  "Биение": "Runout",
+  "Замер": "Measure",
+  "Кастер камерой": "Caster by camera",
+  "Стоп": "Stop",
+  "Датчик наклона": "Tilt sensor",
+  "Держите телефон горизонтально — так же, как при калибровке. Для замера поставьте его на штатив или опору так, чтобы в кадре были мишень на колесе и мишень на полу.": "Hold the phone in landscape — the same way as during calibration. For measuring, put it on a tripod or a support so that the wheel target and the floor target are both in the frame.",
   "ссылка устарела — отсканируйте код заново": "link expired — scan the code again",
   "отключён": "disconnected",
-  "Развал": "Camber",
   "колесо не выбрано": "no wheel selected",
   "норма": "spec",
   "поворот": "steer",
+  "в допуске": "in tolerance",
+  "у границы допуска": "near the limit",
+  "вне допуска": "out of tolerance",
+  "готово": "done",
+  "шаг {n} из 2": "step {n} of 2",
+  "биение {v}°": "runout {v}°",
+  "Сначала — подготовка телефона, шаги 1 и 2. Один раз, дальше они запоминаются.": "First prepare the phone, steps 1 and 2. Once — after that they are remembered.",
+  "Кастер меряют на передних колёсах. Этот телефон — на заднем.": "Caster is measured on the front wheels. This phone is on a rear one.",
+  "В этом телефоне нет гироскопа — кастер меряйте угломером по шкале поворотных кругов.": "This phone has no gyroscope — measure caster with an inclinometer and the turn-plate scale.",
   "Кастер {v} передан на компьютер. Верните колёса прямо.": "Caster {v} sent to the computer. Return the wheels to straight ahead.",
   "Доступ к датчикам запрещён. Разрешите его в настройках Safari для этого сайта.": "Sensor access denied. Allow it in Safari's settings for this site.",
   "Не удалось запросить доступ к датчикам:": "Could not request sensor access:",
   "Датчики не отвечают. Откройте страницу в Chrome (Android) или Safari (iPhone).": "The sensors are not responding. Open the page in Chrome (Android) or Safari (iPhone).",
   "Страница открыта не по защищённому адресу — браузер не даёт доступа к датчикам.": "The page is not open over a secure address — the browser blocks the sensors.",
-  "Телефон как камера (мишени)": "Phone as a camera (targets)",
-  "Камера": "Camera",
-  "развал": "camber",
-  "схождение": "toe",
-  "Сначала один раз откалибруйте камеру, затем учтите биение каждого колеса, затем включайте замер.": "First calibrate the camera once, then compensate each wheel's runout, then start measuring.",
-  "Калибровка камеры": "Camera calibration",
-  "Биение": "Runout",
-  "Замер": "Measure",
-  "Стоп": "Stop",
-  "Датчик наклона": "Tilt sensor",
-  "Держите телефон горизонтально — так же, как при калибровке. Для замера поставьте его на штатив или опору так, чтобы в кадре были мишень на колесе и мишень на полу.": "Hold the phone in landscape — the same way as during calibration. For measuring, put it on a tripod or a support so that the wheel target and the floor target are both in the frame.",
   "Браузер не даёт доступа к камере на этой странице. Откройте её в Chrome (Android) или Safari (iPhone).": "The browser does not give this page access to the camera. Open it in Chrome (Android) or Safari (iPhone).",
   "Не удалось включить камеру:": "Could not start the camera:",
   "Показывайте мишень с колеса под разными углами и в разных частях кадра.": "Show the wheel target at different angles and in different parts of the frame.",
   "Вывесите колесо и медленно поворачивайте его рукой; мишень на колесе и на полу — в кадре.": "Lift the wheel and turn it slowly by hand; keep the wheel target and the floor target in the frame.",
   "Камера смотрит на колесо — показания идут на экран регулировки.": "The camera is watching the wheel — readings go to the adjustment screen.",
-  "Остановлено.": "Stopped.",
-  "кастер": "caster",
-  "Кастер камерой": "Caster by camera",
-  "Колёса на поворотных кругах, педаль тормоза зажата упором. Медленно поворачивайте руль на 15–20° в одну сторону, затем в другую.": "Wheels on turn plates, brake pedal held down with a prop. Slowly steer 15–20° one way, then the other."
+  "Колёса на поворотных кругах, педаль тормоза зажата упором. Медленно поворачивайте руль на 15–20° в одну сторону, затем в другую.": "Wheels on turn plates, brake pedal held down with a prop. Slowly steer 15–20° one way, then the other.",
+  "Остановлено.": "Stopped."
 };
 // end EN
 let lang = document.documentElement.lang === 'en' ? 'en' : 'ru';
@@ -211,12 +330,20 @@ let id = store.get('device');
 if (!id) { id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); store.set('device', id); }
 let wheel = store.get('wheel') || '';
 
+// Имя телефона в списке на компьютере. Chrome на Android прячет модель в
+// строке браузера («Android 10; K»), но отдаёт её по запросу — спросим.
+let model = '';
+if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+  navigator.userAgentData.getHighEntropyValues(['model']).then(v => { model = (v.model || '').trim(); }).catch(() => {});
+}
 function deviceName() {
-  const ua = navigator.userAgent;
-  if (/iPhone/.test(ua)) return 'iPhone ' + id.slice(0, 4).toUpperCase();
-  if (/iPad/.test(ua)) return 'iPad ' + id.slice(0, 4).toUpperCase();
+  const ua = navigator.userAgent, tag = ' ' + id.slice(0, 4).toUpperCase();
+  if (/iPhone/.test(ua)) return 'iPhone' + tag;
+  if (/iPad/.test(ua)) return 'iPad' + tag;
+  if (model) return model + tag;
   const m = ua.match(/Android[^;]*;\s*([^;)]+)/);
-  return (m ? m[1].trim() : 'Android') + ' ' + id.slice(0, 4).toUpperCase();
+  const name = m ? m[1].trim() : '';
+  return (name && name !== 'K' ? name : 'Android') + tag;
 }
 
 // ── Датчики ────────────────────────────────────────────────────────
@@ -248,7 +375,7 @@ function takeBatch() {
 }
 
 // ── Связь ──────────────────────────────────────────────────────────
-let queue = [], inflight = false, pending = {}, lastOK = 0, lastStep = '';
+let queue = [], inflight = false, pending = {}, lastOK = 0, lastStep = '', last = null;
 async function send(extra) {
   if (extra) Object.assign(pending, extra);
   if (inflight) return;
@@ -287,37 +414,88 @@ function dm(v) {
   if (m === 60) { d++; m = 0; }
   return (neg && (d || m) ? '−' : '+') + d + '°' + String(m).padStart(2, '0') + '′';
 }
+const has = v => v !== null && v !== undefined;
+// Знак рядом с цветом: красный и зелёный различимы не у всех.
+const STAT = { good: () => '✓ ' + tr('в допуске'), marginal: () => '! ' + tr('у границы допуска'), bad: () => '✕ ' + tr('вне допуска') };
+
+// Что меряем: развал, кастер или схождение. Запоминается на телефоне.
+let mode = store.get('mode') || 'camber';
+function setMode(m) {
+  mode = m;
+  store.set('mode', m);
+  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-selected', b.dataset.mode === m ? 'true' : 'false'));
+  $('#pCamber').classList.toggle('hide', m !== 'camber');
+  $('#pCaster').classList.toggle('hide', m !== 'caster');
+  $('#pToe').classList.toggle('hide', m !== 'toe');
+  if (last) render(last);
+}
+
 function render(st) {
+  last = st;
   if (st.lang && st.lang !== lang) { lang = st.lang === 'en' ? 'en' : 'ru'; translateStatic(); }
   if (st.step !== lastStep) {
     if (lastStep && navigator.vibrate) navigator.vibrate(st.error ? [60, 60, 60] : 120);
+    // Процедура кастера сама переключает на свою вкладку.
+    if (st.step && st.step.startsWith('caster_') && mode !== 'caster') setMode('caster');
     lastStep = st.step;
   }
-  $('#wheelName').textContent = st.wheel_name ? tr('Развал') + ' · ' + st.wheel_name.toLowerCase() : tr('колесо не выбрано');
-  const c = $('#camber');
-  c.textContent = dm(st.camber);
-  c.className = 'big ' + (st.camber === null || st.camber === undefined ? 'none' : (st.status && st.status !== 'no_spec' ? st.status : ''));
-  $('#camberDeg').textContent = st.camber === null || st.camber === undefined ? '' : (st.camber >= 0 ? '+' : '−') + Math.abs(st.camber).toFixed(2) + '°';
-  $('#norm').textContent = st.spec ? tr('норма') + ` ${dm(st.spec.min)} … ${dm(st.spec.max)}` : '';
-  const steer = $('#steer');
-  steer.classList.toggle('hide', st.steer === undefined || st.steer === null);
-  if (st.steer !== undefined && st.steer !== null) steer.textContent = tr('поворот') + ' ' + Math.abs(st.steer).toFixed(1) + '°';
+  $('#wheelName').textContent = st.wheel_name || tr('колесо не выбрано');
+
+  // Идёт процедура — её подсказка сверху, крупно, с кнопкой «Отмена».
+  const inProc = st.step && st.step !== 'live';
+  $('#proc').classList.toggle('hide', !inProc);
   $('#prompt').textContent = st.prompt || '';
+  $('#bar').style.width = Math.round((st.progress || 0) * 100) + '%';
+  const steer = $('#steer');
+  steer.classList.toggle('hide', !has(st.steer));
+  if (has(st.steer)) steer.textContent = tr('поворот') + ' ' + Math.abs(st.steer).toFixed(1) + '°';
+  if (has(st.caster) && st.step === 'caster_back') {
+    $('#prompt').textContent = tr('Кастер {v} передан на компьютер. Верните колёса прямо.').replace('{v}', dm(st.caster));
+  }
   const err = $('#err');
   err.classList.toggle('hide', !st.error);
   err.textContent = st.error || '';
-  $('#bar').style.width = Math.round((st.progress || 0) * 100) + '%';
-  $('#barWrap').classList.toggle('hide', st.step === 'live');
-  $('#cFlat').classList.toggle('ok', !!st.flat);
-  $('#cMount').classList.toggle('ok', !!st.mounted);
-  $('#cRun').classList.toggle('ok', st.runout !== undefined && st.runout !== null);
-  $('#cRun').textContent = st.runout !== undefined && st.runout !== null ? tr('биение') + ' ' + Math.abs(st.runout).toFixed(2) + '°' : tr('биение');
+
+  // Подготовка: два обязательных шага и биение по желанию.
+  const ready = !!st.flat && !!st.mounted;
+  const mark = (sel, ok, n) => { const e = $(sel); e.classList.toggle('ok', ok); e.textContent = ok ? '✓' : n; };
+  mark('#sFlat', !!st.flat, '1');
+  mark('#sMount', !!st.mounted, '2');
+  mark('#sRun', has(st.runout), '3');
+  // Сделанный шаг можно повторить — например, после смены чехла или планки.
+  const again = { flat: !!st.flat, mount: !!st.mounted, runout: has(st.runout) };
+  document.querySelectorAll('#setup [data-cmd]').forEach(b => { b.textContent = again[b.dataset.cmd] ? tr('Повторить') : tr('Начать'); });
+  $('#pCamber').classList.toggle('ready', ready);
+  $('#runTitle').textContent = has(st.runout) ? tr('биение {v}°').replace('{v}', Math.abs(st.runout).toFixed(2)) : tr('Биение диска');
+  $('#setupState').textContent = ready ? tr('готово') : tr('шаг {n} из 2').replace('{n}', st.flat ? '2' : '1');
+  $('#setup').classList.toggle('done', ready);
+  document.querySelectorAll('#setup [data-cmd]').forEach(b => { b.disabled = inProc; });
+
+  // Развал.
+  const c = $('#camber');
+  c.textContent = dm(st.camber);
+  const status = has(st.camber) && st.status && st.status !== 'no_spec' ? st.status : '';
+  c.className = 'big ' + (has(st.camber) ? status : 'none');
+  $('#camberDeg').textContent = has(st.camber) ? (st.camber >= 0 ? '+' : '−') + Math.abs(st.camber).toFixed(2) + '°' : '';
+  const s = $('#stat');
+  s.className = 'stat ' + status;
+  s.textContent = STAT[status] ? STAT[status]() : '';
+  $('#norm').textContent = st.spec ? tr('норма') + ` ${dm(st.spec.min)} … ${dm(st.spec.max)}` : '';
   $('#cStable').classList.toggle('ok', !!st.stable);
-  $('#bCaster').classList.toggle('hide', !st.front);
-  $('#bCancel').classList.toggle('hide', st.step === 'live');
-  if (st.caster !== undefined && st.caster !== null && st.step === 'caster_back') {
-    $('#prompt').textContent = tr('Кастер {v} передан на компьютер. Верните колёса прямо.').replace('{v}', dm(st.caster));
-  }
+  $('#liveMsg').textContent = !ready ? tr('Сначала — подготовка телефона, шаги 1 и 2. Один раз, дальше они запоминаются.') : (inProc ? '' : (st.prompt || ''));
+
+  // Кастер: только передние колёса и телефон с гироскопом.
+  const cv = $('#casterVal');
+  cv.textContent = dm(st.caster);
+  cv.className = 'big mid ' + (has(st.caster) ? '' : 'none');
+  let why = '';
+  if (!st.front && st.wheel) why = tr('Кастер меряют на передних колёсах. Этот телефон — на заднем.');
+  else if (st.gyro === false && gotMotion && lastOK) why = tr('В этом телефоне нет гироскопа — кастер меряйте угломером по шкале поворотных кругов.');
+  else if (!ready) why = tr('Сначала — подготовка телефона, шаги 1 и 2. Один раз, дальше они запоминаются.');
+  $('#casterWhy').textContent = why;
+  $('#casterWhy').classList.toggle('hide', !why);
+  $('#bCaster').disabled = !!why || inProc;
+  $('#bFront').classList.toggle('hide', !!st.front || !st.wheel);
 }
 
 // ── Экраны ─────────────────────────────────────────────────────────
@@ -329,7 +507,7 @@ function disconnected(why) {
   window.removeEventListener('devicemotion', onMotion);
   conn(false, tr('отключён'));
   show('main');
-  $('#actions').classList.add('hide');
+  document.querySelectorAll('#main button').forEach(b => { b.disabled = true; });
   const err = $('#err');
   err.textContent = (why || '').trim();
   err.classList.remove('hide');
@@ -340,6 +518,7 @@ function show(which) {
   for (const s of ['pick', 'start', 'main', 'camera']) $('#' + s).classList.toggle('hide', s !== which);
   if (which === 'main') $('#main').style.display = 'flex';
   if (which === 'camera') $('#camera').style.display = 'flex';
+  window.scrollTo(0, 0);
 }
 document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
   wheel = b.dataset.w;
@@ -349,7 +528,9 @@ document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
   show(running ? 'main' : 'start');
 });
 document.querySelectorAll('[data-cmd]').forEach(b => b.onclick = () => send({ cmd: b.dataset.cmd }));
+document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => setMode(b.dataset.mode));
 $('#bWheel').onclick = () => show('pick');
+$('#bFront').onclick = () => show('pick');
 
 let running = false, wakeLock = null;
 async function keepAwake() {
@@ -369,11 +550,14 @@ $('#go').onclick = async () => {
   running = true;
   keepAwake();
   show('main');
+  setMode(mode);
   setTimeout(() => {
     if (!gotMotion) {
       const why = window.isSecureContext ? tr('Датчики не отвечают. Откройте страницу в Chrome (Android) или Safari (iPhone).')
                                          : tr('Страница открыта не по защищённому адресу — браузер не даёт доступа к датчикам.');
-      render({ step: 'live', prompt: why, error: why });
+      const err = $('#err');
+      err.textContent = why;
+      err.classList.remove('hide');
     }
   }, 2500);
 };
@@ -490,7 +674,7 @@ function renderCam(st) {
   }
 }
 $('#goCam').onclick = () => openCamera();
-$('#bCamera').onclick = () => openCamera();
+$('#toeCam').onclick = () => openCamera();
 document.querySelectorAll('[data-cmode]').forEach(b => b.onclick = async () => {
   if (await openCamera()) setCamMode(b.dataset.cmode);
 });
@@ -501,6 +685,7 @@ $('#camBack').onclick = () => { closeCamera(); show(running ? 'main' : 'start');
 setInterval(() => { if (!stopped && (running || Object.keys(pending).length)) send(); }, 100);
 setInterval(() => { if (!stopped && !running) send(); }, 1500);
 show(wheel ? 'start' : 'pick');
+setMode(mode);
 send(wheel ? { wheel } : null);
 </script>
 </body>

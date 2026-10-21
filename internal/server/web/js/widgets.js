@@ -246,7 +246,9 @@ export class ValueBox {
       ? t('{v} мм', { v: `${p.mm > 0 ? '+' : p.mm < 0 ? '−' : ''}${Math.abs(p.mm).toFixed(1)}` }) : '';
 
     let hint = '';
-    if (!p || !p.has) hint = t('нет показаний');
+    // Пустое схождение — сразу сказать, откуда его взять: телефон на ободе его
+    // не меряет, и это самый частый вопрос.
+    if (!p || !p.has) hint = paramKind(this.key) === 'toe' ? t('нет показаний — струна или камера') : t('нет показаний');
     else if (p.stale) hint = t('датчик молчит');
     else if (!p.spec) hint = t('допуск не задан');
     else if (p.status === 'bad') hint = t('до допуска {v}', { v: fmt(-p.deviation) });

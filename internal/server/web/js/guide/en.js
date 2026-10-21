@@ -115,7 +115,12 @@ export default {
 
 ['prep', 'Step 2. Preparation', `
 <p>The checklist follows the chosen suspension: kingpin play for a beam axle, strut top bearings for MacPherson, U-bolts
-  and the centre bolt for leaf springs. Tick items off as you go — the ticks are saved.</p>
+  and the centre bolt for leaf springs. The items are grouped — safety, tools, floor, vehicle, front and rear suspension —
+  and each group has its own counter. In large type: what to do; in small type: why. Tick items off as you go — the ticks
+  are saved; once everything is ticked, “All done — ready to measure” appears.</p>
+<p>The “Tools” group depends on the way of measuring: a line and an inclinometer for strings, a bar and a shared Wi-Fi
+  network for a phone, targets and a tripod for a camera. You can choose the way right in this group — the
+  “Measurement” step will already have it selected.</p>
 <ul>
   <li><b>Tyre pressures</b> — as on the door-pillar placard, with cold tyres. A 0.3 bar left–right difference already
     changes camber.</li>
@@ -124,8 +129,9 @@ export default {
     and buses — the stated axle load.</li>
   <li><b>Steering straight.</b> Before measuring toe, set the steering wheel straight and lock it (a prop between wheel
     and seat).</li>
-  <li><b>Let the suspension settle.</b> After lifting the car, roll it back and forth a metre or two and bounce the body —
-    the arms return to their working position.</li>
+  <li><b>Let the suspension settle.</b> After lifting the car, bounce the body and roll it 3–5 metres forward — the arms
+    return to their working position. Do not roll it back or push it sideways: the bushings would stay loaded differently
+    from how they are when driving.</li>
 </ul>`],
 
 ['tools', 'Tools and floor', `
@@ -169,17 +175,20 @@ export default {
     camera. Phone and computer must be on the same Wi-Fi network (a hotspot on the phone itself will do).</li>
   <li>The phone's browser warns about the certificate — it was made by this program, not by a certificate authority.
     “Advanced” → “Proceed to the site”. Windows may ask for firewall permission — allow private networks.</li>
-  <li>On the phone choose the wheel and press “Start sensors”. On an iPhone Safari asks for motion sensor access — allow it.</li>
-  <li><b>Phone calibration</b> (once): lay it on a table screen up, then screen down. This removes the accelerometer's own
-    error, which on phones can reach 1–2°.</li>
-  <li><b>Mount calibration</b> (once per phone and bar): press the phone against the bar on the rim, then turn it upside
-    down and press it against the same spot. This removes the tilt caused by the camera bump and the case.</li>
-  <li><b>Rim runout</b> (optional): measure in one wheel position, roll the car half a turn and measure again — the
-    program removes runout from all later readings.</li>
+  <li>On the phone, tap the wheel — the buttons sit where the wheels are on the car — and press “Start sensors”. On an
+    iPhone Safari asks for motion sensor access — allow it.</li>
+  <li>At the top there are three tabs — what you measure: <b>Camber</b>, <b>Caster</b>, <b>Toe</b>.</li>
+  <li><b>Camber → “Preparing the phone”</b>, once: <b>1. Phone calibration</b> — on a table screen up, then screen down;
+    this removes the accelerometer's own error, which on phones can reach 1–2°. <b>2. Mount calibration</b> — the phone
+    on the bar on the rim, then upside down on the same spot; this removes the tilt caused by the camera bump and the
+    case. <b>3. Rim runout</b> — optional: a reading, roll the car half a wheel turn, another reading. Finished steps get a
+    ✓ and are remembered.</li>
   <li>Press the phone against the bar, screen facing out — camber flows to the adjustment screen in real time. The
-    “steady” tag on the phone means the reading can be trusted.</li>
-  <li><b>Caster:</b> wheels on turn plates, the “Caster” button on the phone. It asks you to set the wheel straight, steer
-    out about 20°, then in — it measures the steer angle with its gyroscope.</li>
+    “steady” tag means the reading can be trusted.</li>
+  <li><b>Caster</b> (front wheels only): wheels on turn plates, brake held with a prop, “Measure caster”. The phone leads
+    the way: straight, out about 20°, in — it measures the steer angle with its gyroscope.</li>
+  <li><b>Toe</b> — the tab explains why a phone on the rim cannot measure it, and one button turns the phone into a
+    camera with targets.</li>
 </ol>
 <p class="muted">A phone held to the rim does not measure toe: toe is a rotation of the wheel about the vertical, and the
   accelerometer senses only tilt — gravity does not change under such a rotation. The gyroscope does sense it, but drifts —

@@ -602,6 +602,27 @@ details.help div { margin-top: 6px; font-size: 13px; color: var(--muted); }
 .checklist label.chk:has(input:checked) { border-color: var(--green-dim); background: var(--green-bg); }
 .checklist label.chk:has(input:checked) span { color: var(--muted); }
 .progress { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin: 10px 0 4px; }
+.prep { max-width: 1400px; }
+.prep-top { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin: 6px 0 4px; }
+.prep-top .progress { margin: 0 0 5px; height: 8px; }
+/* На узком экране кнопки уходят под полоску, а не сжимают её. */
+.prep-top .grow { flex: 1 1 240px; }
+/* Колонками сверху вниз: группы разной высоты встают без пустот. */
+.prep-grid { column-width: 420px; column-gap: 12px; margin-top: 12px; }
+.prep-grid > .panel { break-inside: avoid; margin: 0 0 12px; }
+.pgroup h3 { margin: 0 0 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.pgroup .gcount { font: 600 13px var(--num); color: var(--muted); padding: 2px 9px; border-radius: 99px; border: 1px solid var(--line2); flex: none; }
+.pgroup .pmethod { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+.pgroup .pmethod select { flex: 1; min-width: 0; }
+.pgroup.done { border-color: var(--green-dim); }
+.pgroup.done .gcount { color: var(--green); border-color: var(--green-dim); }
+.checklist label.chk span b { display: block; font-weight: 600; }
+.checklist label.chk span small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; line-height: 1.35; }
+.caps-list { display: grid; gap: 6px; margin: 10px 0; }
+.caps-list .cap { padding: 8px 12px; border-radius: 8px; background: var(--bg2); border: 1px solid var(--line); }
+.caps-list .cap i { font-style: normal; font-weight: 700; display: inline-block; width: 1.2em; }
+.caps-list .cap.yes i { color: var(--green); }
+.caps-list .cap.no i { color: var(--red); }
 .progress div { height: 100%; background: var(--green); transition: width .25s; }
 
 /* ── Замер ──────────────────────────────────────────────────────────── */
@@ -634,7 +655,14 @@ details.help div { margin-top: 6px; font-size: 13px; color: var(--muted); }
 .method.on { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue) inset; }
 .method b { display: block; font-size: 15px; margin-bottom: 4px; }
 .method span { color: var(--muted); font-size: 12.5px; }
-.method .gets { display: block; margin-top: 8px; color: var(--green); font-size: 12px; }
+.method .caps { display: flex; flex-direction: column; gap: 2px; margin-top: 9px; }
+.method .cap { font-size: 13px; color: var(--text); }
+.method .cap i { font-style: normal; font-weight: 700; display: inline-block; width: 1.1em; }
+.method .cap small { color: var(--muted); font-size: 12px; }
+.method .cap.yes i { color: var(--green); }
+.method .cap.no i { color: var(--red); }
+.method .cap.no { color: var(--muted); }
+.method .cap.dep i { color: var(--dim); }
 .metrics { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
 .metric { background: var(--bg2); border: 1px solid var(--line); border-radius: 9px; padding: 10px 14px; min-width: 120px; }
 .metric .v { font: 600 22px var(--num); }

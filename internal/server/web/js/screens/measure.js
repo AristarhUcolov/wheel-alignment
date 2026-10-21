@@ -11,13 +11,22 @@ let root, method = localStorageGet('method', 'manual');
 
 function localStorageGet(k, d) { try { return JSON.parse(localStorage.getItem('wa.' + k)) ?? d; } catch { return d; } }
 
+// Что меряет каждый способ: да, нет или «зависит» — и чем. Видно сразу, без
+// чтения инструкции: например, что телефон на ободе схождение не меряет.
 const METHODS = () => [
-  { id: 'manual', name: t('Струна и угломер'), desc: t('Леска вдоль бортов, рулетка и угломер. Стоит как один заезд на СТО.'), gets: t('развал · схождение · кастер (с поворотными кругами)') },
-  { id: 'phone', name: t('Телефон на колесе'), desc: t('Телефон прикладывается к ободу и передаёт углы по Wi-Fi в реальном времени.'), gets: t('развал вживую · кастер с гироскопом') },
-  { id: 'optical', name: t('Камера и мишени'), desc: t('Печатные шахматные мишени на колёсах и фотоаппарат или телефон.'), gets: t('развал · схождение · угол тяги · кастер'), beta: true },
-  { id: 'sensor', name: t('Свой датчик'), desc: t('Самодельная голова на ESP32 или любой прибор, умеющий отправить JSON.'), gets: t('что умеет датчик') },
-  { id: 'demo', name: t('Демонстрация'), desc: t('Учебная машина: всё как на настоящей, но без машины.'), gets: t('все углы') },
+  { id: 'manual', name: t('Струна и угломер'), desc: t('Леска вдоль бортов, рулетка и угломер. Стоит как один заезд на СТО.'),
+    caps: [['yes', t('Развал'), t('угломер')], ['yes', t('Кастер'), t('с поворотными кругами')], ['yes', t('Схождение'), t('струна')]] },
+  { id: 'phone', name: t('Телефон на колесе'), desc: t('Телефон прикладывается к ободу и передаёт углы по Wi-Fi в реальном времени.'),
+    caps: [['yes', t('Развал'), t('вживую')], ['yes', t('Кастер'), t('с поворотными кругами')], ['no', t('Схождение'), t('нужна струна или камера')]] },
+  { id: 'optical', name: t('Камера и мишени'), desc: t('Печатные шахматные мишени на колёсах и фотоаппарат или телефон.'), beta: true,
+    caps: [['yes', t('Развал'), ''], ['yes', t('Кастер'), ''], ['yes', t('Схождение'), t('и угол тяги')]] },
+  { id: 'sensor', name: t('Свой датчик'), desc: t('Самодельная голова на ESP32 или любой прибор, умеющий отправить JSON.'),
+    caps: [['dep', t('Развал'), ''], ['dep', t('Кастер'), ''], ['dep', t('Схождение'), t('что умеет датчик')]] },
+  { id: 'demo', name: t('Демонстрация'), desc: t('Учебная машина: всё как на настоящей, но без машины.'),
+    caps: [['yes', t('Развал'), ''], ['yes', t('Кастер'), ''], ['yes', t('Схождение'), t('без машины')]] },
 ];
+
+const CAP = { yes: '✓', no: '✕', dep: '?' };
 
 // Способ замера по умолчанию — из приветствия.
 export function setMethod(m) {
@@ -31,7 +40,8 @@ export function mount(el) {
   root.innerHTML = `
     <h1>${t('Замер')}</h1>
     <p class="lede">${t('Выберите, чем будете мерить. Данные сразу попадают на экран «Регулировка» — там видно, что в допуске, а что нет, и стрелки двигаются, пока вы крутите регулировку.')}</p>
-    <div class="method-cards" id="mMethods"></div>
+    <div class="method-cards" id="mMethods" role="group" aria-label="${t('Способ замера')}"></div>
+    <p class="muted" style="font-size:13px;margin:-8px 0 16px">${t('Способы можно сочетать: например, развал и кастер — телефоном, схождение — струной. Программа сведёт всё на одном экране.')}</p>
     <div id="mBody"></div>
     <div class="actions" id="mActions"></div>`;
   on('frame', updateMini);
@@ -47,10 +57,11 @@ export function show() {
 function renderMethods() {
   const box = $('#mMethods', root);
   box.innerHTML = METHODS().map(m => `
-    <button class="method${m.id === method ? ' on' : ''}" data-m="${m.id}">
+    <button class="method${m.id === method ? ' on' : ''}" data-m="${m.id}" aria-pressed="${m.id === method ? 'true' : 'false'}">
       <b>${m.name}${m.beta ? ` <span class="badge unverified">${t('бета')}</span>` : ''}</b>
       <span>${m.desc}</span>
-      <span class="gets">${m.gets}</span>
+      <span class="caps">${m.caps.map(([k, name, how]) =>
+        `<span class="cap ${k}"><i aria-hidden="true">${CAP[k]}</i> ${name}${how ? ` <small>— ${how}</small>` : ''}</span>`).join('')}</span>
     </button>`).join('');
   $$('.method', box).forEach(b => b.onclick = () => {
     method = b.dataset.m;

@@ -125,6 +125,10 @@ go build -ldflags "-H=windowsgui" -o wheelalign.exe ./cmd/wheelalign
 реальном времени — стрелки на экране двигаются, пока вы крутите регулировку.
 Приложение ставить не нужно: отсканируйте QR-код на экране компьютера.
 
+На телефоне три вкладки — **Развал**, **Кастер**, **Схождение**: сразу видно,
+что телефон меряет сам, а для чего нужна струна или камера. Колесо выбирается
+кнопкой, стоящей там же, где колесо у машины.
+
 Телефон **без калибровки** врёт на 0,5–2°: смещение нуля акселерометра больше
 любого заводского допуска. Поэтому две однократные калибровки — на столе
 (экраном вверх и вниз) и на планке (вертикально и вверх ногами). Первая
@@ -510,9 +514,15 @@ mode](docs/OPTICAL.md#live-mode-the-phone-as-a-camera).
 
 ### The phone as a sensor
 
+<img src="docs/img/phone-en.png" align="right" width="200" alt="The page on the phone">
+
 The phone is held against a straight bar on the rim flanges and sends camber in
 real time — the pointers on the screen move while you turn the adjusters. No
 app to install: scan the QR code on the computer screen.
+
+The phone page has three tabs — **Camber**, **Caster**, **Toe** — so you see at
+once what the phone measures itself and what needs a string or a camera. You
+pick the wheel with a button placed where that wheel is on the car.
 
 **Uncalibrated**, a phone is off by 0.5–2°: its accelerometer's zero offset is
 larger than any factory tolerance. Hence two one-time calibrations — on a table
@@ -525,6 +535,8 @@ camber error **0.02° RMS, 0.05° worst case**.
 “straight → out → in”, the gyroscope measures the steer angle (its own drift is
 measured while straight and subtracted). You need not hold exactly 20°: the
 program solves the problem exactly for any two steer angles.
+
+<br clear="right">
 
 ---
 

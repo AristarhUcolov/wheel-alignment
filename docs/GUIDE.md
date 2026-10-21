@@ -85,13 +85,15 @@
 
 ## Шаг 2. Подготовка
 
-Чек-лист собран под выбранную подвеску: для шкворневой балки — люфт шкворней, для McPherson — опорные подшипники стоек, для рессор — стремянки и центральный болт. Отмечайте пункты по мере проверки — отметки сохраняются.
+Чек-лист собран под выбранную подвеску: для шкворневой балки — люфт шкворней, для McPherson — опорные подшипники стоек, для рессор — стремянки и центральный болт. Пункты разбиты на группы — безопасность, инструмент, площадка, автомобиль, передняя и задняя подвеска; у каждой свой счётчик. Крупно — что сделать, мелко — почему. Отмечайте пункты по мере проверки — отметки сохраняются; когда отмечено всё, появится «Всё готово — можно мерить».
+
+Группа «Инструмент» зависит от способа замера: для струны — леска и угломер, для телефона — планка и общая сеть Wi-Fi, для камеры — мишени и штатив. Способ можно выбрать прямо в этой группе — на шаге «Замер» он уже будет выбран.
 
 - **Давление в шинах** — по табличке на стойке двери, на холодных шинах. Разница 0,3 бар между бортами уже меняет развал.
 - **Люфты** — рулевые наконечники, шаровые опоры или шкворни, подшипники ступиц, сайлентблоки. Если колесо качается рукой — сначала ремонт.
 - **Загрузка** — как требует руководство: обычно полный бак, запаска и инструмент на месте, в салоне никого. У грузовиков и автобусов — указанная нагрузка на ось.
 - **Руль прямо.** Перед замером схождения поставьте руль ровно и зафиксируйте (упор между рулём и сиденьем).
-- **Подвеска «осела».** После подъёма машины прокатите её вперёд-назад на 1–2 метра и покачайте кузов — рычаги встанут в рабочее положение.
+- **Подвеска «осела».** После подъёма машины покачайте кузов и прокатите её на 3–5 метров вперёд — рычаги встанут в рабочее положение. Назад не катите и вбок не толкайте: сайлентблоки останутся поджатыми не так, как при езде.
 
 <a id="ru-tools"></a>
 
@@ -127,12 +129,12 @@
 
 1. На вкладке «Замер → Телефон на колесе» нажмите «Разрешить подключение по Wi-Fi» и отсканируйте QR-код камерой телефона. Телефон и компьютер должны быть в одной сети Wi-Fi (подойдёт точка доступа на самом телефоне).
 2. Браузер телефона предупредит о сертификате — он создан этой программой, а не удостоверяющим центром. «Дополнительно» → «Перейти на сайт». Windows может спросить разрешение для брандмауэра — разрешите в частных сетях.
-3. Выберите на телефоне колесо и нажмите «Включить датчики». На iPhone Safari спросит доступ к датчикам движения — разрешите.
-4. **Калибровка телефона** (один раз): положить на стол экраном вверх, затем экраном вниз. Так вычитается собственная ошибка акселерометра — у телефонов она бывает до 1–2°.
-5. **Калибровка крепления** (один раз для телефона и планки): приложить телефон к планке на ободе, затем перевернуть его вверх ногами и приложить к тому же месту. Так вычитается перекос из-за выступа камеры и чехла.
-6. **Биение диска** (по желанию): замер в одном положении колеса, затем прокатить машину на пол-оборота и замерить снова — программа уберёт биение из всех следующих показаний.
-7. Прижмите телефон к планке экраном наружу — развал идёт на экран регулировки в реальном времени. Метка «стабильно» на телефоне означает, что можно записывать.
-8. **Кастер:** колёса на поворотных кругах, кнопка «Кастер» на телефоне. Телефон попросит поставить колесо прямо, повернуть наружу на ~20°, затем внутрь — угол поворота он меряет гироскопом сам.
+3. На телефоне нажмите на колесо — кнопки стоят там же, где колёса у машины, — и «Включить датчики». На iPhone Safari спросит доступ к датчикам движения — разрешите.
+4. Наверху три вкладки — что меряем: **Развал**, **Кастер**, **Схождение**.
+5. **Развал → «Подготовка телефона»**, один раз: **1. Калибровка телефона** — на столе экраном вверх, затем экраном вниз; так вычитается собственная ошибка акселерометра, у телефонов она бывает до 1–2°. **2. Калибровка крепления** — телефон на планке на ободе, затем вверх ногами на том же месте; так вычитается перекос из-за выступа камеры и чехла. **3. Биение диска** — по желанию: замер, прокатить машину на пол-оборота, снова замер. Сделанные шаги отмечаются ✓ и запоминаются.
+6. Прижмите телефон к планке экраном наружу — развал идёт на экран регулировки в реальном времени. Метка «стабильно» означает, что можно записывать.
+7. **Кастер** (только передние колёса): колёса на поворотных кругах, тормоз зажат упором, «Начать замер кастера». Телефон сам ведёт: прямо, наружу на ~20°, внутрь — угол поворота он меряет гироскопом.
+8. **Схождение** — вкладка объясняет, почему телефон на ободе его не меряет, и одной кнопкой переводит телефон в режим камеры с мишенями.
 
 Приложенный к ободу телефон схождение не меряет: схождение — это поворот колеса вокруг вертикали, а акселерометр чувствует только наклон, сила тяжести при таком повороте не меняется. Гироскоп поворот чувствует, но копит ошибку — за минуту больше, чем весь допуск на схождение. Поэтому схождение берите струной или камерой: тот же телефон, поставленный на штатив, работает камерой в живом режиме (раздел «Камера и мишени»). Два телефона на колёсах — два колеса сразу, четыре — все четыре. Когда закончите, выключите доступ по Wi-Fi. Телефон, подключённый по ошибке, отключается кнопкой «Отключить» в списке.
 
@@ -392,13 +394,15 @@ You can also work without choosing a vehicle — the angles are then shown witho
 
 ## Step 2. Preparation
 
-The checklist follows the chosen suspension: kingpin play for a beam axle, strut top bearings for MacPherson, U-bolts and the centre bolt for leaf springs. Tick items off as you go — the ticks are saved.
+The checklist follows the chosen suspension: kingpin play for a beam axle, strut top bearings for MacPherson, U-bolts and the centre bolt for leaf springs. The items are grouped — safety, tools, floor, vehicle, front and rear suspension — and each group has its own counter. In large type: what to do; in small type: why. Tick items off as you go — the ticks are saved; once everything is ticked, “All done — ready to measure” appears.
+
+The “Tools” group depends on the way of measuring: a line and an inclinometer for strings, a bar and a shared Wi-Fi network for a phone, targets and a tripod for a camera. You can choose the way right in this group — the “Measurement” step will already have it selected.
 
 - **Tyre pressures** — as on the door-pillar placard, with cold tyres. A 0.3 bar left–right difference already changes camber.
 - **Play** — tie-rod ends, ball joints or kingpins, wheel bearings, bushings. If a wheel rocks by hand, repair first.
 - **Load** — as the manual requires: usually a full tank, spare wheel and tools in place, nobody inside. For trucks and buses — the stated axle load.
 - **Steering straight.** Before measuring toe, set the steering wheel straight and lock it (a prop between wheel and seat).
-- **Let the suspension settle.** After lifting the car, roll it back and forth a metre or two and bounce the body — the arms return to their working position.
+- **Let the suspension settle.** After lifting the car, bounce the body and roll it 3–5 metres forward — the arms return to their working position. Do not roll it back or push it sideways: the bushings would stay loaded differently from how they are when driving.
 
 <a id="en-tools"></a>
 
@@ -434,12 +438,12 @@ Every figure you enter goes straight to the adjustment screen. While working: tu
 
 1. On “Measurement → Phone on the wheel” press “Allow Wi-Fi connection” and scan the QR code with the phone's camera. Phone and computer must be on the same Wi-Fi network (a hotspot on the phone itself will do).
 2. The phone's browser warns about the certificate — it was made by this program, not by a certificate authority. “Advanced” → “Proceed to the site”. Windows may ask for firewall permission — allow private networks.
-3. On the phone choose the wheel and press “Start sensors”. On an iPhone Safari asks for motion sensor access — allow it.
-4. **Phone calibration** (once): lay it on a table screen up, then screen down. This removes the accelerometer's own error, which on phones can reach 1–2°.
-5. **Mount calibration** (once per phone and bar): press the phone against the bar on the rim, then turn it upside down and press it against the same spot. This removes the tilt caused by the camera bump and the case.
-6. **Rim runout** (optional): measure in one wheel position, roll the car half a turn and measure again — the program removes runout from all later readings.
-7. Press the phone against the bar, screen facing out — camber flows to the adjustment screen in real time. The “steady” tag on the phone means the reading can be trusted.
-8. **Caster:** wheels on turn plates, the “Caster” button on the phone. It asks you to set the wheel straight, steer out about 20°, then in — it measures the steer angle with its gyroscope.
+3. On the phone, tap the wheel — the buttons sit where the wheels are on the car — and press “Start sensors”. On an iPhone Safari asks for motion sensor access — allow it.
+4. At the top there are three tabs — what you measure: **Camber**, **Caster**, **Toe**.
+5. **Camber → “Preparing the phone”**, once: **1. Phone calibration** — on a table screen up, then screen down; this removes the accelerometer's own error, which on phones can reach 1–2°. **2. Mount calibration** — the phone on the bar on the rim, then upside down on the same spot; this removes the tilt caused by the camera bump and the case. **3. Rim runout** — optional: a reading, roll the car half a wheel turn, another reading. Finished steps get a ✓ and are remembered.
+6. Press the phone against the bar, screen facing out — camber flows to the adjustment screen in real time. The “steady” tag means the reading can be trusted.
+7. **Caster** (front wheels only): wheels on turn plates, brake held with a prop, “Measure caster”. The phone leads the way: straight, out about 20°, in — it measures the steer angle with its gyroscope.
+8. **Toe** — the tab explains why a phone on the rim cannot measure it, and one button turns the phone into a camera with targets.
 
 A phone held to the rim does not measure toe: toe is a rotation of the wheel about the vertical, and the accelerometer senses only tilt — gravity does not change under such a rotation. The gyroscope does sense it, but drifts — within a minute by more than the whole toe tolerance. So take toe by string or by camera: the same phone on a tripod works as a camera in live mode (see “Camera and targets”). Two phones on the wheels measure two wheels at once, four — all four. When you are done, switch Wi-Fi access off. A phone connected by mistake is removed with “Disconnect” in the list.
 
