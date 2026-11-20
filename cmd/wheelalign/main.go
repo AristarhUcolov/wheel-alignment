@@ -144,6 +144,11 @@ func run(addr string, open, forceBrowser bool, dataFlag string) error {
 	link := phone.NewLink(srv.Hub(), data)
 	srv.SetPhone(link)
 	defer link.Close()
+	// Access that was on last time comes back on: a phone still showing the
+	// page reconnects without scanning the code again.
+	if err := link.Restore(); err != nil {
+		log.Printf("доступ для телефонов не включился: %v", err)
+	}
 
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {

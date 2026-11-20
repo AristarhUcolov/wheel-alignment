@@ -59,6 +59,9 @@ func (s *Server) phoneSet(w http.ResponseWriter, r *http.Request) {
 		// access as it is.
 		Forget string `json:"forget"`
 		Allow  string `json:"allow"`
+		// NewKey changes the key in the address: every phone must scan
+		// the new code.
+		NewKey bool `json:"new_key"`
 	}
 	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<12)).Decode(&req); err != nil {
 		writeErr(w, http.StatusBadRequest, err)
@@ -73,6 +76,8 @@ func (s *Server) phoneSet(w http.ResponseWriter, r *http.Request) {
 		s.phone.Forget(req.Forget)
 	case req.Allow != "":
 		s.phone.Allow(req.Allow)
+	case req.NewKey:
+		s.phone.NewKey()
 	case req.Enable:
 		if err := s.phone.Enable(); err != nil {
 			writeErr(w, http.StatusInternalServerError, err)

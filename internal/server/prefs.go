@@ -14,9 +14,10 @@ import (
 	"github.com/AristarhUcolov/wheel-alignment/internal/specs"
 )
 
-// maxUIPrefs bounds what the interface may store: a theme, a few switches and
-// a workshop's name and address fit many times over.
-const maxUIPrefs = 16 << 10
+// maxUIPrefs bounds what the interface may store: a theme, a few switches, a
+// workshop's name and address, and what the adjustment helper has learnt about
+// a hundred-odd adjusters fit with room to spare.
+const maxUIPrefs = 64 << 10
 
 // uiPrefs are the interface's own preferences. The program keeps them in the
 // settings file but does not interpret them — the interface owns their shape.
@@ -24,6 +25,10 @@ type uiPrefs struct {
 	mu  sync.Mutex
 	raw json.RawMessage
 }
+
+// settingsMu serialises read-modify-write of the settings file: the language
+// and the interface preferences live in one file and may be saved at once.
+var settingsMu sync.Mutex
 
 // SetVersion is the program's version, shown in the interface and the report.
 func (s *Server) SetVersion(v string) { s.version = v }
@@ -82,6 +87,8 @@ func (s *Server) setSettings(w http.ResponseWriter, r *http.Request) {
 	s.ui.raw = ui
 	s.ui.mu.Unlock()
 	if s.settingsPath != "" {
+		settingsMu.Lock()
+		defer settingsMu.Unlock()
 		st := desktop.LoadSettings(s.settingsPath)
 		st.UI = ui
 		if err := desktop.SaveSettings(s.settingsPath, st); err != nil {

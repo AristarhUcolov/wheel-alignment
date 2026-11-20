@@ -22,6 +22,12 @@ export default {
   <li><b>Report.</b> When everything is green, take the “after” snapshot (F5) and open the report with its before/after
     table (F6). It can be printed or saved as PDF.</li>
 </ol>
+<p><b>Nothing gets lost.</b> The chosen vehicle, the figures you typed, the “before” and “after” snapshots, the checklist and
+  the plate number are kept by the program: close it, open it tomorrow — everything is still there, and the screen opens
+  where you stopped. Start the next car with <b>“New vehicle”</b> in the menu on the left (or in the report): everything
+  of the previous one is cleared, while phone and camera calibrations stay.</p>
+<p><b>The “what next” line</b> on the adjustment screen leads you through the whole job: the “before” snapshot, then the
+  angles in the right order, the “after” snapshot, the report. Its button does the next thing right away.</p>
 <div class="note">New to this? Start the demonstration (F9 on the adjustment screen) and press F10 — the program shows by
   itself in which order and how the angles are set. With the ← → keys you can “turn” any angle yourself and watch what
   happens to the others.</div>`],
@@ -38,8 +44,10 @@ export default {
     one (Wi-Fi) at that, not the internet.</li>
 </ol>
 <p>Where your data lives: <code>%APPDATA%\\wheelalign</code> (on Linux <code>~/.config/wheelalign</code>). It holds the settings
-  (<code>settings.json</code>), your own specifications (the <code>vehicles</code> folder), the phone certificate
-  (<code>tls</code>) and the log <code>wheelalign.log</code> — attach it when reporting a bug.</p>
+  (<code>settings.json</code>), the current job — the vehicle on the stand, the figures typed in, the snapshots
+  (<code>session.json</code>), your own specifications (the <code>vehicles</code> folder), phone calibrations
+  (<code>phones.json</code>) and phone access (<code>phone-link.json</code>), the phone certificate (<code>tls</code>) and the log
+  <code>wheelalign.log</code> — attach it when reporting a bug.</p>
 <p class="muted">Start options: <code>-browser</code> — open in the browser instead of a window; <code>-data &lt;folder&gt;</code> —
   keep the data elsewhere (for example next to the program on a USB stick). Full list: <code>wheelalign -h</code>.</p>`],
 
@@ -89,7 +97,13 @@ export default {
   <tr><td><b>Thrust angle</b></td><td>Where the rear axle points relative to the car's centreline: half the difference of
     the rear wheels' toe.</td><td>The car “crabs”, the steering wheel is off-centre when driving straight although the
     front toe is in spec.</td></tr>
-</tbody></table>`],
+</tbody></table>
+<div data-figs="camber toe caster"></div>
+<div data-figs="sai thrust"></div>
+<p>In short, what pulls a car (Hyundai bulletin 20-SS-001H): it pulls towards the wheel with more positive camber — the
+  front camber difference should be under 0.5° — and towards the wheel with less caster. Toe does not cause a pull, but
+  tyre wear and whether the steering wheel sits straight depend on it. Tyres (unequal pressure, ply steer and conicity),
+  a dragging brake, a sagging spring, road crown and crosswind can pull a car too.</p>`],
 
 ['vehicle', 'Step 1. Vehicle', `
 <ul>
@@ -114,6 +128,7 @@ export default {
 <p class="muted">You can also work without choosing a vehicle — the angles are then shown without an in-spec / out-of-spec verdict.</p>`],
 
 ['prep', 'Step 2. Preparation', `
+<p>Items with a picture have a <b>“What it looks like”</b> button — the diagram opens right under the item.</p>
 <p>The checklist follows the chosen suspension: kingpin play for a beam axle, strut top bearings for MacPherson, U-bolts
   and the centre bolt for leaf springs. The items are grouped — safety, tools, floor, vehicle, front and rear suspension —
   and each group has its own counter. In large type: what to do; in small type: why. Tick items off as you go — the ticks
@@ -135,6 +150,9 @@ export default {
 </ul>`],
 
 ['tools', 'Tools and floor', `
+<div data-figs="level settle rideHeight"></div>
+<div data-figs="play dryPark"></div>
+<div data-figs="turnplates pedal wheelLock"></div>
 <table class="params"><thead><tr><th>What</th><th>What for</th><th>Substitute</th></tr></thead><tbody>
   <tr><td>Fishing line 0.3–0.5 mm, 2 × 5 m</td><td>Reference lines for toe</td><td>Not thread — it sags and stretches</td></tr>
   <tr><td>4 stands up to hub height</td><td>Hold the strings</td><td>Bricks with blocks, buckets of sand</td></tr>
@@ -162,17 +180,22 @@ export default {
     runout; runout above 0.5° means a bent rim and unreliable readings for that wheel.</li>
   <li><b>Toe</b> — from the string to the rim flange at the front and rear of the wheel, strictly at hub height. Higher or
     lower mixes camber into the reading. A wheel pointing inwards has the larger front distance; enter it as it is.</li>
-  <li><b>Caster</b> — on turn plates: camber with the wheel steered 20° out and 20° in. The program solves this exactly,
-    not with the “swing × 1.5” rule, which is off by up to 0.27° on cars with large caster. Read the steer angle off the
-    turn plate scale or chalk it on the floor.</li>
+  <li><b>Caster</b> — on turn plates: camber with the wheel steered 20° out and 20° in. “Out” for the left wheel is the
+    steering wheel turned left, for the right wheel — turned right. The program solves this exactly, not with the
+    “swing × 1.5” rule, which is off by up to 0.27° on cars with large caster. Read the steer angle off the turn plate
+    scale or chalk it on the floor.</li>
 </ol>
-<p>Every figure you enter goes straight to the adjustment screen. While working: turn the tie rod, measure, enter the new
-  figure. The screen updates at once.</p>`],
+<p>Every figure you enter goes straight to the adjustment screen and is kept. While working: turn the tie rod, measure,
+  enter the new figure. The screen updates at once. Delete a figure and it leaves the screen too; “Clear all fields”
+  removes everything typed by hand at once.</p>
+<div data-figs="bar strings runout"></div>
+<div data-figs="steer:left steer:right"></div>`],
 
 ['phone', 'Measuring: a phone on the wheel', `
 <ol>
-  <li>On “Measurement → Phone on the wheel” press “Allow Wi-Fi connection” and scan the QR code with the phone's
-    camera. Phone and computer must be on the same Wi-Fi network (a hotspot on the phone itself will do).</li>
+  <li>Press <b>“Phone”</b> at the top right — from any screen — and scan the QR code with the phone's camera. Wi-Fi access
+    switches on by itself. The same is on “Measurement → Phone on the wheel”. Phone and computer must be on the same
+    Wi-Fi network (a hotspot on the phone itself will do).</li>
   <li>The phone's browser warns about the certificate — it was made by this program, not by a certificate authority.
     “Advanced” → “Proceed to the site”. Windows may ask for firewall permission — allow private networks.</li>
   <li>On the phone, tap the wheel — the buttons sit where the wheels are on the car — and press “Start sensors”. On an
@@ -186,7 +209,8 @@ export default {
   <li>Press the phone against the bar, screen facing out — camber flows to the adjustment screen in real time. The
     “steady” tag means the reading can be trusted.</li>
   <li><b>Caster</b> (front wheels only): wheels on turn plates, brake held with a prop, “Measure caster”. The phone leads
-    the way: straight, out about 20°, in — it measures the steer angle with its gyroscope.</li>
+    the way: straight, then “turn the steering wheel left” or “right” about 20°, then the other way — it measures the steer
+    angle with its gyroscope.</li>
   <li><b>Toe</b> — the tab explains why a phone on the rim cannot measure it, and one button turns the phone into a
     camera with targets.</li>
 </ol>
@@ -194,8 +218,22 @@ export default {
   accelerometer senses only tilt — gravity does not change under such a rotation. The gyroscope does sense it, but drifts —
   within a minute by more than the whole toe tolerance. So take toe by string or by camera: the same phone on a tripod
   works as a camera in live mode (see “Camera and targets”). Two phones on the wheels measure two wheels at once, four —
-  all four. When you are done, switch Wi-Fi access off. A phone connected by mistake is removed with “Disconnect” in the
-  list.</p>`],
+  all four. A phone connected by mistake is removed with “Disconnect” in the list.</p>
+<p><b>Accuracy check</b> — the fourth, optional step of “Preparing the phone”. The phone goes on the table screen up and
+  down again, then on the bar upright and upside down — but the calibration is compared, not changed. “Zero” shows how far
+  the accelerometer's zero has moved since calibration (it does in the cold and with age), “mount” — how far the phone has
+  shifted on the bar (a new case, another bar). Over 0.1° and the phone tells you which calibration step to repeat.
+  Professional inclinometers are checked the same way: turned over by 180°, the zero offset changes sign and the angle
+  does not.</p>
+<p><b>The gyroscope of older phones.</b> Chrome on Android before version 66 gave the rotation rate in radians rather than
+  degrees — the wheel's steer angle would come out 57 times too small. The program finds this out from the turn-over during
+  calibration (always at least 180°) and converts. If caster comes out negative, the phone warns: most often the steering
+  wheel was turned the wrong way first.</p>
+<p><b>Set up once — then it just works.</b> The program remembers that access is on: after a restart it switches on again,
+  the address and the code stay the same, and a phone with the page open reconnects by itself, keeping its wheel and its
+  calibration. You can add the page to the phone's home screen. If someone else has seen the code, press “New key”: every
+  phone is disconnected and each has to scan the new code. When the phones are no longer needed, “Switch Wi-Fi access
+  off”.</p>`],
 
 ['optical', 'Measuring: camera and targets', `
 <p>A printed chessboard on a rigid sheet can be fixed to the wheel as crookedly as you like — the program finds the wheel's
@@ -251,6 +289,10 @@ export default {
   <li><b>The “how far to turn” helper.</b> In the same panel: press “Remember position”, turn the tie rod or eccentric by
     a known amount (¼, ½, 1 turn) and press how far you turned it. The program works out what one turn does on your car
     and from then on tells you: “to nominal ≈ 1¼ turns, the same way”.</li>
+  <li><b>“What next”</b> — the line under the verdict. It shows the next step: the “before” snapshot, then the angle to
+    adjust now, in the right order (rear axle → caster → camber → toe), and how far it is from the spec; then the “after”
+    snapshot and the report. The button on the right does it or opens the angle's panel. If the angle has no adjuster on
+    your suspension, the line says so — look for wear or a bent part.</li>
   <li><b>The source bar</b> at the top shows where data comes from: phone, sensor, camera, manual entry, demo.</li>
   <li><b>Sound and voice</b> — the buttons next to the units, keys <kbd>F7</kbd> and <kbd>F8</kbd>: guidance when you
     cannot see the screen (see “Settings and accessibility”).</li>
@@ -268,7 +310,14 @@ export default {
     and measure again. An alignment without a check measurement is not an alignment, it is a hope.</li>
 </ol>
 <p><b>Which way to turn the tie rod if you don't know:</b> a quarter turn, then watch the pointer. The live screen answers
-  that question faster than any diagram.</p>`],
+  that question faster than any diagram.</p>
+<p>Factory procedures use the same order: Hyundai bulletin 20-SS-001H says to set rear camber and toe first, then centre and
+  lock the steering wheel, and only then adjust front caster, camber and toe; the Tesla manual likewise goes rear camber,
+  rear toe, front camber and caster, front toe. Set angles to the centre of the specification, not just “inside it”.</p>
+<p><b>Steering wheel crooked although toe is in spec?</b> Then the toe is split unevenly between the wheels. The front toe
+  panel on the adjustment screen tells which way the steering wheel will point — set the steering wheel straight and bring
+  each wheel to its own nominal.</p>
+<div data-figs="thrust tieRod"></div>`],
 
 ['report', 'Step 5. The report', `
 <p>The report is built from two snapshots: “before” — ahead of adjustment, and “after” — once everything is set. F5 on the
@@ -276,7 +325,53 @@ export default {
   all four wheels.</p>
 <p>You can add the plate number or VIN, the mileage and your name. “Print / PDF” opens the system print dialog — choose
   “Save as PDF” to get a file. The report lists the source of the specifications, the adjustment order and remarks
-  (rim runout, included-angle differences and so on).</p>`],
+  (rim runout, included-angle differences and so on).</p>
+<p>Finished with the car — <b>“New vehicle”</b>: readings, snapshots, the checklist and the report fields are cleared, and
+  the next car starts with a clean sheet.</p>`],
+
+['tyres', 'What tyre wear tells you', `
+<p>Before measuring, look at the front and rear tyres and run your palm over the tread: wear often tells at once which
+  angle is off or what is worn. Write down what you see — after the alignment you will have something to compare with.</p>
+<div data-wear></div>
+<p class="muted">From MOOG's “Understanding Tire Wear” and Hyundai bulletin 20-SS-001H. Feathering is easier to feel than to
+  see: run your palm across the tread one way and the other — on one side the block edges are sharp. Cupping is not an
+  alignment matter: dampers, wheel balance and play come first.</p>`],
+
+['diag', 'Diagnosis: what is bent', `
+<p>Camber and toe are adjusted, but steering axis inclination (SAI) and the included angle (SAI + camber) are set by the
+  parts. If they are out of spec or differ left to right, adjustment will not help — something is bent. Compare the two
+  sides with each other.</p>
+<table class="params"><thead><tr><th>Camber</th><th>SAI</th><th>Included angle</th><th>Probable cause</th></tr></thead><tbody>
+  <tr><td>out of spec</td><td>in spec</td><td>in spec</td><td>The knuckle is sound. A misadjusted cam bolt, a shifted
+    subframe, a bent control arm or a displaced strut tower.</td></tr>
+  <tr><td>out of spec</td><td>out of spec</td><td>in spec</td><td>The knuckle is sound. A bent strut, a bent control arm or a
+    displaced upper strut mount.</td></tr>
+  <tr><td>out of spec</td><td>any</td><td>out of spec</td><td>A bent steering knuckle (spindle) — the knuckle is replaced.</td></tr>
+</tbody></table>
+<p>Per Hyundai bulletin 20-SS-001H: an SAI difference between left and right of more than 1° means damaged parts; lower SAI
+  on one side often means a bent lower control arm, higher — a damaged upper strut mount. SAI from a wheel sweep is not
+  precise: a 0.1° zero error of the gauge gives almost 2° of SAI, so confirm such a finding with the camera.</p>
+<p><b>Steering lock angles.</b> On turn plates, steer until the outer wheel stands at 20° and note the angle of the inner
+  one; then the other way (“Measurement → Steering lock angles”). The inner wheel usually turns further than the outer,
+  but what matters is that left and right match: a difference over 1° means a bent steering arm or tie rod, even when toe is
+  in spec. Such a car is repaired, not adjusted.</p>
+<p class="muted">The table follows study material for the ASE A4 exam; the exact SAI, included angle and lock angles for your
+  model are in its workshop manual.</p>`],
+
+['road', 'Road test', `
+<p>An alignment is checked on the road. The procedure from Hyundai bulletin 20-SS-001H:</p>
+<ol>
+  <li>A straight, level stretch at least 250 m long, no ruts, wind or noticeable crown; a lane 3–3.5 m wide.</li>
+  <li>Tyre pressures to specification, only the driver in the car.</li>
+  <li>About 64 km/h (40 mph). Set the steering wheel so the car goes straight and let it go lightly.</li>
+  <li>Time how many seconds the car takes to drift one metre — from one side of the lane to the other. <b>More than 6 s
+    passes, 6 s or less fails.</b></li>
+  <li>Repeat in the opposite direction on the same road: if the drift changes side, the road or the wind is to blame, not
+    the car.</li>
+  <li>If the car goes straight but the steering wheel is crooked, redo the toe with the steering wheel locked straight.</li>
+</ol>
+<div data-figs="roadTest"></div>
+<p>The result goes into the report — the “Road test” section at the bottom.</p>`],
 
 ['susp', 'Suspension types', `
 <p class="muted">Every model has its own factory specification, but there are only about a dozen suspension designs in the
@@ -331,15 +426,41 @@ export default {
     the program on private networks.</td></tr>
   <tr><td>“Connection is not private” on the phone</td><td>That is expected: the certificate was made by the program.
     “Advanced” → “Proceed to the site”.</td></tr>
-  <tr><td>“Link expired”</td><td>Wi-Fi access was switched off and on again, so the key changed. Scan the QR code again.</td></tr>
+  <tr><td>“Link expired”</td><td>The key in the address was changed with “New key”. Scan the new QR code.</td></tr>
+  <tr><td>The phone says “no connection to the computer”</td><td>The program on the computer is closed or the phone has left the
+    Wi-Fi network. As soon as the program is running again and the phone is on the same network, the connection comes back
+    by itself — no need to scan again. If the computer's network address has changed, scan the code once more.</td></tr>
   <tr><td>The phone's sensors do not respond</td><td>Open the page in Chrome (Android) or Safari (iPhone); on an iPhone allow
     motion sensor access. Browsers built into messengers do not provide the sensors.</td></tr>
   <tr><td>Figures jump around</td><td>The phone is not pressed to the bar, the bar rests on the tyre, wind shakes the string,
     someone is sitting in the car. Wait for “readings steady”.</td></tr>
   <tr><td>Camera calibration is “poor”</td><td>More photos, the board in every corner of the frame and tilted, the board
     glued to a rigid flat sheet, the square size measured with calipers.</td></tr>
+  <tr><td>Caster came out negative</td><td>Most often the steering wheel was first turned the wrong way. For the left wheel —
+    left first, then right; for the right wheel — right first. Measure caster again.</td></tr>
+  <tr><td>The phone's accuracy check failed</td><td>“Zero” — redo the phone calibration on the table (step 1); “mount” — the
+    mount calibration on the bar (step 2). Check that the bar is straight and pressed against the rim flanges.</td></tr>
   <tr><td>You found a bug</td><td>Describe it in Issues on GitHub and attach <code>wheelalign.log</code> from the data folder.</td></tr>
 </tbody></table>`],
+
+['sources', 'Where the method comes from', `
+<p>The working order, the checks and the thresholds in the program come from manufacturers' open documents and training
+  material, not invention:</p>
+<ul>
+  <li><b>Hyundai, bulletin 20-SS-001H</b> “Wheel Alignment Requirements and Best Practices” (2020, published by NHTSA):
+    the adjustment order, pull from camber and caster, the 0.5° camber difference, the 1° SAI difference, the road test.</li>
+  <li><b>Tesla, Model 3 service manual</b>, “Four Wheel Alignment Check and Adjust”: preparation, load, ride height, brake
+    pedal depressor, steering wheel lock, rear-then-front order, road test.</li>
+  <li><b>MOOG (Federal-Mogul), “Understanding Tire Wear”</b>: tyre wear and its causes.</li>
+  <li><b>Study material for the ASE A4 exam</b> (suspension and steering): pre-alignment inspection, play checks, the dry
+    park test, SAI and included angle diagnosis, steering lock angles.</li>
+  <li><b>Analog Devices, AN-1057</b> “Using an Accelerometer for Inclination Sensing”: calibrating a tilt sensor by turning
+    it over by 180° — the phone's calibration and check rest on it.</li>
+  <li><b>W3C, “Device Orientation and Motion”</b>, and the Chromium change for Chrome 66: rotation rate in degrees per
+    second; before Chrome 66 on Android — in radians.</li>
+</ul>
+<p class="muted">Your car's factory tolerances come only from its workshop manual: see “Where the specifications come
+  from”.</p>`],
 
 ['safety', 'Safety', `
 <ul>

@@ -5,11 +5,11 @@ import { api, refreshSession, toast, h, $, $$ } from '../state.js';
 import { esc } from '../fmt.js';
 import { t, lang } from '../i18n.js';
 import { prefs, setPref } from '../prefs.js';
-import { go, switchLang } from '../app.js';
+import { go, switchLang, openPhone } from '../app.js';
 import { setMethod } from './measure.js';
 import { wakeAudio, sounds } from '../assist.js';
 
-let back = null, step = 0, method = 'manual', opener = null;
+let back = null, step = 0, method = null, opener = null;
 
 export function maybeWelcome() {
   if (!prefs.welcomed) showWelcome();
@@ -19,6 +19,7 @@ export function showWelcome() {
   if (back) return;
   opener = document.activeElement;
   step = 0;
+  method = prefs.method || 'manual';
   back = h(`<div class="modal-back"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="wTitle"></div></div>`);
   document.body.append(back);
   back.addEventListener('keydown', onKey);
@@ -101,7 +102,9 @@ function draw() {
       <div class="actions" style="margin:0">
         ${step ? `<button class="btn" id="wBack">${t('Назад')}</button>` : ''}
         ${last
-          ? `<button class="btn" id="wDemo">${t('Посмотреть демонстрацию')}</button><button class="btn primary" id="wCar">${t('Найти свой автомобиль')}</button>`
+          ? `<button class="btn${method === 'demo' ? ' primary' : ''}" id="wDemo">${t('Посмотреть демонстрацию')}</button>
+             ${method === 'phone' ? `<button class="btn" id="wPhone">${t('Подключить телефон')}</button>` : ''}
+             <button class="btn${method === 'demo' ? '' : ' primary'}" id="wCar">${t('Найти свой автомобиль')}</button>`
           : `<button class="btn primary" id="wNext">${t('Далее')}</button>`}
       </div>
     </div>`;
@@ -121,8 +124,11 @@ function draw() {
   const nb = $('#wNext', m), bb = $('#wBack', m);
   if (nb) nb.onclick = () => { step++; draw(); };
   if (bb) bb.onclick = () => { step--; draw(); };
-  const car = $('#wCar', m), demo = $('#wDemo', m);
+  const car = $('#wCar', m), demo = $('#wDemo', m), ph = $('#wPhone', m);
   if (car) car.onclick = () => { finish(); go('vehicle'); setTimeout(() => { const q = $('#vq'); if (q) q.focus(); }, 60); };
+  // Телефон — сразу код на экране: включить доступ и отсканировать, без
+  // поиска нужной вкладки. Под окном уже открыт выбор автомобиля.
+  if (ph) ph.onclick = () => { finish(); go('vehicle'); openPhone(); };
   if (demo) demo.onclick = async () => {
     finish();
     try {

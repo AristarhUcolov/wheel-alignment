@@ -1,15 +1,17 @@
 // Шаг 3: замер — выбор способа и ввод данных.
 
-import { state, on, api, save, toast, refreshSession, h, $, $$ } from '../state.js';
+import { state, on, api, saveJob, toast, refreshSession, h, $, $$ } from '../state.js';
 import { WHEELS, esc, fmtParam, parseNum } from '../fmt.js';
 import { t } from '../i18n.js';
 import { go, snapshot } from '../app.js';
+import { prefs, setPref } from '../prefs.js';
 import * as optical from './optical.js';
+import { figure } from '../illus.js';
 import * as phone from './phone.js';
 
-let root, method = localStorageGet('method', 'manual');
+let root;
 
-function localStorageGet(k, d) { try { return JSON.parse(localStorage.getItem('wa.' + k)) ?? d; } catch { return d; } }
+const method = () => prefs.method || 'manual';
 
 // Что меряет каждый способ: да, нет или «зависит» — и чем. Видно сразу, без
 // чтения инструкции: например, что телефон на ободе схождение не меряет.
@@ -28,10 +30,10 @@ const METHODS = () => [
 
 const CAP = { yes: '✓', no: '✕', dep: '?' };
 
-// Способ замера по умолчанию — из приветствия.
+// Способ замера выбирают здесь, в приветствии и на шаге «Подготовка».
 export function setMethod(m) {
-  method = m;
-  try { localStorage.setItem('wa.method', JSON.stringify(method)); } catch { /* без сохранения */ }
+  if (m === method()) return;
+  setPref('method', m);
   if (root && root.classList.contains('active')) { renderMethods(); renderBody(); }
 }
 
@@ -46,6 +48,8 @@ export function mount(el) {
     <div class="actions" id="mActions"></div>`;
   on('frame', updateMini);
   on('session', () => { if (state.screen === 'measure') renderActions(); });
+  // Новая машина: поля прежней — пустые.
+  on('job', () => { manualData = null; if (root.classList.contains('active')) renderBody(); });
 }
 
 export function show() {
@@ -57,17 +61,20 @@ export function show() {
 function renderMethods() {
   const box = $('#mMethods', root);
   box.innerHTML = METHODS().map(m => `
-    <button class="method${m.id === method ? ' on' : ''}" data-m="${m.id}" aria-pressed="${m.id === method ? 'true' : 'false'}">
+    <button class="method${m.id === method() ? ' on' : ''}" data-m="${m.id}" aria-pressed="${m.id === method() ? 'true' : 'false'}">
       <b>${m.name}${m.beta ? ` <span class="badge unverified">${t('бета')}</span>` : ''}</b>
       <span>${m.desc}</span>
       <span class="caps">${m.caps.map(([k, name, how]) =>
         `<span class="cap ${k}"><i aria-hidden="true">${CAP[k]}</i> ${name}${how ? ` <small>— ${how}</small>` : ''}</span>`).join('')}</span>
     </button>`).join('');
   $$('.method', box).forEach(b => b.onclick = () => {
-    method = b.dataset.m;
-    try { localStorage.setItem('wa.method', JSON.stringify(method)); } catch { /* без сохранения */ }
+    const was = method();
+    setPref('method', b.dataset.m);
     renderMethods();
     renderBody();
+    $(`.method[data-m="${b.dataset.m}"]`, root).focus({ preventScroll: true });
+    // Карточки способов занимают пол-экрана — сразу к тому, что выбрали.
+    if (was !== b.dataset.m) $('#mBody', root).scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 }
 
@@ -86,20 +93,36 @@ function renderActions() {
 function renderBody() {
   const body = $('#mBody', root);
   body.innerHTML = '';
-  if (method === 'manual') manual(body);
-  else if (method === 'phone') phone.render(body);
-  else if (method === 'optical') optical.render(body);
-  else if (method === 'sensor') sensor(body);
+  const m = method();
+  if (m === 'manual') manual(body);
+  else if (m === 'phone') phone.render(body);
+  else if (m === 'optical') optical.render(body);
+  else if (m === 'sensor') sensor(body);
   else demo(body);
   updateMini();
 }
 
 // ── Струна и угломер ─────────────────────────────────────────────────
 
-const manualData = localStorageGet('manual', {});
+// Поля формы по колёсам — как их хранит программа в файле работы. Числа, а
+// не текст: «0,5» после перезапуска покажется как «0.5», и это одно и то же.
+let manualData = null;
+const FIELDS = ['camber', 'camber_180', 'toe_front_mm', 'toe_rear_mm', 'sweep_out', 'sweep_in', 'half_sweep'];
+
+function loadManual() {
+  if (manualData) return manualData;
+  manualData = {};
+  const saved = (state.session && state.session.manual) || {};
+  for (const [w, d] of Object.entries(saved)) {
+    manualData[w] = { invert_gauge: !!d.invert_gauge };
+    for (const f of FIELDS) manualData[w][f] = d[f] ?? null;
+  }
+  return manualData;
+}
 
 function manual(body) {
   const ss = state.session || {};
+  const data = loadManual();
   body.append(h(`<div>
     <div class="panel">
       <h2 style="margin-top:0">${t('Как мерить')}</h2>
@@ -108,7 +131,9 @@ function manual(body) {
         <li>${t('Схождение — от струны до края обода спереди и сзади колеса, строго на высоте центра ступицы.')}</li>
         <li>${t('Кастер (по желанию, нужны поворотные круги) — развал при повороте колеса на 20° наружу и 20° внутрь.')}</li>
       </ol>
-      <p class="muted" style="margin-top:10px;font-size:13px">${t('Каждое введённое число сразу уходит на экран регулировки. Меряете после поворота регулятора — вводите новое число, стрелка сдвинется.')}</p>
+      <p class="muted" style="margin-top:10px;font-size:13px">${t('Каждое введённое число сразу уходит на экран регулировки и сохраняется — закроете программу, откроете снова, всё на месте. Меряете после поворота регулятора — вводите новое число, стрелка сдвинется. Стёрли число — оно уйдёт и с экрана.')}</p>
+      <details class="figs"><summary>${t('Рисунки: планка на ободе, струны, биение диска')}</summary>
+        <div class="illus-row">${figure('bar')}${figure('strings')}${figure('runout')}</div></details>
     </div>
 
     <details class="panel" id="boxCheck" style="margin-top:12px" open>
@@ -125,12 +150,29 @@ function manual(body) {
     </details>
 
     <div class="wheelgrid" id="mWheels" style="margin-top:12px"></div>
+
+    <details class="panel" style="margin-top:12px">
+      <summary style="cursor:pointer;font-weight:600">${t('Кастер: куда поворачивать руль')}</summary>
+      <p class="muted" style="margin-top:10px;font-size:13px">${t('Колёса на поворотных кругах, педаль тормоза зажата упором. Для левого колеса «наружу» — руль влево, для правого — вправо. Угол поворота колеса читайте по шкале круга.')}</p>
+      <div class="illus-row">${figure('steer', { arg: 'left', caption: false })}${figure('steer', { arg: 'right', caption: false })}${figure('pedal')}</div>
+    </details>
+
+    <details class="panel" id="tootBox" style="margin-top:12px">
+      <summary style="cursor:pointer;font-weight:600">${t('Углы поворота колёс')} <span class="muted" style="font-weight:400">${t('— по желанию: найти погнутый поворотный рычаг')}</span></summary>
+      <p class="muted" style="margin-top:10px;font-size:13px">${t('На поворотных кругах поверните руль так, чтобы наружное колесо встало ровно на 20°, и запишите, сколько показывает круг под внутренним. Потом то же в другую сторону. Внутреннее колесо обычно поворачивается на 1–4° больше наружного; главное — чтобы влево и вправо было одинаково (методика ASE).')}</p>
+      <div class="cols3">
+        <label class="f">${t('Руль влево: правое на 20°, левое показывает, °')}<input type="text" inputmode="decimal" data-num data-note="toot_l"></label>
+        <label class="f">${t('Руль вправо: левое на 20°, правое показывает, °')}<input type="text" inputmode="decimal" data-num data-note="toot_r"></label>
+      </div>
+      <div id="tootRes" style="margin-top:10px"></div>
+    </details>
+    <div class="actions"><button class="btn danger" id="mClear">${t('Очистить все поля')}</button></div>
   </div>`));
 
   const grid = $('#mWheels', body);
   for (const w of WHEELS) {
-    const d = manualData[w.key] || {};
-    const v = f => (d[f] ?? '') === '' ? '' : d[f];
+    const d = data[w.key] || {};
+    const v = f => (d[f] === null || d[f] === undefined) ? '' : d[f];
     grid.append(h(`<div class="wcard" data-w="${w.key}">
       <h3><span>${w.name}</span><span class="live-mini" data-mini="${w.key}"></span></h3>
       <div class="pair">
@@ -144,14 +186,16 @@ function manual(body) {
       <label class="chk" style="font-size:13px;color:var(--muted)"><input type="checkbox" data-f="invert_gauge"${d.invert_gauge ? ' checked' : ''}>
         <span>${t('Угломер показывает наоборот (наклон наружу — минус)')}</span></label>
       ${w.front ? `
-      <details style="margin-top:10px">
+      <details style="margin-top:10px"${d.sweep_out !== null && d.sweep_out !== undefined || d.sweep_in !== null && d.sweep_in !== undefined ? ' open' : ''}>
         <summary style="cursor:pointer;color:var(--blue);font-size:13.5px">${t('Кастер — развал при повороте колеса')}</summary>
         <div class="pair" style="margin-top:8px">
           <label class="f">${t('Колесо повёрнуто НАРУЖУ, °')}<input type="text" inputmode="decimal" data-num data-f="sweep_out" value="${v('sweep_out')}"></label>
           <label class="f">${t('Колесо повёрнуто ВНУТРЬ, °')}<input type="text" inputmode="decimal" data-num data-f="sweep_in" value="${v('sweep_in')}"></label>
         </div>
         <label class="f">${t('На сколько градусов поворачивали в каждую сторону')}<input type="text" inputmode="decimal" data-num data-f="half_sweep" value="${v('half_sweep') || 20}"></label>
-        <small class="dim">${t('«Наружу» — от центра машины. Поворот руля влево даёт «наружу» для левого колеса и «внутрь» для правого.')}</small>
+        <small class="dim">${w.key === 'FL'
+          ? t('«Наружу» для левого колеса — руль влево, «внутрь» — руль вправо.')
+          : t('«Наружу» для правого колеса — руль вправо, «внутрь» — руль влево.')}</small>
       </details>` : ''}
     </div>`));
   }
@@ -165,12 +209,32 @@ function manual(body) {
     }));
   });
 
-  const boxSaved = localStorageGet('box', {});
+  const boxSaved = { ...((state.session && state.session.box) || {}) };
   $$('[data-box]', body).forEach(inp => {
     inp.value = boxSaved[inp.dataset.box] ?? '';
-    inp.oninput = () => { boxSaved[inp.dataset.box] = inp.value; save('box', boxSaved); boxCheck(body); };
+    inp.oninput = () => { boxSaved[inp.dataset.box] = inp.value; saveJob({ box: { ...boxSaved } }); boxCheck(body); };
   });
   boxCheck(body);
+
+  // Углы поворота: записываются в работу, итог — сразу под полями.
+  const notes = () => ({ ...((state.session && state.session.notes) || {}) });
+  $$('[data-note]', body).forEach(inp => {
+    inp.value = notes()[inp.dataset.note] ?? '';
+    inp.oninput = () => { saveJob({ notes: { ...notes(), [inp.dataset.note]: inp.value } }); tootCheck(body); };
+  });
+  tootCheck(body);
+  if (notes().toot_l || notes().toot_r) $('#tootBox', body).open = true;
+
+  $('#mClear', body).onclick = async () => {
+    if (!confirm(t('Очистить все введённые вручную числа? Они уйдут и с экрана регулировки.'))) return;
+    for (const w of WHEELS) {
+      try { await api('/api/live/manual', { method: 'POST', body: { wheel: w.key, replace: true } }); } catch (e) { toast(e.message, true); }
+    }
+    manualData = {};
+    saveJob({ box: {} });
+    if (state.session) state.session.manual = {};
+    renderBody();
+  };
 }
 
 function num(card, f) {
@@ -179,31 +243,28 @@ function num(card, f) {
   return Number.isFinite(v) ? v : null;
 }
 
+// Колесо отправляется целиком: пустое поле — это стёртое число, и оно уходит
+// с экрана регулировки. Непонятное число (красная рамка) не отправляется, пока
+// его не исправят.
 async function sendWheel(card) {
   const w = card.dataset.w;
-  const d = {
-    camber: num(card, 'camber'), camber_180: num(card, 'camber_180'),
-    toe_front_mm: num(card, 'toe_front_mm'), toe_rear_mm: num(card, 'toe_rear_mm'),
-    sweep_out: num(card, 'sweep_out'), sweep_in: num(card, 'sweep_in'), half_sweep: num(card, 'half_sweep'),
-    invert_gauge: card.querySelector('[data-f="invert_gauge"]').checked,
-  };
-  manualData[w] = d;
-  save('manual', manualData);
+  if ($$('input[data-num]', card).some(i => Number.isNaN(parseNum(i.value)))) return;
+  const d = { invert_gauge: card.querySelector('[data-f="invert_gauge"]').checked };
+  for (const f of FIELDS) d[f] = num(card, f);
+  loadManual()[w] = d;
+  if (state.session) {
+    state.session.manual = state.session.manual || {};
+    state.session.manual[w] = d;
+  }
 
-  const body = { wheel: w, invert_gauge: d.invert_gauge };
-  if (d.camber !== null) body.camber = d.camber;
-  if (d.camber !== null && d.camber_180 !== null) body.camber_180 = d.camber_180;
-  if (d.toe_front_mm !== null && d.toe_rear_mm !== null) {
-    body.toe_front_mm = d.toe_front_mm;
-    body.toe_rear_mm = d.toe_rear_mm;
+  const body = { wheel: w, replace: true, invert_gauge: d.invert_gauge };
+  for (const f of ['camber', 'camber_180', 'toe_front_mm', 'toe_rear_mm']) if (d[f] !== null) body[f] = d[f];
+  if (WHEELS.find(x => x.key === w).front) {
+    for (const f of ['sweep_out', 'sweep_in', 'half_sweep']) if (d[f] !== null) body[f] = d[f];
   }
-  if (d.sweep_out !== null && d.sweep_in !== null) {
-    body.sweep = { camber_out: d.sweep_out, camber_in: d.sweep_in, half_sweep_deg: d.half_sweep || 20 };
-  }
-  if (Object.keys(body).length <= 2 && !body.sweep) return;
   try {
     await api('/api/live/manual', { method: 'POST', body });
-  } catch (e) { toast(`${w}: ${e.message}`, true); }
+  } catch (e) { toast(`${WHEELS.find(x => x.key === w).name}: ${e.message}`, true); }
 }
 
 function boxCheck(body) {
@@ -229,6 +290,22 @@ function boxCheck(body) {
           : t('{side} струна: «перед − зад» = {got} мм, нужно {want} мм. Сдвиньте конец у переднего колеса на {off} мм ближе к колесу.', { side: n, got: got.toFixed(1), want: want.toFixed(1), off: Math.abs(off).toFixed(1) })}</div>`;
   });
   hint.innerHTML = rows.join('') + `<p class="muted" style="font-size:12.5px">${t('Требуемая разница {want} мм — из-за разных колей ({tf} и {tr} мм).', { want: want.toFixed(1), tf, tr })}</p>`;
+}
+
+// Углы поворота колёс (toe-out on turns). Разница влево и вправо больше 1° —
+// погнут поворотный рычаг кулака или рулевая тяга, даже если схождение в
+// норме: так колёса и стирают шины в поворотах. Методика ASE.
+function tootCheck(body) {
+  const box = $('#tootRes', body);
+  const g = k => { const v = parseNum($(`[data-note="${k}"]`, body).value); return Number.isFinite(v) ? v : null; };
+  const l = g('toot_l'), r = g('toot_r');
+  if (l === null || r === null) { box.innerHTML = ''; return; }
+  const d = Math.abs(l - r);
+  const odd = l < 20 || r < 20
+    ? `<p class="muted" style="font-size:12.5px;margin-top:6px">${t('Внутреннее колесо повёрнуто меньше наружного — так бывает редко; проверьте замер и данные завода.')}</p>` : '';
+  box.innerHTML = (d > 1
+    ? `<div class="danger-box">✕ ${t('Разница {d}°: один из поворотных рычагов кулака или рулевая тяга погнуты. Сравните с данными завода и проверьте рычаги до регулировки схождения.', { d: d.toFixed(1) })}</div>`
+    : `<div class="ok-box">✓ ${t('Влево и вправо почти одинаково ({l}° и {r}°): поворотные рычаги в порядке.', { l: l.toFixed(1), r: r.toFixed(1) })}</div>`) + odd;
 }
 
 function updateMini() {
@@ -296,6 +373,10 @@ function demo(body) {
     } catch (e) { toast(e.message, true); }
   };
   const r = $('#dRestart', body), s = $('#dStop', body);
-  if (r) r.onclick = () => api('/api/sim', { method: 'POST', body: { action: 'restart' } }).then(() => toast(t('Машина снова разрегулирована')));
-  if (s) s.onclick = async () => { await api('/api/sim', { method: 'POST', body: { action: 'stop' } }); await refreshSession(); renderBody(); };
+  if (r) r.onclick = () => api('/api/sim', { method: 'POST', body: { action: 'restart' } })
+    .then(() => toast(t('Машина снова разрегулирована'))).catch(e => toast(e.message, true));
+  if (s) s.onclick = async () => {
+    try { await api('/api/sim', { method: 'POST', body: { action: 'stop' } }); await refreshSession(); } catch (e) { toast(e.message, true); }
+    renderBody();
+  };
 }

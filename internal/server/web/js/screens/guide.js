@@ -7,6 +7,7 @@ import { esc } from '../fmt.js';
 import { t, lang } from '../i18n.js';
 import RU from '../guide/ru.js';
 import EN from '../guide/en.js';
+import { figure, tyreWearTable } from '../illus.js';
 
 let root;
 
@@ -19,6 +20,16 @@ export function mount(el) {
     <div class="toc">${g.sections.map(([id, name]) => `<button class="chip" data-to="${id}">${name}</button>`).join('')}</div>
     ${g.sections.map(([id, name, html]) => `<h2 id="g-${id}">${name}</h2>${html}`).join('\n')}
   </div>`;
+  // Рисунки: data-figs="camber toe steer:left" — ключи из illus.js, после
+  // двоеточия — вариант; data-wear — таблица износа шин.
+  $$('[data-figs]', root).forEach(el => {
+    el.classList.add('illus-row');
+    el.innerHTML = el.dataset.figs.split(/\s+/).filter(Boolean).map(k => {
+      const [key, arg] = k.split(':');
+      return figure(key, arg ? { arg } : {});
+    }).join('');
+  });
+  $$('[data-wear]', root).forEach(el => { el.innerHTML = tyreWearTable(); });
   $$('[data-to]', root).forEach(b => b.onclick = () => {
     const target = $('#g-' + b.dataset.to, root);
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });

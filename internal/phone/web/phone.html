@@ -88,6 +88,24 @@
   .camvals .mid { display: block; font: 600 clamp(34px, 11vw, 52px)/1.1 var(--num); font-variant-numeric: tabular-nums; }
   .camvals small { color: var(--muted); font-size: 13px; }
   button.on { border-color: var(--blue); box-shadow: 0 0 0 2px var(--blue) inset; }
+
+  /* Картинка к шагу: как положить или приложить телефон. */
+  .pic { display: flex; justify-content: center; margin: 4px 0 6px; }
+  .pic svg { width: 100%; max-width: 300px; height: auto; }
+  .warnbox { color: #ffe0a3; background: rgba(255,176,32,.12); border-left: 3px solid var(--amber); padding: 10px 12px; border-radius: 0 10px 10px 0; }
+  .chk-res { display: block; font-size: 14px; margin-top: 3px; }
+  .chk-res.ok { color: var(--green); } .chk-res.bad { color: #ffb4b4; }
+  .sic.bad { border-color: var(--red); background: var(--red); color: #2b0606; }
+
+  /* Поворот руля при замере кастера: куда и докуда. */
+  .steerbox { text-align: center; }
+  .steerdir { font: 700 26px/1.2 system-ui, sans-serif; color: var(--blue); margin: 2px 0 4px; }
+  .gauge { position: relative; height: 34px; margin: 8px 6px 2px; }
+  .gauge .track { position: absolute; left: 0; right: 0; top: 12px; height: 10px; border-radius: 5px; background: var(--line); }
+  .gauge .zone { position: absolute; top: 12px; height: 10px; background: var(--green); opacity: .55; border-radius: 5px; }
+  .gauge .needle { position: absolute; top: 2px; width: 4px; height: 30px; margin-left: -2px; background: #fff; border-radius: 2px; transition: left .12s linear; }
+  .gauge .needle.in { background: var(--green); box-shadow: 0 0 10px var(--green); }
+  .gscale { display: flex; justify-content: space-between; color: var(--dim); font: 12px var(--num); margin: 0 4px; }
 </style>
 </head>
 <body>
@@ -95,6 +113,7 @@
     <b id="title" data-t>Датчик сход-развала</b>
     <span><span class="dot" id="dot"></span><span id="conn" class="muted" data-t>нет связи</span></span>
   </header>
+  <div class="note hide" id="offline" data-t>Нет связи с компьютером. Проверьте, что программа на компьютере запущена, а телефон — в той же сети Wi-Fi. Как только связь вернётся, всё продолжится само.</div>
 
   <section id="pick" class="hide">
     <p class="prompt" data-t>На каком колесе будет телефон?</p>
@@ -136,12 +155,20 @@
     </div>
 
     <div class="card proc hide" id="proc">
+      <div class="pic hide" id="pic" aria-hidden="true"></div>
       <div class="prompt" id="prompt" aria-live="polite"></div>
+      <div class="steerbox hide" id="steerBox">
+        <div class="pic" id="wheelPic" aria-hidden="true"></div>
+        <div class="steerdir" id="steerDir"></div>
+        <div class="gauge" aria-hidden="true"><div class="track"></div><div class="zone" id="gZone"></div><div class="needle" id="gNeedle"></div></div>
+        <div class="gscale" aria-hidden="true"><span>0°</span><span>10°</span><span>20°</span><span>30°</span><span>40°</span></div>
+      </div>
       <div class="steer hide" id="steer"></div>
       <div class="bar" id="barWrap"><div id="bar"></div></div>
       <button class="wide" data-cmd="cancel" style="margin-top:12px" data-t>Отмена</button>
     </div>
     <div class="err hide" id="err"></div>
+    <div class="warnbox hide" id="warn"></div>
 
     <div id="pCamber">
       <div class="card setup" id="setup">
@@ -155,6 +182,10 @@
         <div class="srow"><span class="sic" id="sRun">3</span>
           <div><b id="runTitle" data-t>Биение диска</b><small data-t>По желанию, для каждого колеса: замер, прокатить машину на пол-оборота, снова замер.</small></div>
           <button class="small" data-cmd="runout" data-t>Начать</button></div>
+        <div class="srow"><span class="sic" id="sCheck">4</span>
+          <div><b data-t>Проверка точности</b><small data-t>По желанию: телефон переворачивают на столе и на планке — программа сверяет с калибровкой. Полезно после смены чехла, планки или в мороз.</small>
+            <span class="chk-res hide" id="checkRes"></span></div>
+          <button class="small" data-cmd="check" data-t>Начать</button></div>
       </div>
       <div class="card" id="reading">
         <div class="label" data-t>Развал</div>
@@ -306,7 +337,21 @@ const EN = {
   "Вывесите колесо и медленно поворачивайте его рукой; мишень на колесе и на полу — в кадре.": "Lift the wheel and turn it slowly by hand; keep the wheel target and the floor target in the frame.",
   "Камера смотрит на колесо — показания идут на экран регулировки.": "The camera is watching the wheel — readings go to the adjustment screen.",
   "Колёса на поворотных кругах, педаль тормоза зажата упором. Медленно поворачивайте руль на 15–20° в одну сторону, затем в другую.": "Wheels on turn plates, brake pedal held down with a prop. Slowly steer 15–20° one way, then the other.",
-  "Остановлено.": "Stopped."
+  "Остановлено.": "Stopped.",
+  "Нет связи с компьютером. Проверьте, что программа на компьютере запущена, а телефон — в той же сети Wi-Fi. Как только связь вернётся, всё продолжится само.": "No connection to the computer. Check that the program is running on the computer and that the phone is on the same Wi-Fi network. As soon as the connection is back, everything carries on by itself.",
+  "Проверка точности": "Accuracy check",
+  "По желанию: телефон переворачивают на столе и на планке — программа сверяет с калибровкой. Полезно после смены чехла, планки или в мороз.": "Optional: the phone is turned over on the table and on the bar, and the program compares with the calibration. Useful after a new case or bar, or in the cold.",
+  "экраном вверх": "screen up",
+  "экраном вниз": "screen down",
+  "ровный стол, не трогать": "level table, do not touch",
+  "камера сверху": "camera at the top",
+  "камера снизу — вверх ногами": "camera at the bottom — upside down",
+  "руль ВЛЕВО": "steering wheel LEFT",
+  "руль ВПРАВО": "steering wheel RIGHT",
+  "руль прямо": "steering wheel straight",
+  "ноль {z} · крепление {m}": "zero {z} · mount {m}",
+  "ноль ушёл: повторите калибровку телефона (шаг 1)": "the zero has moved: redo the phone calibration (step 1)",
+  "крепление сдвинулось: повторите калибровку крепления (шаг 2)": "the mount has shifted: redo the mount calibration (step 2)"
 };
 // end EN
 let lang = document.documentElement.lang === 'en' ? 'en' : 'ru';
@@ -322,12 +367,20 @@ translateStatic();
 
 const token = location.pathname.split('/')[2] || '';
 const $ = s => document.querySelector(s);
+// Хранилище браузера привязано к адресу вместе с портом: сменился порт —
+// телефон «забыл бы» себя, а с собой и калибровку на компьютере. Поэтому
+// то же самое — ещё и в cookie: она привязана только к адресу компьютера.
+const cookie = {
+  get(k) { const m = document.cookie.match(new RegExp('(?:^|; )wa_' + k + '=([^;]*)')); return m ? decodeURIComponent(m[1]) : null; },
+  set(k, v) { try { document.cookie = 'wa_' + k + '=' + encodeURIComponent(v) + '; max-age=31536000; path=/; SameSite=Strict; Secure'; } catch {} },
+};
 const store = {
-  get(k) { try { return localStorage.getItem('wa.' + k); } catch { return null; } },
-  set(k, v) { try { localStorage.setItem('wa.' + k, v); } catch {} },
+  get(k) { let v = null; try { v = localStorage.getItem('wa.' + k); } catch {} return v !== null ? v : cookie.get(k); },
+  set(k, v) { try { localStorage.setItem('wa.' + k, v); } catch {} cookie.set(k, v); },
 };
 let id = store.get('device');
-if (!id) { id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); store.set('device', id); }
+if (!id) id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+store.set('device', id);
 let wheel = store.get('wheel') || '';
 
 // Имя телефона в списке на компьютере. Chrome на Android прячет модель в
@@ -383,7 +436,9 @@ async function send(extra) {
   if (b) queue.push(b);
   if (queue.length > 30) queue = queue.slice(-30);
   const body = { d: id, name: deviceName(), samples: queue, ...pending };
-  if (wheel && !body.wheel && !lastOK) body.wheel = wheel;
+  // Колесо — с каждым запросом: если компьютер перезапустили, он узнает
+  // телефон и его колесо сразу, без нового выбора.
+  if (wheel && !body.wheel) body.wheel = wheel;
   const sentPending = pending;
   queue = []; pending = {};
   inflight = true;
@@ -401,10 +456,62 @@ async function send(extra) {
     conn(false);
   } finally { inflight = false; }
 }
+let failedSince = 0;
 function conn(ok, why) {
   $('#dot').classList.toggle('on', ok);
   $('#conn').textContent = ok ? tr('на связи') : (why || tr('нет связи'));
+  if (ok) failedSince = 0; else if (!failedSince) failedSince = Date.now();
+  // Связь пропала надолго — объяснить, что делать, а не только «нет связи».
+  $('#offline').classList.toggle('hide', ok || !!why || Date.now() - failedSince < 6000);
 }
+
+// ── Картинки к шагам ───────────────────────────────────────────────
+// Как положить или приложить телефон: вид сбоку на стол и вид на колесо.
+// Подписи — тем же переводом, что и вся страница.
+const SVGNS = 'xmlns="http://www.w3.org/2000/svg"';
+function picTable(screenUp) {
+  const phone = screenUp
+    ? '<rect x="66" y="64" width="108" height="12" rx="5" fill="#16223a" stroke="#e8eef8" stroke-width="2"/><rect x="72" y="61" width="96" height="4" rx="2" fill="#4f8cff"/>'
+    : '<rect x="66" y="64" width="108" height="12" rx="5" fill="#16223a" stroke="#e8eef8" stroke-width="2"/><rect x="72" y="75" width="96" height="4" rx="2" fill="#4f8cff"/><rect x="76" y="58" width="18" height="7" rx="2" fill="#a3b2c9"/>';
+  const label = screenUp ? tr('экраном вверх') : tr('экраном вниз');
+  return `<svg ${SVGNS} viewBox="0 0 240 120"><text x="120" y="22" text-anchor="middle" fill="#e8eef8" font-size="15" font-weight="600">${label}</text>
+    <path d="M120 30 V${screenUp ? 54 : 52}" stroke="#4f8cff" stroke-width="3"/><path d="${screenUp ? 'M113 37 L120 28 L127 37' : 'M113 45 L120 54 L127 45'}" fill="none" stroke="#4f8cff" stroke-width="3"/>
+    ${phone}<rect x="14" y="78" width="212" height="9" rx="2" fill="#7787a1"/><rect x="28" y="87" width="8" height="26" fill="#7787a1"/><rect x="204" y="87" width="8" height="26" fill="#7787a1"/>
+    <text x="120" y="108" text-anchor="middle" fill="#a3b2c9" font-size="12">${tr('ровный стол, не трогать')}</text></svg>`;
+}
+function picRim(upright, mark) {
+  // Колесо, вид сбоку машины. Планка — поперёк обода, на закраинах; телефон —
+  // на планке экраном к нам. Камера (точка) сверху — «вертикально», снизу —
+  // «вверх ногами».
+  const cam = upright ? 46 : 114;
+  const chalk = mark === 'top' ? '<rect x="113" y="10" width="14" height="10" rx="2" fill="#fff"/>' : mark === 'bottom' ? '<rect x="113" y="140" width="14" height="10" rx="2" fill="#fff"/>' : '';
+  const roll = mark === 'bottom' ? `<path d="M196 46 A80 80 0 0 1 196 114" fill="none" stroke="#ffb020" stroke-width="3"/><path d="M189 108 L196 117 L203 108" fill="none" stroke="#ffb020" stroke-width="3"/><text x="214" y="84" fill="#ffb020" font-size="12" text-anchor="middle">½</text>` : '';
+  const flip = upright ? '' : `<path d="M40 52 A28 28 0 1 1 40 108" fill="none" stroke="#4f8cff" stroke-width="3"/><path d="M33 102 L40 111 L47 101" fill="none" stroke="#4f8cff" stroke-width="3"/><text x="40" y="84" fill="#4f8cff" font-size="12" text-anchor="middle">180°</text>`;
+  return `<svg ${SVGNS} viewBox="0 0 240 160"><circle cx="120" cy="80" r="74" fill="#0b0f16" stroke="#46597c" stroke-width="3"/>
+    <circle cx="120" cy="80" r="52" fill="#3a4a66"/><circle cx="120" cy="80" r="46" fill="#1c2a46"/>${chalk}
+    <rect x="113" y="27" width="14" height="106" rx="3" fill="#c9a86b"/>
+    <rect x="97" y="38" width="46" height="84" rx="8" fill="#111a2c" stroke="#e8eef8" stroke-width="2"/><rect x="101" y="50" width="38" height="60" rx="3" fill="#4f8cff" opacity=".45"/>
+    <circle cx="120" cy="${cam}" r="3" fill="#e8eef8"/>${flip}${roll}
+    <text x="120" y="157" text-anchor="middle" fill="#a3b2c9" font-size="11">${upright ? tr('камера сверху') : tr('камера снизу — вверх ногами')}</text></svg>`;
+}
+function picWheel(dir, step) {
+  // Руль: в какую сторону крутить. Повёрнут в нужную сторону, стрелка — туда же.
+  const a = dir === 'left' ? -35 : 35;
+  const arc = dir === 'left'
+    ? '<path d="M70 26 A62 62 0 0 0 40 74" fill="none" stroke="#4f8cff" stroke-width="5"/><path d="M31 66 L40 78 L49 66" fill="none" stroke="#4f8cff" stroke-width="5"/>'
+    : '<path d="M170 26 A62 62 0 0 1 200 74" fill="none" stroke="#4f8cff" stroke-width="5"/><path d="M191 66 L200 78 L209 66" fill="none" stroke="#4f8cff" stroke-width="5"/>';
+  return `<svg ${SVGNS} viewBox="0 0 240 132">${step === 'back' ? '' : arc}
+    <g transform="translate(120 70) rotate(${step === 'back' ? 0 : a})"><circle r="48" fill="none" stroke="#e8eef8" stroke-width="10"/><circle r="11" fill="#e8eef8"/>
+    <path d="M-46 3 H-11 M11 3 H46 M0 13 V46" stroke="#e8eef8" stroke-width="8" stroke-linecap="round"/><rect x="-4" y="-56" width="8" height="12" fill="#ffb020"/></g></svg>`;
+}
+const PIC = {
+  flat_up: () => picTable(true), check_flat_up: () => picTable(true),
+  flat_down: () => picTable(false), check_flat_down: () => picTable(false),
+  mount_up: () => picRim(true), check_mount_up: () => picRim(true), caster_zero: () => picRim(true),
+  mount_down: () => picRim(false), check_mount_down: () => picRim(false),
+  runout_1: () => picRim(true, 'top'), runout_2: () => picRim(true, 'bottom'),
+};
+let picShown = '';
 
 // ── Показ ──────────────────────────────────────────────────────────
 function dm(v) {
@@ -446,15 +553,42 @@ function render(st) {
   $('#proc').classList.toggle('hide', !inProc);
   $('#prompt').textContent = st.prompt || '';
   $('#bar').style.width = Math.round((st.progress || 0) * 100) + '%';
+  // Картинка — только когда шаг сменился: перерисовка десять раз в секунду
+  // ни к чему.
+  const picKey = PIC[st.step] ? st.step : '';
+  if (picKey !== picShown) {
+    picShown = picKey;
+    $('#pic').innerHTML = picKey ? PIC[picKey]() : '';
+    $('#pic').classList.toggle('hide', !picKey);
+  }
+  // Кастер: куда крутить руль, докуда, и где колесо сейчас.
+  const sb = $('#steerBox');
+  const steering = !!st.steer_dir;
+  sb.classList.toggle('hide', !steering);
   const steer = $('#steer');
-  steer.classList.toggle('hide', !has(st.steer));
+  steer.classList.toggle('hide', !has(st.steer) || steering);
   if (has(st.steer)) steer.textContent = tr('поворот') + ' ' + Math.abs(st.steer).toFixed(1) + '°';
+  if (steering) {
+    const back = st.step === 'caster_back';
+    const key = st.steer_dir + (back ? ':back' : '');
+    if (sb.dataset.key !== key) { sb.dataset.key = key; $('#wheelPic').innerHTML = picWheel(st.steer_dir, back ? 'back' : ''); }
+    $('#steerDir').textContent = back ? tr('руль прямо') : (st.steer_dir === 'left' ? tr('руль ВЛЕВО') : tr('руль ВПРАВО'));
+    const max = 40, pct = v => Math.max(0, Math.min(100, v / max * 100));
+    const lo = st.steer_lo || 0, hi = st.steer_hi || 0, v = has(st.steer) ? st.steer : 0;
+    $('#gZone').style.left = pct(lo) + '%';
+    $('#gZone').style.width = (pct(hi) - pct(lo)) + '%';
+    $('#gNeedle').style.left = pct(Math.max(0, v)) + '%';
+    $('#gNeedle').classList.toggle('in', v >= lo && v <= hi);
+  }
   if (has(st.caster) && st.step === 'caster_back') {
     $('#prompt').textContent = tr('Кастер {v} передан на компьютер. Верните колёса прямо.').replace('{v}', dm(st.caster));
   }
   const err = $('#err');
   err.classList.toggle('hide', !st.error);
   err.textContent = st.error || '';
+  const warn = $('#warn');
+  warn.classList.toggle('hide', !st.warn);
+  warn.textContent = st.warn || '';
 
   // Подготовка: два обязательных шага и биение по желанию.
   const ready = !!st.flat && !!st.mounted;
@@ -462,14 +596,31 @@ function render(st) {
   mark('#sFlat', !!st.flat, '1');
   mark('#sMount', !!st.mounted, '2');
   mark('#sRun', has(st.runout), '3');
+  // Проверка точности: итог по нулю и креплению; провал — что делать.
+  const ck = st.check, done = ck && ck.has_mount;
+  const sc = $('#sCheck');
+  sc.classList.toggle('ok', !!(done && st.check_ok));
+  sc.classList.toggle('bad', !!(done && !st.check_ok));
+  sc.textContent = done ? (st.check_ok ? '✓' : '✕') : '4';
+  const cr = $('#checkRes');
+  cr.classList.toggle('hide', !done);
+  if (done) {
+    const zeroBad = Math.abs(ck.zero) > 0.1, mountBad = Math.abs(ck.mount) > 0.1;
+    let txt = tr('ноль {z} · крепление {m}').replace('{z}', dm(ck.zero)).replace('{m}', dm(ck.mount));
+    if (zeroBad) txt += ' — ' + tr('ноль ушёл: повторите калибровку телефона (шаг 1)');
+    else if (mountBad) txt += ' — ' + tr('крепление сдвинулось: повторите калибровку крепления (шаг 2)');
+    else txt = '✓ ' + txt;
+    cr.textContent = txt;
+    cr.className = 'chk-res ' + (st.check_ok ? 'ok' : 'bad');
+  }
   // Сделанный шаг можно повторить — например, после смены чехла или планки.
-  const again = { flat: !!st.flat, mount: !!st.mounted, runout: has(st.runout) };
+  const again = { flat: !!st.flat, mount: !!st.mounted, runout: has(st.runout), check: !!(st.check && st.check.has_mount) };
   document.querySelectorAll('#setup [data-cmd]').forEach(b => { b.textContent = again[b.dataset.cmd] ? tr('Повторить') : tr('Начать'); });
   $('#pCamber').classList.toggle('ready', ready);
   $('#runTitle').textContent = has(st.runout) ? tr('биение {v}°').replace('{v}', Math.abs(st.runout).toFixed(2)) : tr('Биение диска');
   $('#setupState').textContent = ready ? tr('готово') : tr('шаг {n} из 2').replace('{n}', st.flat ? '2' : '1');
   $('#setup').classList.toggle('done', ready);
-  document.querySelectorAll('#setup [data-cmd]').forEach(b => { b.disabled = inProc; });
+  document.querySelectorAll('#setup [data-cmd]').forEach(b => { b.disabled = inProc || ((b.dataset.cmd === 'check' || b.dataset.cmd === 'runout') && !ready); });
 
   // Развал.
   const c = $('#camber');
@@ -481,7 +632,9 @@ function render(st) {
   s.className = 'stat ' + status;
   s.textContent = STAT[status] ? STAT[status]() : '';
   $('#norm').textContent = st.spec ? tr('норма') + ` ${dm(st.spec.min)} … ${dm(st.spec.max)}` : '';
+  // «Стабильно» — про число на экране; пока числа нет, и метке не место.
   $('#cStable').classList.toggle('ok', !!st.stable);
+  $('#cStable').classList.toggle('hide', !has(st.camber));
   $('#liveMsg').textContent = !ready ? tr('Сначала — подготовка телефона, шаги 1 и 2. Один раз, дальше они запоминаются.') : (inProc ? '' : (st.prompt || ''));
 
   // Кастер: только передние колёса и телефон с гироскопом.

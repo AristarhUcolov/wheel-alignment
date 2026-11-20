@@ -5,13 +5,12 @@ import { t } from './i18n.js';
 const listeners = new Map();
 
 export const state = {
-  session: null,     // /api/session
+  session: null,     // /api/session — машина на стенде и всё, что для неё введено
   frame: null,       // последний кадр живых показаний
   screen: 'vehicle',
-  units: load('units', 'dm'),   // 'dm' — градусы и минуты, 'deg' — градусы, 'mm' — схождение в мм
-  liveView: load('liveView', 'overview'),
+  units: 'dm',       // 'dm' — градусы и минуты, 'deg' — градусы, 'mm' — схождение в мм
+  liveView: 'overview',
   selected: null,    // ключ параметра, открытого в боковой панели
-  checks: load('checks', {}),
   connected: false,
 };
 
@@ -26,16 +25,48 @@ export function emit(event, data) {
   }
 }
 
-// localStorage может быть недоступен (режим без сохранения данных) — тогда
-// просто работаем без запоминания настроек.
-function load(key, def) {
-  try {
-    const v = localStorage.getItem('wa.' + key);
-    return v === null ? def : JSON.parse(v);
-  } catch { return def; }
+// Части работы, которые читает только интерфейс: отметки подготовки, струны,
+// шапка протокола. Хранит их программа — в файле работы, а не в браузере:
+// закрыли программу, открыли завтра — всё на месте. Запись отложенная и
+// по частям: печатать в поле можно сколько угодно быстро.
+const jobPending = {};
+let jobTimer = null;
+export function saveJob(patch) {
+  Object.assign(jobPending, patch);
+  if (state.session) {
+    if (patch.checks) state.session.checks = patch.checks;
+    if (patch.box) state.session.box = patch.box;
+    if (patch.report) state.session.report_meta = patch.report;
+    if (patch.notes) state.session.notes = patch.notes;
+  }
+  clearTimeout(jobTimer);
+  jobTimer = setTimeout(flushJob, 400);
 }
-export function save(key, value) {
-  try { localStorage.setItem('wa.' + key, JSON.stringify(value)); } catch { /* без сохранения */ }
+export async function flushJob() {
+  clearTimeout(jobTimer);
+  const body = { ...jobPending };
+  for (const k of Object.keys(jobPending)) delete jobPending[k];
+  if (!Object.keys(body).length) return;
+  try { await api('/api/job', { method: 'POST', body }); } catch (e) { toast(e.message, true); }
+}
+// Перед закрытием окна — дописать то, что ещё не ушло.
+window.addEventListener('beforeunload', () => {
+  if (!Object.keys(jobPending).length) return;
+  try {
+    navigator.sendBeacon && navigator.sendBeacon('/api/job', new Blob([JSON.stringify(jobPending)], { type: 'application/json' }));
+  } catch { /* не успели — не страшно */ }
+});
+
+// Новая машина: всё, что было введено и измерено для прежней, уходит.
+// Калибровки телефонов и камер остаются — они принадлежат оборудованию.
+export async function newJob() {
+  for (const k of Object.keys(jobPending)) delete jobPending[k];
+  clearTimeout(jobTimer);
+  state.session = await api('/api/job/new', { method: 'POST', body: {} });
+  state.selected = null;
+  emit('job');
+  emit('session', state.session);
+  return state.session;
 }
 
 // ── HTTP ─────────────────────────────────────────────────────────────

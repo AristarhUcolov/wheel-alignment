@@ -1,12 +1,17 @@
 // Экран «Регулировка»: живые показания, как на стенде.
 
-import { state, on, emit, api, save, toast, h, $, $$ } from '../state.js';
+import { state, on, emit, api, toast, refreshSession, h, $, $$ } from '../state.js';
 import { ValueBox, CarView, camberPicto, casterPicto, toePicto, glyphOf } from '../widgets.js';
-import { WHEELS, fmtParam, fmtRangeParam, specValue, shortLabel, paramKind, paramWheel, esc, statusText, inches, fmtDM } from '../fmt.js';
+import { WHEELS, fmtParam, fmtRangeParam, fmtGap, specValue, shortLabel, paramKind, paramWheel, esc, statusText, inches, fmtDM } from '../fmt.js';
 import { t, lang } from '../i18n.js';
-import { openDrawer, closeDrawer, go, drawerKey } from '../app.js';
-import { prefs, setPref } from '../prefs.js';
+import { openDrawer, closeDrawer, go, drawerKey, snapshot, openPhone } from '../app.js';
+import { prefs, setPref, setHelper } from '../prefs.js';
 import { announce, wakeAudio, sounds, speak, stopSpeaking, speechAvailable } from '../assist.js';
+import { figure } from '../illus.js';
+
+// Рисунок к углу в панели «что это».
+const FIG = { camber: 'camber', toe: 'toe', caster: 'caster', sai: 'sai', thrust_angle: 'thrust',
+  front_total_toe: 'toe', rear_total_toe: 'toe', front_cross_camber: 'camber', rear_cross_camber: 'camber', front_cross_caster: 'caster' };
 
 let root, body, boxes = {}, car = null, pictos = {}, crossEls = {};
 
@@ -33,6 +38,11 @@ export function mount(el) {
       </div>
       <div class="units" id="views" role="group" aria-label="${esc(t('Вид'))}">${VIEWS().map(v => `<button data-v="${v.id}">${v.name}</button>`).join('')}</div>
     </div>
+    <div class="next-step hidden" id="liveNext">
+      <span class="ic" aria-hidden="true">➜</span>
+      <span class="tx" role="status" aria-live="polite"></span>
+      <button class="btn small" id="liveNextBtn"></button>
+    </div>
     <div class="live-body" id="liveBody"></div>`;
   body = $('#liveBody', root);
 
@@ -41,9 +51,15 @@ export function mount(el) {
   $('#aSound', root).onclick = toggleSound;
   $('#aVoice', root).onclick = toggleVoice;
 
+  $('#liveNextBtn', root).onclick = () => { if (nextRun) nextRun(); };
   on('frame', render);
   on('session', () => { build(); drawerBuiltFor = null; render(); });
-  on('prefs', () => { state.units = prefs.units; renderAssist(); render(); });
+  on('prefs', key => {
+    state.units = prefs.units;
+    if (key === 'liveView' || key === '*') { state.liveView = prefs.liveView; build(); }
+    renderAssist();
+    render();
+  });
   build();
   renderAssist();
 }
@@ -92,9 +108,7 @@ export function setUnits(u) {
 
 export function setView(v) {
   state.liveView = v;
-  save('liveView', v);
-  build();
-  render();
+  setPref('liveView', v);
   emit('fkeys');
 }
 
@@ -202,12 +216,15 @@ function build() {
       <p class="muted">${t('Экран оживёт, как только придут данные: с телефона на колесе, со своего датчика, с камеры — или когда вы введёте замеры струной и угломером.')}</p>
       <div class="actions" style="justify-content:center">
         <button class="btn primary" data-go="measure">${t('Выбрать способ замера')}</button>
+        <button class="btn" data-phone>${t('Подключить телефон')}</button>
         <button class="btn" data-sim="start">${t('Запустить демонстрацию')}</button>
       </div>
     </div></div>`));
   $('[data-go]', body).onclick = () => go('measure');
+  $('[data-phone]', body).onclick = () => openPhone();
   $('[data-sim]', body).onclick = () => api('/api/sim', { method: 'POST', body: { action: 'start' } })
-    .then(() => { refreshSim(true); toast(t('Демонстрация: стрелками ← → можно «крутить» выбранный угол')); })
+    .then(() => refreshSession())
+    .then(() => toast(t('Демонстрация: стрелками ← → можно «крутить» выбранный угол')))
     .catch(e => toast(e.message, true));
 }
 
@@ -275,7 +292,92 @@ function render() {
   const empty = $('#liveEmpty', body);
   if (empty) empty.classList.toggle('hidden', !!(f && f.measured > 0));
 
+  renderNext();
   if (drawerKey() && state.selected) openParam(state.selected, true);
+}
+
+// ── Что делать дальше ────────────────────────────────────────────────
+// Одна строка над табло ведёт по работе целиком: снимок «до», затем углы в
+// правильном порядке — задняя ось (она задаёт линию тяги), кастер, развал и
+// в самом конце схождение, — снимок «после» и протокол. Новичку не нужно
+// помнить порядок, мастеру строка не мешает.
+
+const ORDER = ['camber_RL', 'camber_RR', 'rear_cross_camber', 'toe_RL', 'toe_RR', 'rear_total_toe', 'thrust_angle',
+  'caster_FL', 'caster_FR', 'front_cross_caster', 'camber_FL', 'camber_FR', 'front_cross_camber',
+  'toe_FL', 'toe_FR', 'front_total_toe'];
+
+function adjustableHere(key) {
+  const ss = state.session;
+  const info = ss && ss.params ? ss.params[key] : null;
+  if (!['camber', 'toe', 'caster', 'thrust_angle'].includes(paramKind(key))) return true;
+  const adv = suspAdvice(key);
+  return !(info && !info.adjustable && adv && adv.adj && !adv.adj.usual);
+}
+
+function missingList(P) {
+  const parts = [];
+  for (const [k, name] of [['camber', t('развал')], ['toe', t('схождение')]]) {
+    const miss = WHEELS.filter(w => !(P[k + '_' + w.key] && P[k + '_' + w.key].has));
+    if (!miss.length) continue;
+    parts.push(miss.length === 4 ? t('{what} всех колёс', { what: name }) : `${name}: ${miss.map(w => w.name.toLowerCase()).join(', ')}`);
+  }
+  return parts.join('; ');
+}
+
+function nextStep() {
+  const f = state.frame, ss = state.session || {};
+  if (!f || !f.measured || !state.connected) return null;
+  const P = f.params;
+  const all4 = WHEELS.every(w => P['camber_' + w.key] && P['camber_' + w.key].has && P['toe_' + w.key] && P['toe_' + w.key].has);
+  if (!f.has_limits) {
+    return { text: t('Допуски не заданы — выберите автомобиль или ориентир по классу, и программа покажет, что в норме, а что нет.'),
+      btn: t('Выбрать автомобиль'), run: () => go('vehicle') };
+  }
+  if (all4 && !ss.has_before) {
+    return { text: t('Все колёса измерены. Прежде чем крутить, сделайте снимок «до» — он нужен для протокола.'),
+      btn: t('Снимок «до» (F5)'), run: () => snapshot('before') };
+  }
+  const bad = ORDER.filter(k => P[k] && P[k].has && P[k].status === 'bad');
+  if (bad.length) {
+    const key = bad.find(adjustableHere) || bad[0];
+    const p = P[key];
+    const info = ss.params && ss.params[key];
+    const what = info ? info.label : shortLabel(key);
+    const rimMM = inches(ss.rim_diameter_in || 0);
+    const gap = fmtGap(key, -p.deviation, state.units, rimMM);
+    const text = adjustableHere(key)
+      ? t('Сейчас регулируйте: {what} — до допуска {v}.', { what, v: gap })
+      : t('{what} вне допуска на {v} и штатно не регулируется — ищите износ или деформацию.', { what, v: gap });
+    return { cls: 'bad', text: bad.length > 1 ? `${text} ${t('Всего вне допуска: {n}.', { n: bad.length })}` : text,
+      btn: t('Как регулировать'), run: () => pick(key) };
+  }
+  if (!all4) {
+    return { text: t('Не измерено: {list}. Для протокола нужны развал и схождение всех четырёх колёс.', { list: missingList(P) }),
+      btn: t('К замеру'), run: () => go('measure') };
+  }
+  if (!ss.has_after) {
+    return { cls: 'good', text: f.overall === 'marginal'
+      ? t('Все углы в допуске, некоторые — у границы: их можно подвести ближе к номиналу. Или сделайте снимок «после».')
+      : t('Все углы в допуске. Сделайте снимок «после» — и протокол готов.'),
+      btn: t('Снимок «после» (F5)'), run: () => snapshot('after') };
+  }
+  return { cls: 'good', text: t('Готово: снимки «до» и «после» сделаны, протокол можно печатать.'), btn: t('Протокол (F6)'), run: () => go('report') };
+}
+
+let nextRun = null, nextShown = '';
+function renderNext() {
+  const el = $('#liveNext', root);
+  if (!el) return;
+  const n = nextStep();
+  nextRun = n ? n.run : null;
+  const sig = n ? `${n.cls || ''}|${n.text}|${n.btn}` : '';
+  if (sig === nextShown) return;
+  nextShown = sig;
+  el.classList.toggle('hidden', !n);
+  if (!n) return;
+  el.className = 'next-step' + (n.cls ? ' ' + n.cls : '');
+  $('.tx', el).textContent = n.text;
+  $('#liveNextBtn', root).textContent = n.btn;
 }
 
 const val = (P, k) => (P[k] && P[k].has ? P[k].v : 0);
@@ -286,15 +388,8 @@ function srcName(id) {
   if (id === 'manual') return t('вручную');
   if (id.startsWith('phone')) return t('телефон');
   if (id.startsWith('sensor:')) return t('датчик');
-  if (id === 'optical') return t('камера');
+  if (id === 'optical' || id === 'camera-live') return t('камера');
   return id;
-}
-
-export async function refreshSim(running) {
-  if (state.session) {
-    state.session.sim_running = running;
-    emit('fkeys');
-  }
 }
 
 // ── Боковая панель: как регулировать выбранный угол ─────────────────
@@ -327,10 +422,9 @@ function suspAdvice(key) {
 
 // Помощник регулировки: сколько градусов даёт один шаг регулятора на этой
 // машине, узнаётся из первого же шага — дальше программа считает, сколько
-// ещё крутить и в какую сторону. Схема из руководства не нужна.
-const helper = (() => { try { return JSON.parse(localStorage.getItem('wa.helper')) || {}; } catch { return {}; } })();
+// ещё крутить и в какую сторону. Схема из руководства не нужна. Узнанное
+// хранится в настройках программы — пригодится и на следующей такой машине.
 const helperKey = key => ((state.session && state.session.vehicle && state.session.vehicle.id) || '-') + '|' + key;
-function saveHelper() { try { localStorage.setItem('wa.helper', JSON.stringify(helper)); } catch { /* без сохранения */ } }
 
 function quarters(n) {
   const q = Math.round(Math.abs(n) * 4);
@@ -405,8 +499,10 @@ export function openParam(key, refresh = false) {
         </div>
         <p class="dim" style="text-align:center;font-size:12px">${paramKind(key) === 'toe' ? t('¼, ½, 1, 2 — на сколько оборотов тяги вы повернули') : t('¼, ½, 1, 2 — на сколько шагов регулятора вы повернули')}</p>
       </div>` : ''}
-    ${explain ? `<div class="sect"><h3>${t('Что это')}</h3><p>${esc(explain())}</p></div>` : ''}
-    ${adjust ? `<div class="sect"><h3>${t('Чем регулируется')}</h3>${adjust}</div>` : ''}
+    <div class="sect hidden" id="dCenter"></div>
+    <div class="sect hidden" id="dNotes"></div>
+    ${explain ? `<div class="sect"><h3>${t('Что это')}</h3><p>${esc(explain())}</p>${FIG[kind] ? figure(FIG[kind], { caption: false }) : ''}</div>` : ''}
+    ${adjust ? `<div class="sect"><h3>${t('Чем регулируется')}</h3>${adjust}${kind.includes('toe') || kind === 'thrust_angle' ? figure('tieRod') : ''}</div>` : ''}
     ${notAdjustable ? `<div class="warn">${t('На этой конструкции угол штатно не регулируется. Если он вне допуска — ищите износ или деформацию, а не регулировочный болт.')}</div>` : ''}
     <p class="dim" id="dSrc" style="margin-top:14px;font-size:12px"></p>`;
 
@@ -421,13 +517,12 @@ export function openParam(key, refresh = false) {
 function helperAction(key, what) {
   const p = state.frame && state.frame.params[key];
   const hk = helperKey(key);
-  const hs = helper[hk] || {};
-  if (what === 'forget') { delete helper[hk]; saveHelper(); updateParam(key); return; }
+  const hs = { ...(prefs.helper[hk] || {}) };
+  if (what === 'forget') { setHelper(hk, null); updateParam(key); return; }
   if (!p || !p.has) { toast(t('Нет показаний по этому углу'), true); return; }
   if (what === 'mark') {
     hs.base = p.v;
-    helper[hk] = hs;
-    saveHelper();
+    setHelper(hk, hs);
     toast(t('Запомнено. Поверните регулятор и нажмите, на сколько.'));
   } else {
     if (hs.base === undefined) { toast(t('Сначала нажмите «Запомнить положение», потом поворачивайте'), true); return; }
@@ -437,8 +532,7 @@ function helperAction(key, what) {
     if (Math.abs(delta) < 0.005) { toast(t('Угол почти не изменился — поверните сильнее или проверьте, тот ли регулятор'), true); return; }
     hs.rate = delta / turns;
     hs.base = p.v;
-    helper[hk] = hs;
-    saveHelper();
+    setHelper(hk, hs);
     toast(paramKind(key) === 'toe'
       ? t('Один оборот даёт {v}', { v: fmtDM(Math.abs(hs.rate), { sign: false }) })
       : t('Один шаг даёт {v}', { v: fmtDM(Math.abs(hs.rate), { sign: false }) }));
@@ -480,7 +574,7 @@ function updateParam(key) {
 
   const help = $('#dHelp', b);
   if (help) {
-    const hs = helper[helperKey(key)] || {};
+    const hs = prefs.helper[helperKey(key)] || {};
     let txt = '';
     if (hs.base !== undefined && p && p.has) {
       txt += `<p class="num" style="text-align:center">${t('запомнено {base} · сейчас {now} · сдвиг {d}', { base: fmtDM(hs.base), now: fmtDM(p.v), d: fmtDM(p.v - hs.base) })}</p>`;
@@ -498,6 +592,56 @@ function updateParam(key) {
     help.innerHTML = txt;
   }
   set('#dSrc', p && p.src ? t('Источник: {s}', { s: esc(srcName(p.src)) }) : '');
+  drawerExtras(key);
+}
+
+// Дополнения к панели угла, которые зависят от соседних показаний.
+function drawerExtras(key) {
+  const b = $('#drawerBody');
+  const f = state.frame;
+  if (!b || !f) return;
+  const P = f.params;
+  const kind = paramKind(key);
+  const has = k => P[k] && P[k].has;
+
+  // Руль: схождение колёс разное — при езде прямо руль будет повёрнут. Левое
+  // колесо со схождением «+» смотрит вправо, правое — влево; их средний
+  // поворот (Л − П) / 2 — и есть куда «рулят» колёса при прямом руле.
+  const center = $('#dCenter', b);
+  let ch = '';
+  if ((key === 'toe_FL' || key === 'toe_FR' || key === 'front_total_toe') && has('toe_FL') && has('toe_FR')) {
+    const steer = (P.toe_FL.v - P.toe_FR.v) / 2;
+    const split = fmtDM(Math.abs(P.toe_FL.v - P.toe_FR.v), { sign: false });
+    ch = Math.abs(steer) < 0.05
+      ? `<div class="ok-box">✓ ${t('Схождение поровну между колёсами — при езде прямо руль будет стоять ровно (если при замере он был зафиксирован прямо).')}</div>`
+      : `<div class="warn">${steer > 0
+        ? t('Схождение колёс разное (разница {d}): при езде прямо руль будет повёрнут ВЛЕВО.', { d: split })
+        : t('Схождение колёс разное (разница {d}): при езде прямо руль будет повёрнут ВПРАВО.', { d: split })}
+        ${t('Выставьте руль прямо, зафиксируйте и доведите каждое колесо до его номинала — тогда обе половины схождения равны и руль встанет ровно.')}</div>`;
+  }
+  // SAI: разница слева и справа больше 1° — погнутая деталь (бюллетень
+  // Hyundai 20-SS-001H). Из замера с поворотом SAI неточен — честно об этом.
+  if (kind === 'sai' && has('sai_FL') && has('sai_FR')) {
+    const d = P.sai_FL.v - P.sai_FR.v;
+    const fromSweep = [P.sai_FL.src, P.sai_FR.src].some(src => src !== 'optical' && src !== 'camera-live');
+    if (Math.abs(d) > 1) {
+      const low = d < 0 ? t('левом') : t('правом');
+      ch += `<div class="warn">${t('SAI слева и справа различается на {d}. Меньше на {side} колесе — по бюллетеню Hyundai 20-SS-001H это бывает при погнутом нижнем рычаге; больше на другом — при повреждённой верхней опоре стойки.', { d: fmtDM(Math.abs(d), { sign: false }), side: low })}
+        ${fromSweep ? t('Но SAI из замера с поворотом неточен: ошибка нуля угломера 0,1° даёт почти 2° SAI. Прежде чем менять детали, подтвердите камерой.') : ''}</div>`;
+    } else {
+      ch += `<div class="ok-box">✓ ${t('SAI слева и справа различается меньше чем на 1° — по этому признаку детали не погнуты.')}</div>`;
+    }
+  }
+  if (center.innerHTML !== ch) center.innerHTML = ch;
+  center.classList.toggle('hidden', !ch);
+
+  // Замечания замера кастера — что заметил расчёт (биение, мало поворота,
+  // поворот не в ту сторону).
+  const notes = $('#dNotes', b);
+  const ws = (kind === 'caster' || kind === 'sai' || kind === 'front_cross_caster') ? (f.warnings || []) : [];
+  const nh = ws.length ? `<h3>${t('Замечания к замеру')}</h3><ul class="plain warn" style="padding-left:28px">${[...new Set(ws)].map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : '';
+  if (notes.innerHTML !== nh) notes.innerHTML = nh;
+  notes.classList.toggle('hidden', !nh);
 }
 
 export function simAdjust(key, delta) {

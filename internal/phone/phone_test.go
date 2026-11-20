@@ -26,6 +26,9 @@ type simPhone struct {
 	mount    float64   // degrees the phone sits tipped against the bar (camera bump)
 	noise    float64   // m/s², per batch after the phone's own averaging
 	gyroBias geom.Vec3 // deg/s
+	// gyroUnit is what the browser reports per degree a second: 1 by the
+	// specification, π/180 for Chrome on Android before version 66.
+	gyroUnit float64
 	rng      *rand.Rand
 }
 
@@ -51,11 +54,18 @@ func (p *simPhone) read(f frame, omega geom.Vec3, dt float64) Sample {
 		AX: p.sign * (ax + p.bias.X + n()),
 		AY: p.sign * (ay + p.bias.Y + n()),
 		AZ: p.sign * (az + p.bias.Z + n()),
-		GX: omega.Dot(f.x) + p.gyroBias.X,
-		GY: omega.Dot(f.y) + p.gyroBias.Y,
-		GZ: omega.Dot(f.z) + p.gyroBias.Z,
+		GX: (omega.Dot(f.x) + p.gyroBias.X) * p.unit(),
+		GY: (omega.Dot(f.y) + p.gyroBias.Y) * p.unit(),
+		GZ: (omega.Dot(f.z) + p.gyroBias.Z) * p.unit(),
 	}
 	return s
+}
+
+func (p *simPhone) unit() float64 {
+	if p.gyroUnit == 0 {
+		return 1
+	}
+	return p.gyroUnit
 }
 
 func flatUp() frame   { return frame{geom.V(1, 0, 0), geom.V(0, 1, 0), geom.V(0, 0, 1)} }
@@ -114,6 +124,20 @@ func (r *rig) hold(p *simPhone, f frame, d time.Duration) PhoneState {
 	return r.last
 }
 
+// turnOver turns the phone from screen up to screen down in a second, the way
+// a hand does it: a half turn about the phone's long side, with the gyroscope
+// seeing the turn.
+func (r *rig) turnOver(p *simPhone) {
+	const steps = 10
+	axis := geom.V(0, 1, 0)
+	for i := 1; i <= steps; i++ {
+		th := math.Pi * float64(i) / steps
+		f := rotate(flatUp(), geom.Rodrigues(axis, th))
+		r.now = r.now.Add(100 * time.Millisecond)
+		r.last, _ = r.l.handle(r.id, phoneRequest{Samples: []Sample{p.read(f, axis.Scale(180), 0.1)}})
+	}
+}
+
 // shake is the phone being handled between positions.
 func (r *rig) shake(p *simPhone, f frame) {
 	for i := 0; i < 5; i++ {
@@ -131,6 +155,7 @@ func (r *rig) calibrate(p *simPhone, a geom.Vec3) {
 	if r.last.Step != StepFlatDown {
 		r.t.Fatalf("flat, screen up: still at %s (%s)", r.last.Step, r.last.Error)
 	}
+	r.turnOver(p)
 	r.hold(p, flatDown(), 3500*time.Millisecond)
 	if !r.last.Flat || r.last.Step != StepMountUp {
 		r.t.Fatalf("flat calibration did not complete: %+v", r.last)

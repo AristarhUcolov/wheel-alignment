@@ -24,10 +24,11 @@ export function mount(el) {
           <input type="text" inputmode="numeric" data-num id="vy" class="year" placeholder="${esc(t('Год'))}" aria-label="${esc(t('Год выпуска'))}" min="1900" max="2100">
         </div>
         <div class="chips" id="vclass" role="group" aria-label="${esc(t('Класс'))}">${CLASSES().map(([k, n]) => `<button class="chip" data-c="${k}" aria-pressed="${k === '' ? 'true' : 'false'}">${n}</button>`).join('')}</div>
+        <p class="vhint"><button class="linklike" id="vToGuid">${t('Моей модели нет — взять ориентир по классу ↓')}</button></p>
         <div class="chips hidden" id="vmake"></div>
         <div id="vbrowse"></div>
         <div class="cards" id="vres" aria-live="polite"></div>
-        <h2>${t('Модели нет в базе?')}</h2>
+        <h2 id="vGuidHead" tabindex="-1">${t('Модели нет в базе?')}</h2>
         <p class="lede" style="margin-bottom:6px">${t('Возьмите ориентир по классу — программа покажет, насколько углы далеки от разумных для такой конструкции. Это не заводские данные: найдя их в руководстве, внесите их кнопкой «Внести допуски».')}</p>
         <div class="cards" id="vguid"></div>
       </div>
@@ -40,6 +41,11 @@ export function mount(el) {
     $$('#vclass .chip', root).forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
     search();
   });
+  $('#vToGuid', root).onclick = () => {
+    const hd = $('#vGuidHead', root);
+    hd.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    hd.focus({ preventScroll: true });
+  };
   on('session', renderDetail);
   loadSusp().then(renderDetail);
   search();
@@ -166,6 +172,11 @@ function showGuidance(list) {
 }
 
 async function choose(id) {
+  // Другая машина — снимки прежней теряют смысл и удаляются. Случайный
+  // щелчок по соседней карточке не должен стирать снимок «до».
+  const ss = state.session || {};
+  if ((ss.has_before || ss.has_after) && ss.vehicle && ss.vehicle.id !== id &&
+      !confirm(t('Сменить автомобиль? Снимки «до» и «после» этой машины будут удалены.'))) return;
   try {
     await updateSession({ spec_id: id });
     rememberVehicle(id);

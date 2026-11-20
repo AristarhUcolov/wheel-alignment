@@ -379,6 +379,9 @@ header.top {
 .icon-btn:hover { color: var(--text); border-color: var(--blue); }
 .icon-btn.on { background: var(--blue); border-color: var(--blue); color: var(--on-accent); }
 .icon-btn svg { width: 18px; height: 18px; }
+/* «Телефон» в верхней строке: с подписью — это главный способ подключить датчик. */
+.icon-btn.phone-btn { width: auto; display: inline-flex; gap: 6px; padding: 0 10px; font-size: 13px; }
+html.narrow .icon-btn.phone-btn span { display: none; }
 
 nav.side {
   grid-row: 2;
@@ -407,10 +410,18 @@ nav.side button.active { background: var(--panel2); color: var(--text); border-c
 nav.side button.active i { border-color: var(--blue); background: var(--blue); color: var(--on-accent); }
 nav.side button.done i { border-color: var(--green); color: var(--green); }
 .side-steps { display: flex; flex-direction: column; gap: 4px; }
+/* «Новый автомобиль» — не шаг, а начало следующей работы. */
+nav.side button.side-new { margin-top: 6px; border: 1px dashed var(--line2); color: var(--muted); font-size: 13.5px; padding: 7px 10px; white-space: nowrap; }
+nav.side button.side-new i { border-style: dashed; font-size: 16px; }
+nav.side button.side-new:hover { border-color: var(--blue); color: var(--text); }
 .side-extra { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
 .side-foot { margin-top: auto; padding: 10px 6px 2px; font-size: 11px; color: var(--dim); line-height: 1.4; }
+/* Невысокий экран старого ноутбука: подпись о лицензии уступает место кнопкам. */
+@media (max-height: 800px) { .side-foot { display: none; } }
 
 main { grid-row: 2; grid-column: 2; overflow: auto; position: relative; }
+/* Фокус на всём экране после смены шага — только для диктора, рамка не нужна. */
+main:focus, main:focus-visible { outline: none; }
 .screen { display: none; padding: 18px 22px 28px; min-height: 100%; }
 .screen.active { display: block; }
 .screen:focus { outline: none; }
@@ -573,6 +584,11 @@ nav.side button.support-btn.active i { background: var(--heart); border-color: v
 .vcard .badges { display: flex; gap: 5px; align-items: flex-start; flex-wrap: wrap; justify-content: flex-end; }
 .makes { margin-top: 14px; }
 .makes h3 { margin: 14px 0 8px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+/* Ссылка-кнопка: «Моей модели нет — ориентир по классу». */
+.linklike { background: none; border: none; padding: 0; color: var(--blue); font: inherit; font-size: 13.5px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.linklike:hover { color: var(--text); }
+.vhint { margin: 2px 0 10px; }
+#vGuidHead:focus { outline: none; }
 .make-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
 .make-btn {
   display: flex; justify-content: space-between; align-items: center; gap: 8px;
@@ -646,16 +662,19 @@ details.help div { margin-top: 6px; font-size: 13px; color: var(--muted); }
 }
 .filedrop:hover { border-color: var(--blue); color: var(--text); }
 .filedrop.ready { border-style: solid; border-color: var(--green-dim); color: var(--green); }
-.method-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-bottom: 18px; }
+/* Пять способов — в один ряд на обычном экране: под ними сразу видно поля
+   выбранного способа, а не пустое место. */
+.method-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 8px; margin-bottom: 18px; }
 .method {
-  text-align: left; padding: 14px; border-radius: 10px; cursor: pointer;
+  text-align: left; padding: 11px 12px; border-radius: 10px; cursor: pointer;
   background: var(--panel); border: 1px solid var(--line);
 }
 .method:hover { border-color: var(--line2); }
 .method.on { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue) inset; }
 .method b { display: block; font-size: 15px; margin-bottom: 4px; }
 .method span { color: var(--muted); font-size: 12.5px; }
-.method .caps { display: flex; flex-direction: column; gap: 2px; margin-top: 9px; }
+.method .caps { display: flex; flex-direction: column; gap: 1px; margin-top: 7px; }
+.method > span:not(.caps) { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .method .cap { font-size: 13px; color: var(--text); }
 .method .cap i { font-style: normal; font-weight: 700; display: inline-block; width: 1.1em; }
 .method .cap small { color: var(--muted); font-size: 12px; }
@@ -676,9 +695,9 @@ details.help div { margin-top: 6px; font-size: 13px; color: var(--muted); }
 
 /* ── Живой экран регулировки ────────────────────────────────────────── */
 
-.live-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex: none; }
+.live-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex: none; flex-wrap: wrap; }
 .verdict {
-  flex: 1; display: flex; align-items: center; gap: 12px; min-width: 0;
+  flex: 1 1 280px; display: flex; align-items: center; gap: 12px; min-width: 0;
   padding: 8px 14px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel);
   font-size: 15px; font-weight: 600;
 }
@@ -697,6 +716,21 @@ details.help div { margin-top: 6px; font-size: 13px; color: var(--muted); }
 .assist { display: flex; gap: 6px; flex: none; }
 .assist .icon-btn { height: 34px; width: 38px; }
 
+/* Что делать дальше: одна строка, кнопка ведёт прямо к делу. */
+.next-step {
+  display: flex; align-items: center; gap: 10px; flex: none; margin: -4px 0 8px;
+  padding: 3px 5px 3px 12px; border-radius: 9px; border: 1px solid var(--line2);
+  background: var(--panel2); font-size: 13.5px; min-height: 34px;
+}
+.next-step .btn.small { padding: 4px 12px; }
+.next-step .ic { color: var(--blue); font-weight: 700; flex: none; }
+.next-step .tx { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3; }
+.next-step .btn { flex: none; }
+.next-step.bad { border-color: var(--red-dim); }
+.next-step.bad .ic { color: var(--red); }
+.next-step.good { border-color: var(--green-dim); }
+.next-step.good .ic { color: var(--green); }
+
 .live-body { flex: 1; min-height: 0; position: relative; }
 
 /* Общий вид: колёса по углам, схема в центре. */
@@ -712,6 +746,12 @@ details.help div { margin-top: 6px; font-size: 13px; color: var(--muted); }
 .ov-wheel .vbox .val { font-size: clamp(18px, min(31cqh, 15cqw), 50px); }
 .ov-wheel .vbox .hint { font-size: clamp(10px, 10cqh, 12.5px); min-height: 0; line-height: 1.2; }
 .ov-wheel .vbox .lbl { flex: none; }
+/* Невысокое табло: шкала тоньше, чтобы под цифрой осталось место подсказке. */
+@container (max-height: 84px) {
+  .ov-wheel .vbox .bar { height: 13px; }
+  .ov-wheel .vbox .val { line-height: 1.05; }
+  .ov-wheel .vbox .hint { font-size: 10.5px; }
+}
 /* Совсем низкое табло: шкала в нём нечитаема — остаются цифра, знак и подсказка. */
 @container (max-height: 66px) {
   .ov-wheel .vbox .bar { display: none; }
@@ -756,6 +796,8 @@ details.help div { margin-top: 6px; font-size: 13px; color: var(--muted); }
 .vbox.bad .hint { color: var(--bad-hint); }
 .vbox.marginal .hint { color: var(--marginal-hint); }
 .vbox.small .val { font-size: clamp(20px, 2.2vw, 30px); }
+/* Кастер в общем виде — табло ниже соседних: цифра по его высоте, чтобы подсказка под ней не обрезалась. */
+.ov-wheel .vbox.small .val { font-size: clamp(18px, min(29cqh, 13cqw), 30px); line-height: 1.05; }
 @keyframes blink { 50% { opacity: .2; } }
 
 /* Вид оси: как на экране «Переднее колесо». Ряды делят высоту поровну,
@@ -887,8 +929,22 @@ ol.steps .why { color: var(--muted); font-size: 13px; margin-top: 3px; }
   background: var(--panel); border: 1px solid var(--line2); border-radius: 14px;
   padding: 24px 26px; box-shadow: 0 20px 60px var(--shadow);
 }
-.modal h1 { font-size: 24px; }
+.modal { position: relative; }
+.modal.wide { width: min(1080px, 100%); }
+.modal h1 { font-size: 24px; padding-right: 40px; }
 .modal h1:focus { outline: none; }
+.modal-x {
+  position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 8px;
+  border: 1px solid var(--line2); background: none; color: var(--muted); font-size: 16px; cursor: pointer;
+}
+.modal-x:hover { color: var(--text); border-color: var(--blue); }
+.modal-body { margin-top: 10px; }
+.modal-body .phone-panel { border: none; padding: 0; background: none; }
+
+/* Телефон: код для камеры — всегда на белом, иначе его не прочтёт телефон. */
+.phone-panel { max-width: 1100px; }
+.qr { background: #fff; padding: 12px; border-radius: 10px; flex: none; width: 236px; height: 236px; }
+.qr svg { width: 100%; height: 100%; display: block; }
 .modal .steps-dots { display: flex; gap: 6px; margin: 0 0 14px; }
 .modal .steps-dots i { width: 28px; height: 4px; border-radius: 2px; background: var(--line2); }
 .modal .steps-dots i.on { background: var(--blue); }
@@ -902,6 +958,28 @@ ol.steps .why { color: var(--muted); font-size: 13px; margin-top: 3px; }
 .choice b { display: block; font-size: 15px; margin-bottom: 4px; }
 .choice span { color: var(--muted); font-size: 12.5px; }
 .modal .foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+/* ── Иллюстрации ─────────────────────────────────────────────────────── */
+
+/* Схемы рисуются кодом и берут цвета темы. */
+.illus { margin: 10px 0; max-width: 520px; }
+.illus.small { max-width: 340px; }
+.illus-svg { width: 100%; height: auto; display: block; background: var(--bg2); border: 1px solid var(--line); border-radius: 10px; }
+.illus figcaption { color: var(--muted); font-size: 12.5px; margin-top: 5px; line-height: 1.4; }
+.illus-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.illus-row .illus { flex: 1 1 280px; margin: 0; }
+
+/* Износ шин: картинка, название, о чём говорит. */
+.wear-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 10px 0; }
+.wear-item { display: flex; flex-direction: column; gap: 4px; padding: 8px; background: var(--panel2); border: 1px solid var(--line); border-radius: 9px; }
+.wear-item .illus-svg { background: var(--bg2); }
+.wear-item b { font-size: 13px; }
+.wear-item span { color: var(--muted); font-size: 12.5px; line-height: 1.35; }
+
+/* «Как это выглядит» у пунктов подготовки. */
+.chk .how { margin-left: 2px; }
+.how-btn { background: none; border: none; color: var(--blue); font: inherit; font-size: 12.5px; padding: 2px 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.how-box { margin: 4px 0 2px 30px; }
 
 /* ── Печать отчёта ──────────────────────────────────────────────────── */
 
@@ -931,6 +1009,10 @@ html.narrow nav.side button { justify-content: center; padding: 9px 4px; }
 html.narrow .brand { width: auto; }
 html.narrow .brand div { display: none; }
 html.narrow .vgrid { grid-template-columns: 1fr; }
+/* Узкий экран: способы замера — в один ряд, без описаний; что умеет каждый, видно по значкам. */
+html.narrow .method-cards { grid-template-columns: repeat(auto-fill, minmax(156px, 1fr)); }
+html.narrow .method > span:not(.caps) { display: none; }
+html.narrow .method .cap small { display: none; }
 html.narrow .ov { grid-template-columns: 1fr 1.1fr 1fr; }
 html.narrow .fkey { gap: 6px; padding: 0 4px; font-size: 12.5px; }
 html.narrow .clock { display: none; }

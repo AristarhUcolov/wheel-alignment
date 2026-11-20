@@ -35,7 +35,9 @@ const AX = () => [
 export function mount(el) { root = el; }
 
 export async function show() {
-  if (!susp) susp = await api('/api/suspensions');
+  if (!susp) {
+    try { susp = await api('/api/suspensions'); } catch (e) { toast(e.message, true); return; }
+  }
   render();
 }
 
@@ -53,8 +55,16 @@ function render() {
     rim: ss.rim_diameter_in || '',
     from: v && v.year_from ? v.year_from : '', to: v && v.year_to ? v.year_to : '',
   };
-  const range = (ax, k) => own && own[ax] && own[ax][k] ? own[ax][k] : null;
-  const val = r => r ? fmtDM(r, { sign: true }).replace('′', "'") : '';
+  // Схождение, записанное в миллиметрах, правится в миллиметрах: градусы из
+  // него посчитаны программой, и сохранять их вместо исходных цифр — значит
+  // потерять, как было в документе.
+  const mmRange = ax => own && own[ax + '_total_toe_mm'] ? own[ax + '_total_toe_mm'] : null;
+  const range = (ax, k) => own && own[ax] && own[ax][k] && !(k === 'total_toe' && mmRange(ax)) ? own[ax][k] : null;
+  const val = r => r === null || r === undefined ? '' : fmtDM(r, { sign: true }).replace('′', "'");
+  const mmVal = (ax, b) => { const r = mmRange(ax); return r ? String(r[b]) : ''; };
+  const ownSrc = (own && own.source) || {};
+  const ownCond = (own && own.conditions) || {};
+  const kind = ownSrc.kind && ownSrc.kind !== 'class_guidance' && ownSrc.kind !== 'catalog' ? ownSrc.kind : 'unverified';
   const axes = AX();
   const classes = [['', t('не указан')], ['car', t('Легковой')], ['suv', t('Внедорожник')], ['lcv', t('Фургон, LCV')], ['truck', t('Грузовой')], ['bus', t('Автобус')]];
 
@@ -68,7 +78,7 @@ function render() {
         <div class="cols3">
           <label class="f">${t('Марка')}<input type="text" id="cMake" value="${esc(pre.make)}" placeholder="${esc(t('ГАЗ'))}"></label>
           <label class="f">${t('Модель')}<input type="text" id="cModel" value="${esc(pre.model)}" placeholder="${esc(t('3110 «Волга»'))}"></label>
-          <label class="f">${t('Модификация')}<input type="text" id="cTrim" placeholder="${esc(t('необязательно'))}"></label>
+          <label class="f">${t('Модификация')}<input type="text" id="cTrim" placeholder="${esc(t('необязательно'))}" value="${esc((own && own.trim) || '')}"></label>
           <label class="f">${t('Год начала выпуска')}<input type="text" inputmode="numeric" data-num id="cFrom" placeholder="1997" value="${pre.from}"></label>
           <label class="f">${t('Год окончания')}<input type="text" inputmode="numeric" data-num id="cTo" placeholder="${esc(t('пусто — выпускается'))}" value="${pre.to}"></label>
           <label class="f">${t('Класс')}<select id="cClass">
@@ -94,8 +104,8 @@ function render() {
                   <span class="dim num" data-show="${ax}-${a.k}"></span>
                 </span></label>`).join('')}
             <label class="f">${t('Суммарное схождение в мм, если в документе так')}
-              <span class="row" style="gap:6px"><input type="text" inputmode="decimal" data-num data-mm="${ax}" data-b="min" placeholder="${esc(t('от, мм'))}" style="width:110px">
-              <input type="text" inputmode="decimal" data-num data-mm="${ax}" data-b="max" placeholder="${esc(t('до, мм'))}" style="width:110px"></span></label>
+              <span class="row" style="gap:6px"><input type="text" inputmode="decimal" data-num data-mm="${ax}" data-b="min" placeholder="${esc(t('от, мм'))}" style="width:110px" value="${esc(mmVal(ax, 'min'))}">
+              <input type="text" inputmode="decimal" data-num data-mm="${ax}" data-b="max" placeholder="${esc(t('до, мм'))}" style="width:110px" value="${esc(mmVal(ax, 'max'))}"></span></label>
           </div>
           <div class="cols3" style="margin-top:8px">
             ${['camber', ...(ax === 'front' ? ['caster'] : []), 'toe'].map(k => `
@@ -103,26 +113,26 @@ function render() {
           </div>
           <label class="f" style="margin-top:6px">${t('Чем регулируется (по руководству)')}<input type="text" data-method="${ax}" placeholder="${esc(t('например: регулировочные шайбы под осью нижнего рычага'))}"></label>`).join('')}
         <div class="cols3" style="margin-top:12px">
-          <label class="f">${t('Разница развала лев./прав. не более')}<input type="text" id="cXCam" placeholder="0°30'"></label>
-          <label class="f">${t('Разница кастера лев./прав. не более')}<input type="text" id="cXCas" placeholder="0°30'"></label>
-          <label class="f">${t('Угол тяги не более')}<input type="text" id="cThr" placeholder="0°15'"></label>
+          <label class="f">${t('Разница развала лев./прав. не более')}<input type="text" id="cXCam" placeholder="0°30'" value="${esc(val(own && own.front && own.front.max_cross_camber))}"></label>
+          <label class="f">${t('Разница кастера лев./прав. не более')}<input type="text" id="cXCas" placeholder="0°30'" value="${esc(val(own && own.front && own.front.max_cross_caster))}"></label>
+          <label class="f">${t('Угол тяги не более')}<input type="text" id="cThr" placeholder="0°15'" value="${esc(val(own && own.max_thrust_angle))}"></label>
         </div>
       </div>
 
       <div class="panel">
         <h3 style="margin-top:0">${t('Условия замера и источник')}</h3>
         <div class="cols3">
-          <label class="f">${t('Загрузка')}<input type="text" id="cLoad" placeholder="${esc(t('снаряжённая масса, полный бак'))}"></label>
-          <label class="f">${t('Давление в шинах')}<input type="text" id="cPress" placeholder="${esc(t('по норме, одинаково по бортам'))}"></label>
-          <label class="f">${t('Осадка подвески')}<input type="text" id="cSettle" placeholder="${esc(t('прокатить 3–5 м вперёд'))}"></label>
+          <label class="f">${t('Загрузка')}<input type="text" id="cLoad" placeholder="${esc(t('снаряжённая масса, полный бак'))}" value="${esc(ownCond.load || '')}"></label>
+          <label class="f">${t('Давление в шинах')}<input type="text" id="cPress" placeholder="${esc(t('по норме, одинаково по бортам'))}" value="${esc(ownCond.pressure || '')}"></label>
+          <label class="f">${t('Осадка подвески')}<input type="text" id="cSettle" placeholder="${esc(t('прокатить 3–5 м вперёд'))}" value="${esc(ownCond.settle || '')}"></label>
           <label class="f">${t('Источник')}<select id="cKind">
-            <option value="factory">${t('Заводское руководство')}</option><option value="licensed">${t('Лицензионная база')}</option>
-            <option value="community">${t('Сообщество, перепроверено')}</option><option value="unverified" selected>${t('Не проверено')}</option></select></label>
-          <label class="f">${t('Документ, издание, страница')}<input type="text" id="cRef" placeholder="${esc(t('Руководство по ремонту ГАЗ-3110, стр. 112'))}">
+            ${[['factory', t('Заводское руководство')], ['licensed', t('Лицензионная база')], ['community', t('Сообщество, перепроверено')], ['unverified', t('Не проверено')]]
+              .map(([k, n]) => `<option value="${k}"${k === kind ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+          <label class="f">${t('Документ, издание, страница')}<input type="text" id="cRef" placeholder="${esc(t('Руководство по ремонту ГАЗ-3110, стр. 112'))}" value="${esc(ownSrc.reference || '')}">
             <small>${t('Для заводского источника обязательно.')}</small></label>
-          <label class="f">${t('Как вас указать')}<input type="text" id="cWho" placeholder="${esc(t('необязательно'))}"></label>
+          <label class="f">${t('Как вас указать')}<input type="text" id="cWho" placeholder="${esc(t('необязательно'))}" value="${esc(ownSrc.contributor || '')}"></label>
         </div>
-        <label class="f" style="margin-top:10px">${t('Примечания')}<input type="text" id="cNotes" placeholder="${esc(t('особенности конструкции, порядок регулировки'))}"></label>
+        <label class="f" style="margin-top:10px">${t('Примечания')}<input type="text" id="cNotes" placeholder="${esc(t('особенности конструкции, порядок регулировки'))}" value="${esc((own && own.notes) || '')}"></label>
       </div>
 
       <div class="actions">
@@ -153,6 +163,14 @@ function showParsed(ax, k) {
   if (lo === null && hi === null) { out.textContent = ''; return; }
   if (Number.isNaN(lo) || Number.isNaN(hi)) { out.innerHTML = `<span class="no">${t('не понял число')}</span>`; return; }
   out.textContent = `= ${lo === null ? '?' : fmtDM(lo)} … ${hi === null ? '?' : fmtDM(hi)}`;
+}
+
+// Условия, которых нет в форме (бак, высота кузова), при правке своих
+// допусков не должны пропадать.
+function ownConditions() {
+  const ss = state.session || {};
+  const own = ss.vehicle && ss.vehicle.local && ss.spec ? ss.spec : null;
+  return own && own.conditions ? { ...own.conditions } : {};
 }
 
 function slug(s) { return s.toLowerCase().replace(/[^a-zа-яё0-9]+/gi, '-').replace(/^-|-$/g, ''); }
@@ -192,7 +210,7 @@ function draft() {
     class: g('#cClass'), front_suspension: g('#cFront'), rear_suspension: g('#cRear'),
     rim_diameter_in: parseNum(g('#cRim')) || 0,
     front: axle('front'), rear: axle('rear'),
-    conditions: { load: g('#cLoad'), pressure: g('#cPress'), settle: g('#cSettle') },
+    conditions: { ...(ownConditions()), load: g('#cLoad'), pressure: g('#cPress'), settle: g('#cSettle') },
     source: { kind: g('#cKind'), reference: g('#cRef'), contributor: g('#cWho'), added: new Date().toISOString().slice(0, 10) },
   };
   for (const ax of ['front', 'rear']) {

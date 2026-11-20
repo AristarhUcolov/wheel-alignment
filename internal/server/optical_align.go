@@ -190,7 +190,11 @@ func (s *Server) opticalAlign(w http.ResponseWriter, r *http.Request) {
 
 	// The measurement also goes to the live screen, so that adjusting can
 	// start from it and the before/after report can be taken from it.
-	s.pushResult(res, "optical", i18n.N("Камера и мишени"))
+	s.pushResult(res, opticalSource, opticalName)
+	s.sess.mu.Lock()
+	s.sess.optical = &res
+	s.saveJobLocked()
+	s.sess.mu.Unlock()
 
 	writeJSON(w, http.StatusOK, OpticalAlignResponse{
 		Result:  res,

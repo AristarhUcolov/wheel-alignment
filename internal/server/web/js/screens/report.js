@@ -1,14 +1,17 @@
 // Шаг 5: протокол «до / после».
 
-import { state, on, api, save, toast, $, $$ } from '../state.js';
+import { state, on, api, saveJob, toast, $, $$ } from '../state.js';
 import { esc, fmtDM, fmtMM, statusText } from '../fmt.js';
 import { t, lang } from '../i18n.js';
-import { go, snapshot } from '../app.js';
+import { go, snapshot, startNewCar } from '../app.js';
 import { prefs } from '../prefs.js';
 import { GLYPH } from '../widgets.js';
+import { figure } from '../illus.js';
 
 let root, data = null, version = '';
-const meta = (() => { try { return JSON.parse(localStorage.getItem('wa.reportMeta')) || {}; } catch { return {}; } })();
+
+// Госномер, пробег и исполнитель — часть работы: у следующей машины они свои.
+const meta = () => (state.session && state.session.report_meta) || {};
 
 export function mount(el) {
   root = el;
@@ -21,6 +24,53 @@ async function load() {
   try { data = await api('/api/report'); } catch (e) { toast(e.message, true); return; }
   if (!version) { try { version = (await api('/api/about')).version; } catch { /* без версии */ } }
   render();
+}
+
+const notes = () => (state.session && state.session.notes) || {};
+function setNote(k, v) { saveJob({ notes: { ...notes(), [k]: v } }); }
+
+// Контрольная поездка по бюллетеню Hyundai 20-SS-001H: прямая ровная дорога
+// без ветра, 64 км/ч (40 миль/ч), руль отпущен; машина уходит на метр — по
+// ширине полосы — дольше чем за 6 с: норма. Повторить в обратную сторону.
+function roadVerdict(n) {
+  const secs = parseFloat(String(n.road_secs || '').replace(',', '.'));
+  if (n.road_pull === 'none') return 'good';
+  if (n.road_pull === 'left' || n.road_pull === 'right') {
+    if (Number.isFinite(secs)) return secs > 6 ? 'good' : 'bad';
+    return 'bad';
+  }
+  return '';
+}
+
+function roadPanel() {
+  const n = notes();
+  const sel = (k, opts) => `<select data-note="${k}">${opts.map(([v, label]) => `<option value="${v}"${(n[k] || '') === v ? ' selected' : ''}>${esc(label)}</option>`).join('')}</select>`;
+  const v = roadVerdict(n);
+  const verdict = v === 'good' ? `<div class="ok-box">✓ ${t('Контрольная поездка: машина держит прямую.')}</div>`
+    : v === 'bad' ? `<div class="danger-box">✕ ${t('Контрольная поездка: машину уводит. Проверьте давление, перестановку шин местами, тормоза, затем развал и кастер по бортам.')}</div>` : '';
+  return `<div class="panel" style="margin-top:14px">
+    <div class="row" style="align-items:flex-start;gap:18px">
+      <div class="grow" style="min-width:300px">
+        <h2 style="margin-top:0">${t('Контрольная поездка')}</h2>
+        <p class="muted" style="font-size:13px">${t('Ровная прямая дорога без ветра, около 64 км/ч, руль отпущен. Заметьте, за сколько секунд машину уведёт на метр, и повторите в обратную сторону — так видно, дорога это или машина.')}</p>
+        <div class="cols3">
+          <label class="f">${t('Увод')}${sel('road_pull', [['', t('не проверяли')], ['none', t('держит прямую')], ['left', t('влево')], ['right', t('вправо')]])}</label>
+          <label class="f">${t('Секунд на 1 м')}<input type="text" inputmode="decimal" data-note="road_secs" value="${esc(n.road_secs || '')}" placeholder="${esc(t('если уводит'))}"></label>
+          <label class="f">${t('Руль при езде прямо')}${sel('road_wheel', [['', t('не проверяли')], ['straight', t('ровно')], ['left', t('повёрнут влево')], ['right', t('повёрнут вправо')]])}</label>
+        </div>
+        <div style="margin-top:10px">${verdict}</div>
+      </div>
+      <div class="no-print" style="flex:0 1 320px">${figure('roadTest')}</div>
+    </div></div>`;
+}
+
+// Углы поворота колёс — если их мерили на шаге «Замер».
+function tootRow() {
+  const n = notes();
+  const l = parseFloat(String(n.toot_l || '').replace(',', '.')), r = parseFloat(String(n.toot_r || '').replace(',', '.'));
+  if (!Number.isFinite(l) || !Number.isFinite(r)) return '';
+  const d = Math.abs(l - r);
+  return `<div class="${d > 1 ? 'danger-box' : 'ok-box'}" style="margin-top:10px">${d > 1 ? '✕' : '✓'} ${t('Углы поворота (наружное колесо на 20°): внутреннее влево {l}°, вправо {r}°, разница {d}°.', { l: l.toFixed(1), r: r.toFixed(1), d: d.toFixed(1) })}</div>`;
 }
 
 const AXLES = () => ({ front: t('Передняя ось'), rear: t('Задняя ось'), vehicle: t('Автомобиль в целом') });
@@ -92,15 +142,16 @@ function render() {
           <button class="btn" id="rBefore">${before ? t('Переснять «до»') : t('Снимок «до»')}</button>
           <button class="btn" id="rAfter">${after ? t('Переснять «после»') : t('Снимок «после»')}</button>
           <button class="btn primary" id="rPrint" ${last ? '' : 'disabled'}>${t('Печать / PDF')}</button>
+          <button class="btn" id="rNew" title="${esc(t('Показания, снимки и поля этой машины будут очищены'))}">${t('Новый автомобиль')}</button>
         </div>
       </div>
       <div class="panel">
         <div class="kv">
           <div>${t('Дата')}</div><div>${when.toLocaleString(lang === 'en' ? 'en-GB' : 'ru-RU')}</div>
           <div>${t('Автомобиль')}</div><div>${v ? esc(v.source_kind === 'class_guidance' ? t('не указан') : v.title) : t('не указан')}</div>
-          <div>${t('Госномер / VIN')}</div><div><input type="text" data-meta="plate" value="${esc(meta.plate || '')}" style="width:100%;max-width:360px" aria-label="${esc(t('Госномер / VIN'))}"></div>
-          <div>${t('Пробег, км')}</div><div><input type="text" data-meta="odo" value="${esc(meta.odo || '')}" style="width:100%;max-width:200px" aria-label="${esc(t('Пробег, км'))}"></div>
-          <div>${t('Выполнил')}</div><div><input type="text" data-meta="who" value="${esc(meta.who || (prefs.workshop && prefs.workshop.who) || '')}" style="width:100%;max-width:360px" aria-label="${esc(t('Выполнил'))}"></div>
+          <div>${t('Госномер / VIN')}</div><div><input type="text" data-meta="plate" maxlength="60" value="${esc(meta().plate || '')}" style="width:100%;max-width:360px" aria-label="${esc(t('Госномер / VIN'))}"></div>
+          <div>${t('Пробег, км')}</div><div><input type="text" data-meta="odo" maxlength="20" value="${esc(meta().odo || '')}" style="width:100%;max-width:200px" aria-label="${esc(t('Пробег, км'))}"></div>
+          <div>${t('Выполнил')}</div><div><input type="text" data-meta="who" maxlength="100" value="${esc(meta().who || (prefs.workshop && prefs.workshop.who) || '')}" style="width:100%;max-width:360px" aria-label="${esc(t('Выполнил'))}"></div>
           <div>${t('Подвеска')}</div><div>${esc(t('перед: {front}; зад: {rear}', { front: ss.front_suspension.name, rear: ss.rear_suspension.name }))}</div>
           <div>${t('Допуски')}</div><div>${lim ? `${esc(limName)} <span class="badge ${esc(lim.source_kind)}">${esc(lim.source_label)}</span>` : t('не заданы')}</div>
           <div>${t('Обод')}</div><div>${t('{rim}″ — к этому диаметру отнесено схождение в мм', { rim: ss.rim_diameter_in })}</div>
@@ -117,13 +168,23 @@ function render() {
       <div class="panel" style="margin-top:14px">${table(before, after)}</div>
       ${warnings.length ? `<div class="panel"><h2 style="margin-top:0">${t('На что обратить внимание')}</h2><ul class="plain">${warnings.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''}
       ${steps.length ? `<div class="panel"><h2 style="margin-top:0">${t('Порядок регулировки (по замеру «до»)')}</h2><ol class="steps">
-        ${steps.map(s => `<li><b>${esc(s.title)}</b><div>${esc(s.detail)}</div>${s.why ? `<div class="why">${esc(s.why)}</div>` : ''}</li>`).join('')}</ol></div>` : ''}`}
+        ${steps.map(s => `<li><b>${esc(s.title)}</b><div>${esc(s.detail)}</div>${s.why ? `<div class="why">${esc(s.why)}</div>` : ''}</li>`).join('')}</ol></div>` : ''}
+      ${tootRow()}`}
+      ${roadPanel()}
       <p class="muted" style="font-size:12px;margin-top:14px">${t('Протокол сформирован программой «Сход-развал — открытый стенд» (свободная программа, AGPL-3.0). Программа считает то, что измерено; она не проверяет давление в шинах, люфты и ровность площадки.')}</p>
     </div>`;
 
   $$('[data-meta]', root).forEach(inp => inp.oninput = () => {
-    meta[inp.dataset.meta] = inp.value;
-    save('reportMeta', meta);
+    saveJob({ report: { ...meta(), [inp.dataset.meta]: inp.value } });
+  });
+  $('#rNew', root).onclick = () => startNewCar();
+  $$('[data-note]', root).forEach(el => {
+    el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => {
+      setNote(el.dataset.note, el.value);
+      if (el.tagName === 'SELECT') render();
+    });
+    // Секунды — итог пересчитывается, когда поле оставили, а не на каждой цифре.
+    if (el.tagName !== 'SELECT') el.addEventListener('change', () => render());
   });
   $('#rBefore', root).onclick = async () => { await snapshot('before'); load(); };
   $('#rAfter', root).onclick = async () => { await snapshot('after'); load(); };

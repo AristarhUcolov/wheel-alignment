@@ -279,3 +279,50 @@ func TestSimulatorCouplesToe(t *testing.T) {
 		t.Error("SAI has no adjuster and must be refused")
 	}
 }
+
+// TestClearWheelOnlyOwnSource: emptying a typed-in field takes that number off
+// the screen, but never a reading another sensor put on the same wheel.
+func TestClearWheelOnlyOwnSource(t *testing.T) {
+	h, _ := newTestHub()
+	_ = h.Push(Input{Wheel: align.FL, Camber: f(0.5), Toe: f(0.1), Instant: true, Source: "manual"})
+	_ = h.Push(Input{Wheel: align.FR, Camber: f(-0.2), Source: "phone:x"})
+	_ = h.PushSweep(SweepInput{Wheel: align.FL, Caster: 5, Source: "manual"})
+
+	h.ClearWheel("manual", align.FL, WhatCamber)
+	fr := h.Frame()
+	if fr.Params["camber_FL"].Has {
+		t.Error("typed camber still on screen after the field was emptied")
+	}
+	if !fr.Params["toe_FL"].Has || !fr.Params["caster_FL"].Has {
+		t.Error("clearing camber took toe or caster with it")
+	}
+
+	// The phone's reading on FR is not the form's to clear.
+	h.ClearWheel("manual", align.FR, WhatCamber|WhatToe|WhatCaster)
+	if !h.Frame().Params["camber_FR"].Has {
+		t.Error("an empty form field wiped the phone's camber")
+	}
+
+	h.ClearWheel("manual", align.FL, WhatToe|WhatCaster)
+	fr = h.Frame()
+	if fr.Params["toe_FL"].Has || fr.Params["caster_FL"].Has {
+		t.Error("toe or caster survived ClearWheel")
+	}
+}
+
+// TestNewCarForgetsOneShotSources: a new car drops every reading and the
+// typed-in source, but a streaming phone stays listed.
+func TestNewCarForgetsOneShotSources(t *testing.T) {
+	h, _ := newTestHub()
+	h.Touch(SourceInfo{ID: "manual", Kind: "manual", Name: "m"})
+	h.Touch(SourceInfo{ID: "phone:x", Kind: "phone", Name: "p", Wheel: "FL"})
+	pushAll(h, [4]float64{0.1, 0.2, 0.3, 0.4}, [4]float64{0.1, 0.1, 0.1, 0.1}, true, "manual")
+	h.NewCar("manual", "optical")
+	fr := h.Frame()
+	if fr.Measured != 0 {
+		t.Errorf("%d readings survived a new car", fr.Measured)
+	}
+	if len(fr.Sources) != 1 || fr.Sources[0].ID != "phone:x" {
+		t.Errorf("sources after a new car: %+v", fr.Sources)
+	}
+}

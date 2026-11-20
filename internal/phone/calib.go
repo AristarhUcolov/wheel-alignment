@@ -78,11 +78,25 @@ type Calibration struct {
 	Mount   float64 `json:"mount"` // degrees, for the phone upright
 	Mounted bool    `json:"mounted"`
 
+	// GyroScale turns the page's rotation rates into degrees a second: 1 for
+	// browsers that follow the specification, 180/π for Chrome on Android
+	// before version 66, which gave radians a second. It is found while the
+	// phone is turned over in the flat calibration; 0 — not known yet —
+	// counts as 1.
+	GyroScale float64 `json:"gyro_scale,omitempty"`
+
 	At time.Time `json:"at"`
 }
 
 // Ready reports whether the phone can be trusted for camber.
 func (c Calibration) Ready() bool { return c.Flat && c.Mounted }
+
+func (c Calibration) gyroScale() float64 {
+	if c.GyroScale > 0 {
+		return c.GyroScale
+	}
+	return 1
+}
 
 // up returns the Sign- and bias-corrected reaction vector.
 func (c Calibration) up(s Sample) (x, y, z float64) {
@@ -169,7 +183,7 @@ func (c Calibration) VerticalRate(s Sample) float64 {
 	if n < 1 {
 		return 0
 	}
-	return (s.GX*x + s.GY*y + s.GZ*z) / n
+	return (s.GX*x + s.GY*y + s.GZ*z) / n * c.gyroScale()
 }
 
 func deg(r float64) float64 { return r * 180 / math.Pi }

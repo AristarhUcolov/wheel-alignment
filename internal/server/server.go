@@ -118,6 +118,8 @@ func New(db *specs.DB) (*Server, error) {
 	s.mux.HandleFunc("POST /api/live/sample", s.liveSample)
 	s.mux.HandleFunc("POST /api/live/clear", s.liveClear)
 	s.mux.HandleFunc("POST /api/live/snapshot", s.liveSnapshot)
+	s.mux.HandleFunc("POST /api/job", s.setJob)
+	s.mux.HandleFunc("POST /api/job/new", s.newJob)
 	s.mux.HandleFunc("POST /api/sim", s.simControl)
 	s.mux.HandleFunc("GET /api/report", s.report)
 	s.mux.HandleFunc("GET /api/phone", s.phoneInfo)

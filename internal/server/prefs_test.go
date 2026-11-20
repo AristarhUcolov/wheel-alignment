@@ -56,7 +56,7 @@ func TestUISettingsRefuseJunk(t *testing.T) {
 	for name, body := range map[string]any{
 		"not an object": map[string]any{"ui": []int{1, 2}},
 		"null":          map[string]any{"ui": nil},
-		"too big":       map[string]any{"ui": map[string]any{"x": strings.Repeat("a", 20<<10)}},
+		"too big":       map[string]any{"ui": map[string]any{"x": strings.Repeat("a", 80<<10)}},
 	} {
 		if rec := sendJSON(t, srv, "/api/settings", body); rec.Code < 400 {
 			t.Errorf("%s: accepted with %d", name, rec.Code)

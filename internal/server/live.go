@@ -21,9 +21,14 @@ import (
 // which rim), the stream of frames for the adjustment screen, and the ways
 // readings get in — typed by hand, sent by a sensor, or simulated.
 
-// session is the car on the stand right now.
+// session is the car on the stand right now — the job. It is kept on disk;
+// see job.go.
 type session struct {
 	mu sync.Mutex
+
+	// path is the job's file; empty when nothing is kept (tests, no data
+	// directory).
+	path string
 
 	specID    string
 	frontSusp suspension.Type
@@ -34,6 +39,19 @@ type session struct {
 
 	before *Snapshot
 	after  *Snapshot
+
+	// manual is each wheel's typed-in readings exactly as the form holds
+	// them; optical the last photo measurement. Both are put back on screen
+	// when the program starts again.
+	manual  map[string]ManualLiveRequest
+	optical *align.Result
+
+	// What only the interface reads: the preparation checklist, the
+	// string-line squareness inputs, the report's header.
+	box    map[string]string
+	checks map[string]bool
+	report ReportMeta
+	notes  map[string]string
 }
 
 // Snapshot is the state of the car at one moment, for the before/after report.
@@ -104,6 +122,14 @@ type SessionView struct {
 	SimAuto    bool `json:"sim_auto"`
 	HasBefore  bool `json:"has_before"`
 	HasAfter   bool `json:"has_after"`
+
+	// The job as the interface left it: typed-in readings per wheel, the
+	// string-line squareness inputs, the checklist and the report's header.
+	Manual     map[string]ManualLiveRequest `json:"manual"`
+	Box        map[string]string            `json:"box"`
+	Checks     map[string]bool              `json:"checks"`
+	ReportMeta ReportMeta                   `json:"report_meta"`
+	Notes      map[string]string            `json:"notes"`
 }
 
 func (s *Server) vehicleView(sp specs.Spec) *VehicleView {
@@ -149,6 +175,20 @@ func (s *Server) applySessionLocked() SessionView {
 		SimRunning:      s.sim.Running(), SimAuto: s.sim.Auto(),
 		Lang:      string(i18n.Current()),
 		HasBefore: ss.before != nil, HasAfter: ss.after != nil,
+		Manual: map[string]ManualLiveRequest{}, Box: map[string]string{}, Checks: map[string]bool{},
+		ReportMeta: ss.report, Notes: map[string]string{},
+	}
+	for k, v := range ss.notes {
+		view.Notes[k] = v
+	}
+	for k, v := range ss.manual {
+		view.Manual[k] = v
+	}
+	for k, v := range ss.box {
+		view.Box[k] = v
+	}
+	for k, v := range ss.checks {
+		view.Checks[k] = v
 	}
 	cfg := live.Config{
 		FrontSuspension: ss.frontSusp, RearSuspension: ss.rearSusp,
@@ -223,6 +263,7 @@ func (s *Server) setSession(w http.ResponseWriter, r *http.Request) {
 		}
 		ss.rearSusp = t
 	}
+	rimWas := ss.rimIn
 	if req.RimDiameterIn != nil {
 		if v := *req.RimDiameterIn; v < 8 || v > 30 {
 			writeErr(w, http.StatusBadRequest, errors.New(i18n.T("диаметр обода должен быть от 8 до 30 дюймов")))
@@ -231,12 +272,27 @@ func (s *Server) setSession(w http.ResponseWriter, r *http.Request) {
 		ss.rimIn = *req.RimDiameterIn
 	}
 	if req.TrackFrontMM != nil {
+		if v := *req.TrackFrontMM; v < 0 || v > 4000 {
+			writeErr(w, http.StatusBadRequest, errors.New(i18n.T("колея должна быть от 0 до 4000 мм")))
+			return
+		}
 		ss.trackF = *req.TrackFrontMM
 	}
 	if req.TrackRearMM != nil {
+		if v := *req.TrackRearMM; v < 0 || v > 4000 {
+			writeErr(w, http.StatusBadRequest, errors.New(i18n.T("колея должна быть от 0 до 4000 мм")))
+			return
+		}
 		ss.trackR = *req.TrackRearMM
 	}
-	writeJSON(w, http.StatusOK, s.applySessionLocked())
+	view := s.applySessionLocked()
+	// Toe typed in as string-line millimetres is an angle only for a given
+	// rim: a new diameter changes it.
+	if ss.rimIn != rimWas {
+		s.reapplyManual()
+	}
+	s.saveJobLocked()
+	writeJSON(w, http.StatusOK, view)
 }
 
 // liveStream serves frames as Server-Sent Events. SSE rather than WebSockets:
@@ -292,10 +348,47 @@ type ManualLiveRequest struct {
 
 	ToeFrontMM   *float64 `json:"toe_front_mm"`
 	ToeRearMM    *float64 `json:"toe_rear_mm"`
-	ToeSpanMM    float64  `json:"toe_span_mm"`
-	StringInside bool     `json:"string_inside"`
+	ToeSpanMM    float64  `json:"toe_span_mm,omitempty"`
+	StringInside bool     `json:"string_inside,omitempty"`
 
 	Sweep *SweepInput `json:"sweep,omitempty"`
+
+	// The caster sweep as typed, each reading on its own: one may be filled
+	// in before the other. Sweep, when sent, takes precedence.
+	SweepOut  *float64 `json:"sweep_out,omitempty"`
+	SweepIn   *float64 `json:"sweep_in,omitempty"`
+	HalfSweep *float64 `json:"half_sweep,omitempty"`
+
+	// Replace makes the request the wheel's whole typed-in state: a field
+	// left out is a field the person emptied, and its number leaves the
+	// screen. Without it only what is sent is applied — the form of the API
+	// sensors and scripts use.
+	Replace bool `json:"replace,omitempty"`
+}
+
+func inclinometer(at0 float64, at180 *float64, invert bool) measure.Inclinometer {
+	inc := measure.Inclinometer{At0Deg: at0, Invert: invert}
+	if at180 != nil {
+		inc.At180Deg, inc.Has180 = *at180, true
+	}
+	return inc
+}
+
+// stringToe is a wheel's toe from the string-line distances at the front and
+// rear rim edges; span 0 means the rim's diameter.
+func stringToe(front, rear, span float64, inside bool, rimMM float64) (align.Angle, error) {
+	if span <= 0 {
+		span = rimMM
+	}
+	side := measure.LineOutside
+	if inside {
+		side = measure.LineInside
+	}
+	return measure.StringToe{FrontMM: front, RearMM: rear, SpanMM: span, Side: side}.Toe()
+}
+
+func measureSweep(out, in, half float64) measure.SweepReading {
+	return measure.SweepReading{CamberOut: align.Deg(out), CamberIn: align.Deg(in), HalfSweep: align.Deg(half)}
 }
 
 func parseWheel(s string) (align.Position, error) {
@@ -321,78 +414,20 @@ func (s *Server) liveManual(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
+	if (req.Sweep != nil || req.SweepOut != nil || req.SweepIn != nil) && !pos.IsFront() {
+		writeErr(w, http.StatusBadRequest, errors.New(i18n.T("кастер меряется только на передних колёсах")))
+		return
+	}
 	s.sess.mu.Lock()
-	rimMM := align.Inches(s.sess.rimIn)
-	s.sess.mu.Unlock()
-
-	in := live.Input{Wheel: pos, Instant: true, Source: manualSource}
-	var camber align.Angle
-	if req.Camber != nil {
-		inc := measure.Inclinometer{At0Deg: *req.Camber, Invert: req.Invert}
-		if req.Camber180 != nil {
-			inc.At180Deg, inc.Has180 = *req.Camber180, true
-		}
-		camber, _ = inc.Camber()
-		v := camber.Deg()
-		in.Camber = &v
-	}
-	var toe align.Angle
-	if req.ToeFrontMM != nil && req.ToeRearMM != nil {
-		span := req.ToeSpanMM
-		if span <= 0 {
-			span = rimMM
-		}
-		side := measure.LineOutside
-		if req.StringInside {
-			side = measure.LineInside
-		}
-		toe, err = measure.StringToe{FrontMM: *req.ToeFrontMM, RearMM: *req.ToeRearMM, SpanMM: span, Side: side}.Toe()
-		if err != nil {
-			writeErr(w, http.StatusBadRequest, err)
-			return
-		}
-		v := toe.Deg()
-		in.Toe = &v
-	}
-	s.hub.Touch(live.SourceInfo{ID: manualSource, Kind: "manual", Name: i18n.N("Ручной ввод"), Detail: i18n.N("струна и угломер")})
-	if in.Camber != nil || in.Toe != nil {
-		if err := s.hub.Push(in); err != nil {
-			writeErr(w, http.StatusBadRequest, err)
-			return
-		}
-	}
-
-	if req.Sweep != nil {
-		if !pos.IsFront() {
-			writeErr(w, http.StatusBadRequest, errors.New(i18n.T("кастер меряется только на передних колёсах")))
-			return
-		}
-		half := req.Sweep.HalfSweepDeg
-		if half == 0 {
-			half = 20
-		}
-		sw := measure.SweepReading{
-			CamberOut: align.Deg(req.Sweep.CamberOut), CamberIn: align.Deg(req.Sweep.CamberIn),
-			HalfSweep: align.Deg(half),
-		}
-		if req.Camber != nil {
-			sw.CamberStraight, sw.HasStraight = camber, true
-			sw.ToeStraight = toe
-		}
-		sol, err := sw.Solve(pos)
-		if err != nil {
-			writeErr(w, http.StatusBadRequest, err)
-			return
-		}
-		si := live.SweepInput{Wheel: pos, Caster: sol.Caster.Deg(), Source: manualSource, Warnings: sol.Warnings}
-		if sol.SAI != nil {
-			v := sol.SAI.Deg()
-			si.SAI = &v
-		}
-		if err := s.hub.PushSweep(si); err != nil {
-			writeErr(w, http.StatusBadRequest, err)
-			return
-		}
+	defer s.sess.mu.Unlock()
+	// The form is kept as typed even when a number in it is refused: the
+	// person sees the message and corrects the field, and a restart in
+	// between must not lose the rest of what they entered.
+	s.rememberManual(pos, req)
+	s.saveJobLocked()
+	if err := s.applyManual(pos, req, align.Inches(s.sess.rimIn)); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
 	}
 	writeJSON(w, http.StatusOK, s.hub.Frame())
 }
@@ -562,8 +597,21 @@ func (s *Server) liveSnapshot(w http.ResponseWriter, r *http.Request) {
 	} else {
 		s.sess.after = snap
 	}
+	s.saveJobLocked()
 	s.sess.mu.Unlock()
 	writeJSON(w, http.StatusOK, snap)
+}
+
+// withReport is a snapshot with its verdict worked out now: against the
+// tolerances in force and in the language in use, which may both differ from
+// when it was taken or kept on disk.
+func withReport(sn *Snapshot, lim *specs.Spec) *Snapshot {
+	if sn == nil {
+		return nil
+	}
+	c := *sn
+	c.Report = specs.Compare(c.Result, lim)
+	return &c
 }
 
 // ReportView is everything the report page shows.
@@ -576,7 +624,9 @@ type ReportView struct {
 func (s *Server) report(w http.ResponseWriter, r *http.Request) {
 	s.sess.mu.Lock()
 	defer s.sess.mu.Unlock()
-	writeJSON(w, http.StatusOK, ReportView{Session: s.applySessionLocked(), Before: s.sess.before, After: s.sess.after})
+	view := s.applySessionLocked()
+	lim := s.hub.Config().Limits
+	writeJSON(w, http.StatusOK, ReportView{Session: view, Before: withReport(s.sess.before, lim), After: withReport(s.sess.after, lim)})
 }
 
 func (s *Server) suspensions(w http.ResponseWriter, r *http.Request) {

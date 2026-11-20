@@ -1,7 +1,7 @@
 // Сход-развал — открытый стенд. Каркас интерфейса: шаги, верхняя строка,
 // строка функциональных клавиш, боковая панель, язык, настройки.
 
-import { state, on, emit, api, refreshSession, connectStream, toast, $, $$ } from './state.js';
+import { state, on, emit, api, refreshSession, connectStream, toast, newJob, flushJob, $, $$ } from './state.js';
 import { t, setLang, translateStatic, lang } from './i18n.js';
 import { esc, parseNum } from './fmt.js';
 import { loadPrefs, prefs, flushPrefs } from './prefs.js';
@@ -15,6 +15,8 @@ import * as contrib from './screens/contrib.js';
 import * as settings from './screens/settings.js';
 import * as support from './screens/support.js';
 import { maybeWelcome } from './screens/welcome.js';
+import * as phonePanel from './screens/phone.js';
+import { openModal, modalOpen } from './modal.js';
 
 const SCREENS = { vehicle, prep, measure, live, report, guide, contrib, settings, support };
 const mounted = new Set();
@@ -46,7 +48,35 @@ export function go(name, arg) {
   renderSteps();
 }
 
-$$('nav.side button').forEach(b => b.onclick = () => go(b.dataset.screen));
+$$('nav.side button[data-screen]').forEach(b => b.onclick = () => go(b.dataset.screen));
+$('#sideNew').onclick = () => startNewCar();
+$('#topPhone').onclick = () => openPhone();
+
+// ── Новая машина ─────────────────────────────────────────────────────
+
+// Всё, что было введено и измерено для прежней машины, уходит: показания,
+// снимки, отметки подготовки, госномер. Калибровки телефонов и камер, свои
+// допуски и настройки остаются.
+export async function startNewCar() {
+  const ss = state.session || {};
+  const f = state.frame;
+  const busy = ss.vehicle || ss.has_before || (f && f.measured > 0) || Object.keys(ss.manual || {}).length;
+  if (busy && !confirm(t('Начать новую машину? Показания, снимки «до» и «после», отметки подготовки и поля протокола этой машины будут очищены. Калибровки телефонов и камер останутся.'))) return;
+  try {
+    await flushJob();
+    await newJob();
+    go('vehicle');
+    toast(t('Новая машина: найдите её в базе.'));
+  } catch (e) { toast(e.message, true); }
+}
+
+// ── Подключить телефон ───────────────────────────────────────────────
+
+// Из любого места программы, в один щелчок: доступ включается сразу, на
+// экране — код для камеры телефона.
+export function openPhone() {
+  openModal(t('Подключить телефон'), body => phonePanel.render(body, { autoEnable: true }), { wide: true });
+}
 
 // Поле числа, в котором не число, — сразу красная рамка, а не молча
 // пропавший замер.
@@ -225,7 +255,7 @@ export function renderFkeys() {
 }
 
 document.addEventListener('keydown', e => {
-  if (document.querySelector('.modal-back')) return; // приветствие ведёт себя само
+  if (document.querySelector('.modal-back') || modalOpen()) return; // окно поверх ведёт себя само
   if (/^F([1-9]|1[0-2])$/.test(e.key)) {
     e.preventDefault(); // F5 не должен перезагружать окно, F3 — открывать поиск
     const f = currentFkeys.find(x => x.k === e.key);
@@ -296,6 +326,7 @@ on('prefs', () => renderFkeys());
   // Настройки — первыми: тема и масштаб применяются до первой отрисовки.
   await loadPrefs();
   state.units = prefs.units;
+  state.liveView = prefs.liveView;
   try {
     await refreshSession();
   } catch (e) {

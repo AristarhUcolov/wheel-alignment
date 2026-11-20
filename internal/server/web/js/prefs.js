@@ -20,7 +20,13 @@ const DEFAULTS = {
   workshop: { name: '', contacts: '', who: '' },
   welcomed: false,      // приветствие уже показано
   recent: [],           // последние выбранные автомобили
+  method: 'manual',     // способ замера: manual | phone | optical | sensor | demo
+  liveView: 'overview', // вид экрана регулировки: overview | front | rear
+  helper: {},           // помощник «сколько крутить»: «машина|угол» → градусов на шаг регулятора
 };
+
+// Помощник помнит не больше стольких регуляторов — самые старые забываются.
+const HELPER_MAX = 150;
 
 export const ZOOM = { normal: 1, large: 1.15, xlarge: 1.3 };
 
@@ -29,18 +35,24 @@ export const prefs = structuredClone(DEFAULTS);
 function merge(src) {
   if (!src || typeof src !== 'object') return;
   for (const k of Object.keys(DEFAULTS)) {
-    if (src[k] === undefined) continue;
+    if (src[k] === undefined || src[k] === null) continue;
     if (k === 'workshop') prefs.workshop = { ...DEFAULTS.workshop, ...(src.workshop || {}) };
+    else if (k === 'helper') prefs.helper = typeof src.helper === 'object' ? { ...src.helper } : {};
     else prefs[k] = src[k];
   }
 }
 
-// Старые версии хранили единицы в браузере — переносим один раз.
+// Старые версии хранили часть настроек в браузере, а это хранилище привязано
+// к порту и теряется вместе с ним. Переносим то, что там есть, один раз —
+// настройки из файла программы важнее.
 function legacy() {
-  try {
-    const u = localStorage.getItem('wa.units');
-    return u ? { units: JSON.parse(u) } : null;
-  } catch { return null; }
+  const out = {};
+  const get = k => { try { const v = localStorage.getItem('wa.' + k); return v === null ? undefined : JSON.parse(v); } catch { return undefined; } };
+  for (const [k, from] of [['units', 'units'], ['method', 'method'], ['liveView', 'liveView'], ['helper', 'helper']]) {
+    const v = get(from);
+    if (v !== undefined) out[k] = v;
+  }
+  return out;
 }
 
 export async function loadPrefs() {
@@ -49,8 +61,12 @@ export async function loadPrefs() {
     const r = await api('/api/settings');
     fromServer = r && r.ui && Object.keys(r.ui).length ? r.ui : null;
   } catch { /* без настроек — значения по умолчанию */ }
-  merge(fromServer || legacy());
+  const old = legacy();
+  merge(old);
+  merge(fromServer);
   applyPrefs();
+  // Перенесённое из браузера — сразу в файл, чтобы не зависеть от порта.
+  if (Object.keys(old).some(k => !fromServer || fromServer[k] === undefined)) persist();
   return prefs;
 }
 
@@ -86,8 +102,20 @@ export function rememberVehicle(id) {
   persist();
 }
 
+// Помощник «сколько крутить»: что узнали о регуляторе этой машины. null —
+// забыть. Без перерисовки экранов: меняется только панель угла.
+export function setHelper(key, value) {
+  const h = { ...prefs.helper };
+  delete h[key];
+  if (value) h[key] = value;
+  const keys = Object.keys(h);
+  for (const k of keys.slice(0, Math.max(0, keys.length - HELPER_MAX))) delete h[k];
+  prefs.helper = h;
+  persist();
+}
+
 export function resetPrefs() {
-  const keep = { welcomed: true, recent: prefs.recent, workshop: prefs.workshop };
+  const keep = { welcomed: true, recent: prefs.recent, workshop: prefs.workshop, helper: prefs.helper, method: prefs.method };
   Object.assign(prefs, structuredClone(DEFAULTS), keep);
   applyPrefs();
   persist();

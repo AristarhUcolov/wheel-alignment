@@ -184,9 +184,16 @@ func insideBoard(a, b vision.Target) bool {
 
 // SetDataDir is the user data directory: camera calibrations are kept there
 // between runs, and the interface shows it so a person knows where their data is.
+//
+// The job kept there — the car, its typed-in readings, the snapshots — is
+// read back too, so the program opens where the person left off.
 func (s *Server) SetDataDir(dir string) {
 	s.dataPath = dir
-	lo := s.optLive
+	s.optLive.loadCameras(dir)
+	s.loadJob(dir)
+}
+
+func (lo *liveOptical) loadCameras(dir string) {
 	lo.mu.Lock()
 	defer lo.mu.Unlock()
 	lo.dir = dir

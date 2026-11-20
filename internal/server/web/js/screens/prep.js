@@ -3,11 +3,13 @@
 // У каждого пункта коротко «что сделать» и мелко «почему», у каждой группы —
 // свой счётчик. Список собран под тип подвески и под выбранный способ замера.
 
-import { state, on, save, h, $, $$ } from '../state.js';
+import { state, on, saveJob, h, $, $$ } from '../state.js';
 import { esc } from '../fmt.js';
 import { t } from '../i18n.js';
 import { go } from '../app.js';
 import { setMethod } from './measure.js';
+import { prefs } from '../prefs.js';
+import { figure, tyreWearTable } from '../illus.js';
 
 let root;
 
@@ -16,11 +18,18 @@ export function mount(el) {
   on('session', () => { if (state.screen === 'prep') render(); });
 }
 
+// Отметки — часть работы: хранит их программа, и новая машина начинается с
+// чистого списка.
+const checks = () => (state.session && state.session.checks) || {};
+function setCheck(k, on) {
+  const c = { ...checks() };
+  if (on) c[k] = true; else delete c[k];
+  saveJob({ checks: c });
+}
+
 export function show() { render(); }
 
-function method() {
-  try { return JSON.parse(localStorage.getItem('wa.method')) || 'manual'; } catch { return 'manual'; }
-}
+const method = () => prefs.method || 'manual';
 
 const METHOD_NAME = () => ({ manual: t('Струна и угломер'), phone: t('Телефон на колесе'), optical: t('Камера и мишени'), sensor: t('Свой датчик') });
 
@@ -28,11 +37,11 @@ const METHOD_NAME = () => ({ manual: t('Струна и угломер'), phone:
 function tools() {
   switch (method()) {
     case 'manual': return [
-      ['m1', t('Леска или струна, четыре подставки под неё, рулетка'), t('Струна натягивается вдоль борта на высоте центра колёс.')],
-      ['m2', t('Угломер с точностью 0,1° и ровная планка на обод'), t('Планка ложится на закраины обода, не на шину.')],
+      ['m1', t('Леска или струна, четыре подставки под неё, рулетка'), t('Струна натягивается вдоль борта на высоте центра колёс.'), 'strings'],
+      ['m2', t('Угломер с точностью 0,1° и ровная планка на обод'), t('Планка ложится на закраины обода, не на шину.'), 'bar'],
     ];
     case 'phone': return [
-      ['f1', t('Телефон и ровная планка на закраины обода'), t('Телефон прижимается к планке экраном наружу.')],
+      ['f1', t('Телефон и ровная планка на закраины обода'), t('Телефон прижимается к планке экраном наружу.'), 'bar'],
       ['f2', t('Компьютер и телефон в одной сети Wi-Fi'), t('Подойдёт и точка доступа на самом телефоне.')],
     ];
     case 'optical': return [
@@ -46,7 +55,8 @@ function tools() {
   return [];
 }
 
-// Группы: [ключ, название, пункты]; пункт — [ключ, что сделать, почему].
+// Группы: [ключ, название, пункты]; пункт — [ключ, что сделать, почему,
+// рисунок]. Рисунок — ключ из illus.js или 'wear' для таблицы износа шин.
 // Ключи не зависят от языка — отметки сохраняются и после переключения.
 // Инструмент — сразу после безопасности: его собирают раньше всего.
 function groups() {
@@ -61,18 +71,24 @@ function groups() {
     ]],
     ['tools:' + method(), t('Инструмент'), tools()],
     ['site', t('Площадка'), [
-      ['p1', t('Все четыре колеса в одной плоскости'), t('Разница между пятнами контакта по гидроуровню — меньше 2 мм. Ямка 5 мм под одним колесом — это уже 0,2° ошибки развала.')],
-      ['p2', t('Поворотные круги под передними колёсами — для кастера'), t('Два листа жести со смазкой между ними тоже работают.')],
+      ['p1', t('Все четыре колеса в одной плоскости'), t('Разница между пятнами контакта по гидроуровню — меньше 2 мм. Ямка 5 мм под одним колесом — это уже 0,2° ошибки развала.'), 'level'],
+      ['p2', t('Поворотные круги под передними колёсами — для кастера'), t('Два листа жести со смазкой между ними тоже работают.'), 'turnplates'],
+      ['p3', t('Для кастера — упор педали тормоза'), t('Колесо не должно прокатываться, пока поворачиваете руль, иначе кастер выйдет неверным.'), 'pedal'],
+    ]],
+    ['tyres', t('Шины'), [
+      ['w1', t('На одной оси — шины одной модели и размера, износ похожий'), t('Изношенная шина меньше в диаметре, и машину тянет в её сторону (методика ASE).')],
+      ['w2', t('Осмотрен износ: края, середина, «пила», пятна'), t('Износ подсказывает, какой угол сбит и что изношено. Запишите — после регулировки будет с чем сравнить.'), 'wear'],
     ]],
     ['car', t('Автомобиль'), [
       ...cond,
       ['c1', t('Давление в шинах по норме и одинаковое слева и справа'), t('Разница 0,3 бар — до 0,1° разницы развала.')],
       ['c2', t('Загрузка — как требует спецификация'), t('Обычно: полный бак, запаска и инструмент на местах, без пассажиров.')],
-      ['c3', t('Подвеска осажена'), t('Покачайте кузов и прокатите машину 3–5 м вперёд. Не толкайте вбок и не катите назад.')],
-      ['c4', t('Руль строго прямо и зафиксирован'), t('Упор в сиденье или ремень; «прямо» — по метке на валу, а не по спицам.')],
+      ['c3', t('Подвеска осажена'), t('Покачайте кузов и прокатите машину 3–5 м вперёд. Не толкайте вбок и не катите назад.'), 'settle'],
+      ['c5', t('Высота кузова одинакова слева и справа'), t('Меряйте от центра колеса до кромки арки. Заметная разница — просевшая пружина: её меняют до регулировки, иначе углы выставятся под неё (Tesla, ASE).'), 'rideHeight'],
+      ['c4', t('Руль строго прямо и зафиксирован'), t('Упор в сиденье или ремень; «прямо» — по метке на валу, а не по спицам.'), 'wheelLock'],
     ]],
-    ['front:' + fs.id, t('Передняя подвеска — {name}', { name: fs.name }), (fs.pre_checks || []).map((c, i) => ['f' + i, ...split(c)])],
-    ['rear:' + rs.id, t('Задняя подвеска — {name}', { name: rs.name }), (rs.pre_checks || []).map((c, i) => ['r' + i, ...split(c)])],
+    ['front:' + fs.id, t('Передняя подвеска — {name}', { name: fs.name }), (fs.pre_checks || []).map((c, i) => ['f' + i, ...split(c), illusFor(c)])],
+    ['rear:' + rs.id, t('Задняя подвеска — {name}', { name: rs.name }), (rs.pre_checks || []).map((c, i) => ['r' + i, ...split(c), illusFor(c)])],
   ].filter(([, , items]) => items.length);
 }
 
@@ -81,6 +97,15 @@ function groups() {
 function methodPick() {
   return `<label class="pmethod"><span>${t('Способ замера')}</span><select id="pMethod">${Object.entries(METHOD_NAME()).map(([id, name]) =>
     `<option value="${id}"${id === method() ? ' selected' : ''}>${esc(name)}</option>`).join('')}</select></label>`;
+}
+
+// Рисунок к проверке из каталога подвесок — по смыслу текста, на любом из
+// двух языков: люфт шарниров и подшипников — качать колесо, рулевые тяги —
+// качать руль.
+function illusFor(text) {
+  if (/наконечник|рулев\S* (тяг|механизм|рейк)|маятников|tie.rod|steering (linkage|gear|rack|box)|idler/i.test(text)) return 'dryPark';
+  if (/шаров|шкворн|подшипник ступиц|ball.joint|kingpin|wheel bearing/i.test(text)) return 'play';
+  return '';
 }
 
 // Длинную проверку из описания подвески — на «что сделать» и «почему»:
@@ -105,7 +130,7 @@ function counts(gs) {
   let total = 0, done = 0;
   const per = {};
   for (const [g, , items] of gs) {
-    const d = items.filter(([k]) => state.checks[keyOf(g, k)]).length;
+    const d = items.filter(([k]) => checks()[keyOf(g, k)]).length;
     per[g] = [d, items.length];
     total += items.length;
     done += d;
@@ -163,15 +188,26 @@ function render() {
   for (const [g, title, items] of gs) {
     const sec = h(`<section class="panel pgroup" data-group="${esc(g)}"><h3><span>${esc(title)}</span><span class="gcount"></span></h3>${g.startsWith('tools:') ? methodPick() : ''}<div class="checklist"></div></section>`);
     const list = sec.querySelector('.checklist');
-    for (const [id, text, why] of items) {
+    for (const [id, text, why, pic] of items) {
       const k = keyOf(g, id);
-      const lab = h(`<label class="chk"><input type="checkbox"${state.checks[k] ? ' checked' : ''}><span><b>${esc(text)}</b>${why ? `<small>${esc(why)}</small>` : ''}</span></label>`);
-      lab.querySelector('input').onchange = e => {
-        if (e.target.checked) state.checks[k] = 1; else delete state.checks[k];
-        save('checks', state.checks);
+      const item = h(`<div class="chk-item"><label class="chk"><input type="checkbox"${checks()[k] ? ' checked' : ''}><span><b>${esc(text)}</b>${why ? `<small>${esc(why)}</small>` : ''}</span></label></div>`);
+      item.querySelector('input').onchange = e => {
+        setCheck(k, e.target.checked);
         progress(gs);
       };
-      list.append(lab);
+      // «Как это выглядит» — рисунок открывается под пунктом, не уводя со
+      // страницы. Кнопка — вне подписи: щелчок по ней не ставит галочку.
+      if (pic) {
+        const btn = h(`<button class="how-btn" aria-expanded="false">${t('Как это выглядит')}</button>`);
+        const box = h(`<div class="how-box hidden"></div>`);
+        btn.onclick = () => {
+          const open = box.classList.toggle('hidden') === false;
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          if (open && !box.innerHTML) box.innerHTML = pic === 'wear' ? tyreWearTable() : figure(pic, { small: true });
+        };
+        item.append(btn, box);
+      }
+      list.append(item);
     }
     box.append(sec);
   }
@@ -180,8 +216,9 @@ function render() {
   if (pm) pm.onchange = () => { setMethod(pm.value); render(); $('#pMethod', root).focus(); };
   $('#pNext', root).onclick = () => go('measure');
   const setAll = on => {
-    for (const [g, , items] of gs) for (const [id] of items) { if (on) state.checks[keyOf(g, id)] = 1; else delete state.checks[keyOf(g, id)]; }
-    save('checks', state.checks);
+    const c = { ...checks() };
+    for (const [g, , items] of gs) for (const [id] of items) { if (on) c[keyOf(g, id)] = true; else delete c[keyOf(g, id)]; }
+    saveJob({ checks: c });
     render();
     $(on ? '#pAll' : '#pNone', root).focus();
   };

@@ -25,7 +25,35 @@ const (
 	StepCasterOut  Step = "caster_out"
 	StepCasterIn   Step = "caster_in"
 	StepCasterBack Step = "caster_back"
+
+	// The accuracy check: the calibration positions again, measured but not
+	// stored, to see whether the calibration still holds.
+	StepCheckFlatUp    Step = "check_flat_up"
+	StepCheckFlatDown  Step = "check_flat_down"
+	StepCheckMountUp   Step = "check_mount_up"
+	StepCheckMountDown Step = "check_mount_down"
 )
+
+// checkLimit is how far, in degrees, a calibration may have drifted before the
+// check calls for a new one: the accuracy the phone is meant to have.
+const checkLimit = 0.1
+
+// Check is the outcome of the accuracy check.
+type Check struct {
+	// Zero is the drift of the accelerometer's zero since the flat
+	// calibration, as a camber error in degrees: the table test.
+	Zero    float64 `json:"zero"`
+	HasZero bool    `json:"has_zero"`
+	// Mount is the camber error left in the mount correction: half the
+	// difference between the phone upright and upside down on the same spot.
+	Mount    float64 `json:"mount"`
+	HasMount bool    `json:"has_mount"`
+}
+
+// OK reports whether everything checked is within checkLimit.
+func (c Check) OK() bool {
+	return c.HasZero && c.HasMount && math.Abs(c.Zero) <= checkLimit && math.Abs(c.Mount) <= checkLimit
+}
 
 // Timing and thresholds of the hold-still detector. The phone must be still
 // for the step's hold time before a reading is taken, and the reading is the
@@ -88,6 +116,19 @@ type Device struct {
 	tOut    float64
 	hasGyro bool
 
+	// flipTurn adds up how far the gyroscope says the phone turned while it
+	// was being turned over during the flat calibration, in the page's raw
+	// units: see gyroScaleFrom.
+	flipTurn float64
+
+	// check is the last accuracy check; checkC is its upright reading.
+	check  *Check
+	checkC float64
+
+	// Warn is a remark the phone shows without stopping: a caster that came
+	// out negative, for one.
+	Warn string
+
 	Caster *float64
 	SAI    *float64
 	// sweepDone is set when a caster sweep has produced a result to publish.
@@ -104,13 +145,19 @@ func newDevice(id string, cal Calibration) *Device {
 // Start begins a procedure. It returns an error the phone can display when the
 // procedure cannot start yet.
 func (d *Device) Start(cmd string) error {
-	d.Err = ""
+	d.Err, d.Warn = "", ""
 	d.win = d.win[:0]
 	d.Progress = 0
 	d.moved = false
 	switch cmd {
 	case "flat":
 		d.Step = StepFlatUp
+	case "check":
+		if !d.Cal.Ready() {
+			return i18n.Err("сначала откалибруйте телефон")
+		}
+		d.check = &Check{}
+		d.Step = StepCheckFlatUp
 	case "mount":
 		if !d.Cal.Flat {
 			d.Step = StepFlatUp // the mount offset is measured on top of the flat one
@@ -159,6 +206,20 @@ func (d *Device) SetWheel(p align.Position) {
 	d.setPrompt()
 }
 
+// newCar forgets what belongs to the previous car's wheel: rim runout and
+// caster. A procedure under way for it is abandoned; a calibration is not.
+func (d *Device) newCar() {
+	d.hasRunout, d.runout = false, 0
+	d.Caster, d.SAI, d.sweepDone = nil, nil, nil
+	d.live = d.live[:0]
+	switch d.Step {
+	case StepRunout1, StepRunout2, StepCasterZero, StepCasterOut, StepCasterIn, StepCasterBack:
+		d.Step = StepLive
+		d.restart()
+	}
+	d.setPrompt()
+}
+
 // Feed processes one batch received at time t. It returns true when the
 // calibration changed and should be saved.
 func (d *Device) Feed(s Sample, t time.Time) (calChanged bool) {
@@ -172,6 +233,10 @@ func (d *Device) Feed(s Sample, t time.Time) (calChanged bool) {
 	// Steering angle integrates continuously through the caster steps.
 	if d.Step == StepCasterOut || d.Step == StepCasterIn || d.Step == StepCasterBack {
 		d.yaw += d.steerRate(s) * s.DT
+	}
+	// Turning the phone over shows how the browser counts its gyroscope.
+	if s.HasGyro && (d.Step == StepFlatDown || d.Step == StepCheckFlatDown) {
+		d.flipTurn += math.Sqrt(s.GX*s.GX+s.GY*s.GY+s.GZ*s.GZ) * s.DT
 	}
 
 	d.win = append(d.win, timed{t, s})
@@ -241,7 +306,8 @@ func (d *Device) liveCamber(c float64, still bool) float64 {
 // holdFor is how long the current step needs the phone still.
 func (d *Device) holdFor() time.Duration {
 	switch d.Step {
-	case StepFlatUp, StepFlatDown, StepMountUp, StepMountDown:
+	case StepFlatUp, StepFlatDown, StepMountUp, StepMountDown,
+		StepCheckFlatUp, StepCheckFlatDown, StepCheckMountUp, StepCheckMountDown:
 		return calHoldTime
 	}
 	return holdTime
@@ -256,7 +322,8 @@ func (d *Device) holdFor() time.Duration {
 // 2.4% for a typical 12° — and caster would carry the same error. The vertical
 // component is used only for the sign.
 func (d *Device) steerRate(s Sample) float64 {
-	wx, wy, wz := s.GX-d.gbias[0], s.GY-d.gbias[1], s.GZ-d.gbias[2]
+	k := d.Cal.gyroScale()
+	wx, wy, wz := (s.GX-d.gbias[0])*k, (s.GY-d.gbias[1])*k, (s.GZ-d.gbias[2])*k
 	mag := math.Sqrt(wx*wx + wy*wy + wz*wz)
 	x, y, z := d.Cal.up(s)
 	if wx*x+wy*y+wz*z < 0 {
@@ -303,7 +370,7 @@ func (d *Device) stats(need time.Duration) (Sample, bool, time.Duration) {
 		// With the offset known, "still" means turning slower than
 		// stillRate; before it is known, a gyroscope's offset of a degree
 		// or two a second must not count as movement.
-		lim, rate := 5*stillRate, math.Sqrt(m.GX*m.GX+m.GY*m.GY+m.GZ*m.GZ)
+		lim, rate := 5*stillRate, math.Sqrt(m.GX*m.GX+m.GY*m.GY+m.GZ*m.GZ)*d.Cal.gyroScale()
 		if d.hasBias {
 			lim, rate = stillRate, math.Abs(d.steerRate(m))
 		}
@@ -333,6 +400,7 @@ func (d *Device) onStill(m Sample) (calChanged bool) {
 		}
 		d.hold, d.Err = m, ""
 		d.Step = StepFlatDown
+		d.flipTurn = 0
 		d.restart()
 
 	case StepFlatDown:
@@ -348,6 +416,9 @@ func (d *Device) onStill(m Sample) (calChanged bool) {
 			return false
 		}
 		d.Cal.Sign, d.Cal.BiasZ, d.Cal.Flat, d.Err = sign, bias, true, ""
+		if k := gyroScaleFrom(d.flipTurn); d.hasGyro && k > 0 {
+			d.Cal.GyroScale = k
+		}
 		d.Cal.At = d.LastSeen
 		d.Step = StepMountUp
 		if d.Cal.Mounted {
@@ -456,6 +527,18 @@ func (d *Device) onStill(m Sample) (calChanged bool) {
 		}
 		cs := sol.Caster.Deg()
 		d.Caster = &cs
+		// A caster well below zero almost always means the wheel was steered
+		// the wrong way first: out and in swapped give the same number with
+		// the other sign. Rare cars really have it, so it is a remark, not a
+		// refusal.
+		if cs < -0.5 {
+			if d.left() {
+				d.Warn = i18n.T("Кастер получился отрицательным. Чаще всего это значит, что руль сначала повернули не в ту сторону. Повторите замер: для левого колеса сначала руль ВЛЕВО, потом ВПРАВО.")
+			} else {
+				d.Warn = i18n.T("Кастер получился отрицательным. Чаще всего это значит, что руль сначала повернули не в ту сторону. Повторите замер: для правого колеса сначала руль ВПРАВО, потом ВЛЕВО.")
+			}
+			sol.Warnings = append(sol.Warnings, d.Warn)
+		}
 		if sol.SAI != nil {
 			v := sol.SAI.Deg()
 			d.SAI = &v
@@ -469,9 +552,87 @@ func (d *Device) onStill(m Sample) (calChanged bool) {
 			d.Step = StepLive
 			d.restart()
 		}
+
+	// The check repeats the calibration positions but keeps the
+	// calibration: it measures how far the stored one is from what the
+	// phone shows now.
+	case StepCheckFlatUp:
+		if math.Hypot(m.AX, m.AY) > 1.5 {
+			d.Err = ErrNotFlat.Error()
+			return false
+		}
+		d.hold, d.Err = m, ""
+		d.Step = StepCheckFlatDown
+		d.flipTurn = 0
+		d.restart()
+
+	case StepCheckFlatDown:
+		if (m.AZ > 0) == (d.hold.AZ > 0) {
+			return false // not turned over yet
+		}
+		sign, bias, err := SolveFlat(d.hold, m)
+		if err != nil {
+			d.Err = err.Error()
+			d.Step = StepCheckFlatUp
+			d.restart()
+			return false
+		}
+		zero := deg(math.Asin(math.Max(-1, math.Min(1, (bias-d.Cal.BiasZ)/G))))
+		if sign != d.Cal.Sign {
+			zero = 90 // the phone reports gravity the other way round now: recalibrate
+		}
+		d.check.Zero, d.check.HasZero = zero, true
+		if k := gyroScaleFrom(d.flipTurn); d.hasGyro && k > 0 && k != d.Cal.gyroScale() {
+			d.Cal.GyroScale = k
+			calChanged = true
+		}
+		d.Err = ""
+		d.Step = StepCheckMountUp
+		d.restart()
+
+	case StepCheckMountUp:
+		c, ok := d.Cal.Camber(m)
+		if _, roll := d.Cal.tilt(m); !ok || math.Cos(rad(roll)) < 0.85 {
+			d.Err = ErrNotUpright.Error()
+			return false
+		}
+		d.checkC, d.Err = c, ""
+		d.Step = StepCheckMountDown
+		d.restart()
+
+	case StepCheckMountDown:
+		c, ok := d.Cal.Camber(m)
+		if _, roll := d.Cal.tilt(m); !ok || math.Cos(rad(roll)) > -0.85 {
+			return false // not turned over yet
+		}
+		d.check.Mount, d.check.HasMount = (d.checkC-c)/2, true
+		d.Err = ""
+		d.Step = StepLive
+		d.restart()
 	}
-	return false
+	return calChanged
 }
+
+// gyroScaleFrom tells how the browser counts rotation from how far the
+// gyroscope says the phone turned while it was turned over, screen up to
+// screen down. That is at least 180° however it is done, and a hand rarely
+// turns it more than three times that. The specification asks for degrees a
+// second, and current browsers follow it; Chrome on Android before version 66
+// gave radians a second, which would make every steering angle 57 times too
+// small. The two are far apart, so the answer is clear: 0 when it is not.
+func gyroScaleFrom(turn float64) float64 {
+	switch {
+	case turn >= 120:
+		return 1
+	case turn >= 2.5 && turn <= 15:
+		return 180 / math.Pi
+	}
+	return 0
+}
+
+// left reports a phone on a left wheel; a phone with no wheel yet counts as
+// left, which only ever matters for the wording of a prompt.
+func (d *Device) left() bool { return !d.HasWheel || d.Wheel.SideSign() > 0 }
 
 func (d *Device) setPrompt() {
 	switch d.Step {
@@ -489,12 +650,30 @@ func (d *Device) setPrompt() {
 		d.Prompt = i18n.T("Шаг 2 из 2. Прокатите машину на пол-оборота колеса (метка внизу), приложите планку и телефон к тому же месту обода.")
 	case StepCasterZero:
 		d.Prompt = i18n.T("Кастер. Колёса прямо на поворотных кругах, педаль тормоза зафиксирована упором (колесо не должно проворачиваться), телефон на планке. Не трогайте руль — измеряю.")
+	// «Наружу» и «внутрь» понятны не каждому, а руль влево и вправо —
+	// каждому: наружу левое колесо поворачивает руль влево, правое — вправо.
 	case StepCasterOut:
-		d.Prompt = i18n.F("Поверните колесо НАРУЖУ (от машины) примерно на 20° и остановитесь. Сейчас: %.1f°", math.Abs(d.yaw))
+		if d.left() {
+			d.Prompt = i18n.F("Поверните руль ВЛЕВО: колесо должно повернуться наружу, от машины, примерно на 20°. Остановитесь. Сейчас: %.1f°", math.Abs(d.yaw))
+		} else {
+			d.Prompt = i18n.F("Поверните руль ВПРАВО: колесо должно повернуться наружу, от машины, примерно на 20°. Остановитесь. Сейчас: %.1f°", math.Abs(d.yaw))
+		}
 	case StepCasterIn:
-		d.Prompt = i18n.F("Теперь поверните колесо ВНУТРЬ (к машине) примерно на 20° и остановитесь. Сейчас: %.1f°", d.yaw*-d.outSign)
+		if d.left() {
+			d.Prompt = i18n.F("Теперь поверните руль ВПРАВО: колесо должно повернуться внутрь, к машине, примерно на 20°. Остановитесь. Сейчас: %.1f°", d.yaw*-d.outSign)
+		} else {
+			d.Prompt = i18n.F("Теперь поверните руль ВЛЕВО: колесо должно повернуться внутрь, к машине, примерно на 20°. Остановитесь. Сейчас: %.1f°", d.yaw*-d.outSign)
+		}
 	case StepCasterBack:
 		d.Prompt = i18n.T("Кастер измерен. Верните колёса прямо.")
+	case StepCheckFlatUp:
+		d.Prompt = i18n.T("Проверка, шаг 1 из 4. Положите телефон на ровный стол ЭКРАНОМ ВВЕРХ и не трогайте.")
+	case StepCheckFlatDown:
+		d.Prompt = i18n.T("Шаг 2 из 4. Переверните телефон ЭКРАНОМ ВНИЗ на то же место и не трогайте.")
+	case StepCheckMountUp:
+		d.Prompt = i18n.T("Шаг 3 из 4. Прижмите телефон к планке на ободе экраном наружу, вертикально, как при замере.")
+	case StepCheckMountDown:
+		d.Prompt = i18n.T("Шаг 4 из 4. Переверните телефон вверх ногами и прижмите к тому же месту планки.")
 	default:
 		switch {
 		case !d.HasWheel:

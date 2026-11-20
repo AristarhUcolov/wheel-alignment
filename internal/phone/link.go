@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -32,8 +33,12 @@ var pageFS embed.FS
 // into live readings.
 //
 // It is off until switched on from the interface, and every address it serves
-// carries a random key that changes each time it is switched on: a phone that
-// has not scanned the code on this computer's screen cannot send anything.
+// carries a random key: a phone that has not scanned the code on this
+// computer's screen cannot send anything. The key, the port and whether access
+// was on are kept between runs, so the address in the code stays the same and
+// a phone left with the page open reconnects by itself when the program starts
+// again. "New key" changes the key and shuts out every phone that had the old
+// one.
 type Link struct {
 	hub  *live.Hub
 	dir  string
@@ -41,9 +46,15 @@ type Link struct {
 	sens http.Handler
 	cam  http.Handler
 
+	// listen opens the phones' port; tests bind the loopback interface
+	// instead of every network.
+	listen func(network, addr string) (net.Listener, error)
+
 	mu      sync.Mutex
 	enabled bool
-	token   string
+	token   string // the key in force while enabled, "" while off
+	key     string // the key kept between runs
+	wantOn  bool   // access was on when the program last stopped
 	srv     *http.Server
 	port    int
 	ips     []net.IP
@@ -60,10 +71,23 @@ type Link struct {
 // NewLink returns a switched-off link that feeds hub and keeps phone
 // calibrations in dir.
 func NewLink(hub *live.Hub, dir string) *Link {
-	l := &Link{hub: hub, dir: dir, now: time.Now, devices: map[string]*Device{}, cals: map[string]Calibration{},
+	l := &Link{hub: hub, dir: dir, now: time.Now, listen: net.Listen, devices: map[string]*Device{}, cals: map[string]Calibration{},
 		blocked: map[string]string{}}
 	l.loadCals()
+	l.loadState()
 	return l
+}
+
+// Restore switches access back on if it was on when the program last
+// stopped: the phones' page, still open on a phone, reconnects by itself.
+func (l *Link) Restore() error {
+	l.mu.Lock()
+	on := l.wantOn
+	l.mu.Unlock()
+	if !on {
+		return nil
+	}
+	return l.Enable()
 }
 
 // SetSensorHandler lets DIY sensor heads on the network use the same address
@@ -92,9 +116,20 @@ func (l *Link) Enable() error {
 	if err != nil {
 		return fmt.Errorf("%s: %w", i18n.T("не удалось создать сертификат"), err)
 	}
-	var ln net.Listener
+	// The port of last time first: the address in the code, and every
+	// phone's saved state (which lives with the address), stay the same.
+	ports := []int{}
+	if l.port > 0 {
+		ports = append(ports, l.port)
+	}
 	for port := 8701; port <= 8720; port++ {
-		ln, err = net.Listen("tcp", fmt.Sprintf(":%d", port))
+		if port != l.port {
+			ports = append(ports, port)
+		}
+	}
+	var ln net.Listener
+	for _, port := range ports {
+		ln, err = l.listen("tcp", fmt.Sprintf(":%d", port))
 		if err == nil {
 			l.port = port
 			break
@@ -103,10 +138,11 @@ func (l *Link) Enable() error {
 	if ln == nil {
 		return fmt.Errorf("%s: %w", i18n.T("не удалось открыть порт для телефонов"), err)
 	}
-	l.token = newToken()
+	if l.key == "" {
+		l.key = newToken()
+	}
+	l.token = l.key
 	l.ips = ips
-	// A new key is a fresh start: phones disconnected last time may join again.
-	l.blocked = map[string]string{}
 	l.srv = &http.Server{
 		Handler:           l.Handler(),
 		ReadHeaderTimeout: 10 * time.Second,
@@ -115,16 +151,29 @@ func (l *Link) Enable() error {
 	}
 	srv := l.srv
 	go func() { _ = srv.ServeTLS(ln, "", "") }()
-	l.enabled = true
+	l.enabled, l.wantOn = true, true
+	l.saveStateLocked()
 	return nil
 }
 
-// Disable stops accepting phones. Readings already on the live screen stay
-// there and grow stale.
+// Disable stops accepting phones, and remembers that access is off. Readings
+// already on the live screen stay there and grow stale.
 func (l *Link) Disable() {
+	l.stop(true)
+}
+
+// Close stops the listener at the end of the program. Unlike Disable it
+// leaves access marked as on, so the next start brings it back.
+func (l *Link) Close() { l.stop(false) }
+
+func (l *Link) stop(remember bool) {
 	l.mu.Lock()
 	srv := l.srv
 	l.enabled, l.srv, l.token = false, nil, ""
+	if remember {
+		l.wantOn = false
+		l.saveStateLocked()
+	}
 	l.mu.Unlock()
 	if srv != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
@@ -133,8 +182,38 @@ func (l *Link) Disable() {
 	}
 }
 
-// Close is Disable, for deferred shutdown.
-func (l *Link) Close() { l.Disable() }
+// NewKey replaces the key in the address. Every phone that had the old one is
+// shut out and must scan the new code; phones disconnected on the desktop get
+// a fresh start. Calibrations stay — they belong to the phones.
+func (l *Link) NewKey() {
+	l.mu.Lock()
+	l.key = newToken()
+	if l.enabled {
+		l.token = l.key
+	}
+	l.blocked = map[string]string{}
+	var gone []string
+	for id := range l.devices {
+		gone = append(gone, "phone:"+id)
+	}
+	l.devices = map[string]*Device{}
+	l.saveStateLocked()
+	l.mu.Unlock()
+	for _, src := range gone {
+		l.hub.Clear(src)
+		l.hub.RemoveSource(src)
+	}
+}
+
+// NewCar forgets what the phones learnt about the previous car's wheels —
+// rim runout and caster. Their calibrations stay.
+func (l *Link) NewCar() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	for _, d := range l.devices {
+		d.newCar()
+	}
+}
 
 // ErrForgotten is what a disconnected phone is told.
 var ErrForgotten = i18n.Err("Этот телефон отключён на компьютере. Чтобы подключить его снова, разрешите его в списке телефонов или отсканируйте новый код.")
@@ -149,6 +228,7 @@ func (l *Link) Forget(id string) bool {
 	if ok {
 		delete(l.devices, id)
 		l.blocked[id] = d.Name
+		l.saveStateLocked()
 	}
 	l.mu.Unlock()
 	if ok {
@@ -165,6 +245,9 @@ func (l *Link) Allow(id string) bool {
 	defer l.mu.Unlock()
 	_, ok := l.blocked[id]
 	delete(l.blocked, id)
+	if ok {
+		l.saveStateLocked()
+	}
 	return ok
 }
 
@@ -186,6 +269,9 @@ type DeviceInfo struct {
 	Prompt     string   `json:"prompt"`
 	Online     bool     `json:"online"`
 	AgeS       float64  `json:"age_s"`
+	// Check is the outcome of the last accuracy check: "ok", "fail" or ""
+	// when the phone has not been checked since it connected.
+	Check string `json:"check,omitempty"`
 }
 
 // Info is the link's state for the desktop interface.
@@ -225,6 +311,12 @@ func (l *Link) Info() Info {
 			c := round2(d.camber)
 			di.Camber = &c
 		}
+		if d.check != nil && d.check.HasMount {
+			di.Check = "fail"
+			if d.check.OK() {
+				di.Check = "ok"
+			}
+		}
 		inf.Devices = append(inf.Devices, di)
 	}
 	sort.Slice(inf.Devices, func(i, j int) bool { return inf.Devices[i].ID < inf.Devices[j].ID })
@@ -256,6 +348,19 @@ type PhoneState struct {
 	Caster    *float64     `json:"caster,omitempty"`
 	Runout    *float64     `json:"runout,omitempty"`
 	Gyro      bool         `json:"gyro"`
+
+	// During the caster sweep: which way to turn the steering wheel now
+	// ("left" or "right"), and the window the wheel's steer angle must reach,
+	// degrees. Steer is then the angle reached in that direction.
+	SteerDir string  `json:"steer_dir,omitempty"`
+	SteerLo  float64 `json:"steer_lo,omitempty"`
+	SteerHi  float64 `json:"steer_hi,omitempty"`
+
+	// Check is the last accuracy check, while it runs and after.
+	Check   *Check `json:"check,omitempty"`
+	CheckOK bool   `json:"check_ok,omitempty"`
+	// Warn is a remark that does not stop anything.
+	Warn string `json:"warn,omitempty"`
 	// Lang tells the page which language the program speaks, for its own
 	// buttons; the prompts above already come translated.
 	Lang string `json:"lang"`
@@ -373,9 +478,12 @@ func (l *Link) handle(id string, req phoneRequest) (PhoneState, error) {
 	}
 
 	var cmdErr error
+	// The page sends its wheel with every request, so that a phone whose
+	// computer was restarted carries on where it was. Only a change of wheel
+	// resets what belongs to the wheel.
 	if req.Wheel != "" {
 		for _, p := range align.AllPositions {
-			if strings.EqualFold(req.Wheel, p.String()) {
+			if strings.EqualFold(req.Wheel, p.String()) && (!d.HasWheel || d.Wheel != p) {
 				d.SetWheel(p)
 			}
 		}
@@ -457,10 +565,27 @@ func (l *Link) stateLocked(d *Device) PhoneState {
 		c := round2(d.camber)
 		st.Camber = &c
 	}
+	// The steering wheel turns the left front wheel out to the left and the
+	// right one out to the right.
+	out, in := "left", "right"
+	if !d.left() {
+		out, in = "right", "left"
+	}
 	switch d.Step {
-	case StepCasterOut, StepCasterIn, StepCasterBack:
-		y := round2(d.yaw)
-		st.Steer = &y
+	case StepCasterOut:
+		y := round2(math.Abs(d.yaw))
+		st.Steer, st.SteerDir, st.SteerLo, st.SteerHi = &y, out, minTurn, maxTurn
+	case StepCasterIn:
+		y := round2(d.yaw * -d.outSign)
+		st.Steer, st.SteerDir, st.SteerLo, st.SteerHi = &y, in, minTurn, maxTurn
+	case StepCasterBack:
+		y := round2(math.Abs(d.yaw))
+		st.Steer, st.SteerDir, st.SteerLo, st.SteerHi = &y, out, 0, 2
+	}
+	st.Warn = d.Warn
+	if d.check != nil {
+		c := *d.check
+		st.Check, st.CheckOK = &c, c.OK()
 	}
 	if d.Caster != nil {
 		c := round2(*d.Caster)
@@ -471,6 +596,60 @@ func (l *Link) stateLocked(d *Device) PhoneState {
 		st.Runout = &r
 	}
 	return st
+}
+
+// ── Kept between runs ────────────────────────────────────────────────
+
+// savedState is phone-link.json: whether access was on, the key and port of
+// the address, and the phones disconnected on the desktop.
+type savedState struct {
+	On      bool              `json:"on"`
+	Key     string            `json:"key,omitempty"`
+	Port    int               `json:"port,omitempty"`
+	Blocked map[string]string `json:"blocked,omitempty"`
+}
+
+func (l *Link) statePath() string { return filepath.Join(l.dir, "phone-link.json") }
+
+func (l *Link) loadState() {
+	if l.dir == "" {
+		return
+	}
+	b, err := os.ReadFile(l.statePath())
+	if err != nil {
+		return
+	}
+	var st savedState
+	if json.Unmarshal(b, &st) != nil {
+		return
+	}
+	if k := sanitizeID(st.Key); len(k) >= 8 {
+		l.key = k
+	}
+	if st.Port >= 1024 && st.Port <= 65535 {
+		l.port = st.Port
+	}
+	for id, name := range st.Blocked {
+		if id = sanitizeID(id); id != "" {
+			l.blocked[id] = truncate(name, 40)
+		}
+	}
+	l.wantOn = st.On
+}
+
+func (l *Link) saveStateLocked() {
+	if l.dir == "" {
+		return
+	}
+	b, err := json.MarshalIndent(savedState{On: l.wantOn, Key: l.key, Port: l.port, Blocked: l.blocked}, "", "  ")
+	if err != nil {
+		return
+	}
+	_ = os.MkdirAll(l.dir, 0o755)
+	tmp := l.statePath() + ".tmp"
+	if os.WriteFile(tmp, b, 0o600) == nil {
+		_ = os.Rename(tmp, l.statePath())
+	}
 }
 
 // ── Calibration storage ──────────────────────────────────────────────

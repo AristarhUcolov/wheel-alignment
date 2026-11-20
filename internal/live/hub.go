@@ -258,6 +258,55 @@ func (h *Hub) Clear(source string) {
 	h.dirty = true
 }
 
+// What selects the quantities ClearWheel drops.
+type What uint8
+
+const (
+	WhatCamber What = 1 << iota
+	WhatToe
+	WhatCaster
+)
+
+// ClearWheel drops one wheel's readings of the given kinds — but only those
+// the named source put there. Emptying a typed-in field must take that number
+// off the screen, and must not wipe the phone measuring the same wheel.
+func (h *Hub) ClearWheel(source string, wheel align.Position, what What) {
+	if wheel < align.FL || wheel > align.RR {
+		return
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if what&WhatCamber != 0 && h.camber[wheel].has && h.camber[wheel].source == source {
+		h.camber[wheel].clear()
+		h.dirty = true
+	}
+	if what&WhatToe != 0 && h.toe[wheel].has && h.toe[wheel].source == source {
+		h.toe[wheel].clear()
+		h.dirty = true
+	}
+	if s := h.sweep[wheel]; what&WhatCaster != 0 && s != nil && s.source == source {
+		h.sweep[wheel] = nil
+		h.dirty = true
+	}
+}
+
+// NewCar drops every reading and forgets the one-shot sources — typed-in and
+// photographed readings belong to the car that has just left. Streaming
+// sensors stay listed: a phone still clamped to a rim simply carries on.
+func (h *Hub) NewCar(oneShot ...string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	for i := range h.camber {
+		h.camber[i].clear()
+		h.toe[i].clear()
+		h.sweep[i] = nil
+	}
+	for _, id := range oneShot {
+		delete(h.sources, id)
+	}
+	h.dirty = true
+}
+
 // Frame builds the current frame.
 func (h *Hub) Frame() Frame {
 	h.mu.Lock()

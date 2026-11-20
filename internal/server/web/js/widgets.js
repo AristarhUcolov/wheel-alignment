@@ -5,7 +5,7 @@
 // Цвета — переменные CSS: тема и палитра для различения цветов меняют и
 // схемы тоже.
 
-import { fmtParam, specValue, fmtDM, shortLabel, paramKind, isToeKey } from './fmt.js';
+import { fmtParam, fmtGap, specValue, fmtDM, shortLabel, paramKind, isToeKey } from './fmt.js';
 import { h } from './state.js';
 import { t } from './i18n.js';
 
@@ -251,7 +251,7 @@ export class ValueBox {
     if (!p || !p.has) hint = paramKind(this.key) === 'toe' ? t('нет показаний — струна или камера') : t('нет показаний');
     else if (p.stale) hint = t('датчик молчит');
     else if (!p.spec) hint = t('допуск не задан');
-    else if (p.status === 'bad') hint = t('до допуска {v}', { v: fmt(-p.deviation) });
+    else if (p.status === 'bad') hint = t('до допуска {v}', { v: fmtGap(this.key, -p.deviation, units, rimMM) });
     else if (!p.stable) hint = t('показания меняются…');
     else if (p.status === 'marginal') hint = t('у границы допуска');
     else hint = t('в допуске');

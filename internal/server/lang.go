@@ -38,9 +38,11 @@ func (s *Server) setLang(w http.ResponseWriter, r *http.Request) {
 	}
 	i18n.Set(l)
 	if s.settingsPath != "" {
+		settingsMu.Lock()
 		st := desktop.LoadSettings(s.settingsPath)
 		st.Lang = string(l)
 		_ = desktop.SaveSettings(s.settingsPath, st)
+		settingsMu.Unlock()
 	}
 	s.sess.mu.Lock()
 	s.applySessionLocked()

@@ -92,6 +92,17 @@ export function specValue(key, deg, units, rimMM) {
   return units === 'deg' ? fmtDeg(deg) : fmtDM(deg);
 }
 
+// Сколько осталось до границы допуска. Округлённое до нуля «+0°00′» читалось
+// бы как «уже в допуске», хотя граница ещё не пройдена, — поэтому меньше
+// единицы показа пишется как «< 0°01′».
+export function fmtGap(key, deg, units, rimMM) {
+  const mm = units === 'mm' && isToeKey(key) && rimMM > 0;
+  const tiny = mm ? Math.abs(rimMM * Math.tan(deg * Math.PI / 180)) < 0.05
+    : units === 'deg' ? Math.abs(deg) < 0.005 : Math.abs(deg) < 1 / 120;
+  if (tiny && deg !== 0) return '< ' + (mm ? t('{v} мм', { v: '0.1' }) : units === 'deg' ? '0.01°' : '0°01′');
+  return specValue(key, deg, units, rimMM);
+}
+
 export function statusText(s) {
   return {
     good: t('в допуске'),
