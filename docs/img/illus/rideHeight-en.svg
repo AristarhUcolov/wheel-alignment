@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="340" font-family="Segoe UI, Arial, sans-serif" class="illus-svg" viewBox="0 0 320 170" role="img" aria-label="Ride height"><rect width="320" height="170" rx="10" fill="#e3e8f0"/><title>Ride height</title><line x1="10" y1="160" x2="310" y2="160" stroke="#b6c2d5" stroke-width="2"/>
+      <path d="M40 40 H280 V92 H222 Q222 50 160 50 Q98 50 98 92 H40 Z" fill="#edf2f9" stroke="#8b9cb8" stroke-width="2"/>
+      <circle cx="160" cy="112" r="48" fill="#2b3242" stroke="#1a202d" stroke-width="2"/>
+    <circle cx="160" cy="112" r="32.6" fill="#9aa8bf" stroke="#8b9cb8" stroke-width="2"/>
+    <circle cx="160" cy="112" r="28.8" fill="#d9e1ee"/>
+    <circle cx="160" cy="112" r="6.2" fill="#9aa8bf"/>
+      <line x1="160" y1="112" x2="160" y2="54" stroke="#1c5fd6" stroke-width="3"/>
+      <polygon points="160,52 154,63 166,63" fill="#1c5fd6"/><circle cx="160" cy="112" r="5" fill="#1c5fd6"/>
+      <text x="222" y="116" text-anchor="start" font-size="11" font-weight="400" fill="#1c5fd6">from the wheel centre</text>
+      <text x="222" y="130" text-anchor="start" font-size="11" font-weight="400" fill="#1c5fd6">to the arch lip</text>
+      <text x="160" y="16" text-anchor="middle" font-size="11" font-weight="400" fill="#0e1828">the same left and right;</text>
+      <text x="160" y="30" text-anchor="middle" font-size="11" font-weight="400" fill="#0e1828">a difference means a sagging spring</text></svg>

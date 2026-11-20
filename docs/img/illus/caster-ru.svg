@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="368" font-family="Segoe UI, Arial, sans-serif" class="illus-svg" viewBox="0 0 320 184" role="img" aria-label="Кастер: наклон оси поворота вперёд-назад"><rect width="320" height="184" rx="10" fill="#e3e8f0"/><title>Кастер: наклон оси поворота вперёд-назад</title><line x1="10" y1="168" x2="310" y2="168" stroke="#b6c2d5" stroke-width="2"/>
+      <circle cx="168" cy="104" r="64" fill="#2b3242" stroke="#1a202d" stroke-width="2"/>
+    <circle cx="168" cy="104" r="43.5" fill="#9aa8bf" stroke="#8b9cb8" stroke-width="2"/>
+    <circle cx="168" cy="104" r="38.4" fill="#d9e1ee"/>
+    <circle cx="168" cy="104" r="8.3" fill="#9aa8bf"/>
+      <line x1="168" y1="18" x2="168" y2="168" stroke="#5a6880" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="187.1" y1="14" x2="154" y2="168" stroke="#1c5fd6" stroke-width="4" stroke-linecap="round"/>
+      <path d="M168 26 A78 78 0 0 1 184.2 27.7" fill="none" stroke="#955700" stroke-width="2.5"/>
+      <text x="198" y="24" text-anchor="start" font-size="12" font-weight="400" fill="#1c5fd6">ось поворота</text>
+      <line x1="70" y1="30" x2="33.1" y2="30" stroke="#5a6880" stroke-width="2" stroke-linecap="round"/><polygon points="26,30 35.3,25.8 35.3,34.2" fill="#5a6880"/><text x="48" y="22" text-anchor="middle" font-size="11" font-weight="400" fill="#44536b">перёд</text>
+      <text x="160" y="182" text-anchor="middle" font-size="11" font-weight="400" fill="#44536b">плюс — верх оси назад; вид сбоку, угол увеличен</text></svg>

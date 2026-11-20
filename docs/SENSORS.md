@@ -29,10 +29,12 @@ POST http://127.0.0.1:8700/api/live/sample
 POST https://192.168.0.57:8701/p/abcd1234ef/sample
 ```
 
-Ключ в адресе меняется при каждом включении — чужое устройство без него ничего
-не отправит. Сертификат самоподписанный, проверку сертификата в датчике
-отключите (в `curl` — ключ `-k`, в Arduino `WiFiClientSecure` —
-`setInsecure()`).
+Чужое устройство без ключа в адресе ничего не отправит. Ключ, порт и то, что
+доступ включён, программа помнит между запусками — адрес, прошитый в датчик,
+продолжает работать и после перезапуска. Сменить ключ (и отключить всех, у кого
+был старый) — кнопка «Сменить ключ» там же. Сертификат самоподписанный,
+проверку сертификата в датчике отключите (в `curl` — ключ `-k`, в Arduino
+`WiFiClientSecure` — `setInsecure()`).
 
 ## Что отправлять
 
@@ -146,10 +148,12 @@ wheel → Allow Wi-Fi connection” in the program. An address like
 POST https://192.168.0.57:8701/p/abcd1234ef/sample
 ```
 
-The key in the address changes every time access is switched on — a stranger's
-device cannot send anything without it. The certificate is self-signed, so turn
-off certificate checking in the sensor (`-k` in `curl`, `setInsecure()` in
-Arduino's `WiFiClientSecure`).
+A stranger's device cannot send anything without the key in the address. The
+program remembers the key, the port and that access is on between runs, so an
+address flashed into a sensor keeps working after a restart. To change the key
+(and shut out everyone who had the old one) press "New key" in the same place.
+The certificate is self-signed, so turn off certificate checking in the sensor
+(`-k` in `curl`, `setInsecure()` in Arduino's `WiFiClientSecure`).
 
 ## What to send
 

@@ -4,15 +4,19 @@ and en.js), so the guide on GitHub says exactly what the program says.
     python docs/tools/guide_md.py
 
 The section "Suspension types" is filled in the program from the suspension
-catalogue; here its table is kept from the current GUIDE.md.
+catalogue; here its table is kept from the current GUIDE.md. The diagrams the
+program draws (data-figs, data-wear) come from docs/img/illus — export them
+first with `node docs/tools/illus_export.mjs`.
 """
 import html
+import json
 import os
 import re
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 GUIDE = os.path.join(ROOT, 'internal', 'server', 'web', 'js', 'guide')
 OUT = os.path.join(ROOT, 'docs', 'GUIDE.md')
+ILLUS = os.path.join(ROOT, 'docs', 'img', 'illus')
 
 HEAD = {
     'ru': dict(anchor='ru', lang_line='**Русский** · [English](#eng)', title='Сход-развал — инструкция',
@@ -90,7 +94,32 @@ def lists(tag, body):
     return '\n'.join(mark(i) + inline(x) for i, x in enumerate(items))
 
 
-def block(h, susp_table):
+def figures(attrs, lang):
+    """The diagrams of a data-figs block, side by side, with their captions."""
+    keys = re.search(r'data-figs="([^"]*)"', attrs).group(1).split()
+    caps = WEAR.get(lang + '_captions', {})
+    imgs = []
+    for k in keys:
+        name = k.replace(':', '-')
+        if not os.path.exists(os.path.join(ILLUS, f'{name}-{lang}.svg')):
+            continue
+        alt = html.escape(caps.get(k, ''), quote=True)
+        imgs.append(f'<img src="img/illus/{name}-{lang}.svg" width="320" alt="{alt}">')
+    return ' '.join(imgs)
+
+
+def wear_table(lang):
+    rows = WEAR.get(lang, [])
+    if not rows:
+        return ''
+    head = {'ru': '|   | Износ | О чём говорит |', 'en': '|   | Wear | What it tells |'}[lang]
+    out = [head, '|---|---|---|']
+    for r in rows:
+        out.append(f'| <img src="img/illus/wear-{r["kind"]}-{lang}.svg" width="160" alt=""> | **{r["title"]}** | {r["why"]} |')
+    return '\n'.join(out)
+
+
+def block(h, susp_table, lang):
     out = []
     pos = 0
     pat = re.compile(r'<(p|ol|ul|table|div)([^>]*)>(.*?)</\1>', re.S)
@@ -107,6 +136,10 @@ def block(h, susp_table):
                 out.append('> ' + inline(body))
             elif 'gSusp' in attrs:
                 out.append(susp_table)
+            elif 'data-figs' in attrs:
+                out.append(figures(attrs, lang))
+            elif 'data-wear' in attrs:
+                out.append(wear_table(lang))
             else:
                 out.append(inline(body))
     return '\n\n'.join(x for x in out if x)
@@ -132,11 +165,15 @@ def build(lang):
     for sid, name, body in sections:
         out.append(f'<a id="{p}-{sid}"></a>')
         out.append(f'## {inline(unjs(name))}')
-        out.append(block(unjs(body), susp))
+        out.append(block(unjs(body), susp, lang))
         if sid in IMAGES[lang]:
             out.append(IMAGES[lang][sid])
     return '\n\n'.join(out)
 
+
+WEAR = {}
+if os.path.exists(os.path.join(ILLUS, 'wear.json')):
+    WEAR = json.load(open(os.path.join(ILLUS, 'wear.json'), encoding='utf-8'))
 
 doc = build('ru') + '\n\n---\n\n' + build('en') + '\n'
 open(OUT, 'w', encoding='utf-8', newline='\n').write(doc)

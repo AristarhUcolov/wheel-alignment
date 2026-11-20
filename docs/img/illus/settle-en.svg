@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" font-family="Segoe UI, Arial, sans-serif" class="illus-svg" viewBox="0 0 320 160" role="img" aria-label="Suspension settling"><rect width="320" height="160" rx="10" fill="#e3e8f0"/><title>Suspension settling</title><line x1="10" y1="140" x2="310" y2="140" stroke="#b6c2d5" stroke-width="2"/>
+      <path d="M40 112 V92 Q40 80 54 78 L96 74 L128 50 Q136 44 150 44 H214 Q228 44 238 54 L262 76 L284 80 Q296 82 296 96 V112 Z" fill="#edf2f9" stroke="#8b9cb8" stroke-width="2"/>
+      <circle cx="92" cy="114" r="24" fill="#2b3242" stroke="#1a202d" stroke-width="2"/>
+    <circle cx="92" cy="114" r="16.3" fill="#9aa8bf" stroke="#8b9cb8" stroke-width="2"/>
+    <circle cx="92" cy="114" r="14.4" fill="#d9e1ee"/>
+    <circle cx="92" cy="114" r="3.1" fill="#9aa8bf"/><circle cx="246" cy="114" r="24" fill="#2b3242" stroke="#1a202d" stroke-width="2"/>
+    <circle cx="246" cy="114" r="16.3" fill="#9aa8bf" stroke="#8b9cb8" stroke-width="2"/>
+    <circle cx="246" cy="114" r="14.4" fill="#d9e1ee"/>
+    <circle cx="246" cy="114" r="3.1" fill="#9aa8bf"/>
+      <line x1="170" y1="4" x2="170" y2="27.7" stroke="#955700" stroke-width="3" stroke-linecap="round"/><polygon points="170,36 165.2,25.2 174.8,25.2" fill="#955700"/><line x1="184" y1="36" x2="184" y2="14.3" stroke="#955700" stroke-width="3" stroke-linecap="round"/><polygon points="184,6 188.8,16.8 179.2,16.8" fill="#955700"/>
+      <text x="200" y="24" text-anchor="start" font-size="12" font-weight="400" fill="#955700">bounce the body</text>
+      <line x1="110" y1="154" x2="48.3" y2="154" stroke="#1c5fd6" stroke-width="3" stroke-linecap="round"/><polygon points="40,154 50.8,149.2 50.8,158.8" fill="#1c5fd6"/><text x="120" y="158" text-anchor="start" font-size="11" font-weight="400" fill="#1c5fd6">roll 3–5 m forward, not back</text></svg>

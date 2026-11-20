@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="492" font-family="Segoe UI, Arial, sans-serif" class="illus-svg" viewBox="0 0 320 246" role="img" aria-label="Thrust angle: where the rear axle points"><rect width="320" height="246" rx="10" fill="#e3e8f0"/><title>Thrust angle: where the rear axle points</title><text x="160" y="22" text-anchor="middle" font-size="11" font-weight="400" fill="#5a6880">front ▲</text><rect x="110" y="34" width="100" height="196" rx="34" fill="#edf2f9" stroke="#8b9cb8" stroke-width="2"/>
+      <g transform="translate(110 74) rotate(0)">
+    <rect x="-8" y="-23" width="16" height="46" rx="4.8" fill="#2b3242" stroke="#1a202d" stroke-width="2"/>
+    <line x1="0" y1="-32" x2="0" y2="32" stroke="#b36b00" stroke-width="1.6" stroke-dasharray="3 3"/></g><g transform="translate(210 74) rotate(0)">
+    <rect x="-8" y="-23" width="16" height="46" rx="4.8" fill="#2b3242" stroke="#1a202d" stroke-width="2"/>
+    <line x1="0" y1="-32" x2="0" y2="32" stroke="#b36b00" stroke-width="1.6" stroke-dasharray="3 3"/></g>
+      <g transform="translate(110 196) rotate(7)">
+    <rect x="-8" y="-23" width="16" height="46" rx="4.8" fill="#2b3242" stroke="#1a202d" stroke-width="2"/>
+    <line x1="0" y1="-32" x2="0" y2="32" stroke="#b36b00" stroke-width="1.6" stroke-dasharray="3 3"/></g><g transform="translate(210 196) rotate(7)">
+    <rect x="-8" y="-23" width="16" height="46" rx="4.8" fill="#2b3242" stroke="#1a202d" stroke-width="2"/>
+    <line x1="0" y1="-32" x2="0" y2="32" stroke="#b36b00" stroke-width="1.6" stroke-dasharray="3 3"/></g>
+      <line x1="160" y1="30" x2="160" y2="236" stroke="#5a6880" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <line x1="160" y1="196" x2="184.4" y2="-2.5" stroke="#c81e1e" stroke-width="3"/>
+      <path d="M160 100 A96 96 0 0 1 171.7 100.7" fill="none" stroke="#c81e1e" stroke-width="2.5"/>
+      <text x="236" y="100" text-anchor="start" font-size="12" font-weight="400" fill="#c81e1e">thrust line</text>
+      <text x="236" y="118" text-anchor="start" font-size="11" font-weight="400" fill="#c81e1e">of the rear wheels</text>
+      <text x="84" y="140" text-anchor="end" font-size="12" font-weight="400" fill="#44536b">centre</text><text x="84" y="156" text-anchor="end" font-size="11" font-weight="400" fill="#44536b">line</text>
+      <text x="160" y="244" text-anchor="middle" font-size="11" font-weight="400" fill="#44536b">the car crabs, the steering wheel is crooked</text></svg>

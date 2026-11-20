@@ -8,7 +8,7 @@
 
 Та же инструкция есть в программе — клавиша **F1**. Подробности о методе и точности — в [PROCEDURE.md](PROCEDURE.md).
 
-**Содержание:** [Коротко: пять шагов](#ru-start) · [Установка и первый запуск](#ru-install) · [Настройки и доступность](#ru-access) · [Углы простыми словами](#ru-angles) · [Шаг 1. Автомобиль](#ru-vehicle) · [Шаг 2. Подготовка](#ru-prep) · [Инструмент и площадка](#ru-tools) · [Замер: струна и угломер](#ru-string) · [Замер: телефон на колесе](#ru-phone) · [Замер: камера и мишени](#ru-optical) · [Замер: свой датчик](#ru-sensor) · [Шаг 4. Экран регулировки](#ru-live) · [Порядок регулировки — не переставляйте](#ru-order) · [Шаг 5. Отчёт](#ru-report) · [Типы подвески](#ru-susp) · [Грузовики, автобусы, фургоны](#ru-trucks) · [Когда регулировка не поможет](#ru-bent) · [Откуда берутся допуски](#ru-data) · [Если что-то не работает](#ru-trouble) · [Безопасность](#ru-safety) · [Клавиши](#ru-keys)
+**Содержание:** [Коротко: пять шагов](#ru-start) · [Установка и первый запуск](#ru-install) · [Настройки и доступность](#ru-access) · [Углы простыми словами](#ru-angles) · [Шаг 1. Автомобиль](#ru-vehicle) · [Шаг 2. Подготовка](#ru-prep) · [Инструмент и площадка](#ru-tools) · [Замер: струна и угломер](#ru-string) · [Замер: телефон на колесе](#ru-phone) · [Замер: камера и мишени](#ru-optical) · [Замер: свой датчик](#ru-sensor) · [Шаг 4. Экран регулировки](#ru-live) · [Порядок регулировки — не переставляйте](#ru-order) · [Шаг 5. Отчёт](#ru-report) · [Износ шин подскажет](#ru-tyres) · [Диагностика: что погнуто](#ru-diag) · [Контрольная поездка](#ru-road) · [Типы подвески](#ru-susp) · [Грузовики, автобусы, фургоны](#ru-trucks) · [Когда регулировка не поможет](#ru-bent) · [Откуда берутся допуски](#ru-data) · [Если что-то не работает](#ru-trouble) · [Откуда методика](#ru-sources) · [Безопасность](#ru-safety) · [Клавиши](#ru-keys)
 
 <a id="ru-start"></a>
 
@@ -19,6 +19,10 @@
 3. **Замер.** Выберите, чем мерить: струна и угломер, телефон, камера или свой датчик. Способы можно сочетать — например, развал и кастер телефоном, схождение струной.
 4. **Регулировка.** Экран как у стенда: крупные цифры, зелёные — в допуске, красные — нет; над каждой — шкала допуска со стрелкой. Нажмите на угол — справа появится, чем он регулируется на вашей машине. Перед первым поворотом ключа сделайте снимок «до» (F5).
 5. **Отчёт.** Когда всё зелёное — снимок «после» (F5) и протокол с таблицей «до / после» (F6). Его можно распечатать или сохранить в PDF.
+
+**Не потеряется ничего.** Выбранная машина, введённые числа, снимки «до» и «после», отметки подготовки и госномер хранятся программой: закрыли её, открыли завтра — всё на месте, экран откроется там, где вы остановились. Следующую машину начинайте кнопкой **«Новый автомобиль»** в меню слева (или в протоколе): всё прежнее очистится, а калибровки телефонов и камер останутся.
+
+**Подсказка «что дальше»** на экране регулировки ведёт по всей работе: снимок «до», затем углы в правильном порядке, снимок «после», протокол. Кнопка в этой строке сразу делает нужное.
 
 > Новичку: запустите демонстрацию (F9 на экране регулировки) и нажмите F10 — программа сама покажет, в каком порядке и как выставляются углы. Стрелками ← → можно «покрутить» любой угол самому и посмотреть, что при этом происходит с соседними.
 
@@ -31,7 +35,7 @@
 3. **Язык** — переключатель RU / EN в правом верхнем углу. При первом запуске выбирается язык системы; ваш выбор запоминается.
 4. **Интернет не нужен.** Всё работает на этом компьютере. Сеть нужна только телефону-датчику, и то локальная (Wi-Fi), а не интернет.
 
-Где лежат ваши данные: `%APPDATA%\wheelalign` (в Linux — `~/.config/wheelalign`). Там настройки (`settings.json`), ваши допуски (папка `vehicles`), сертификат для телефона (`tls`) и журнал работы `wheelalign.log` — его стоит приложить к сообщению об ошибке.
+Где лежат ваши данные: `%APPDATA%\wheelalign` (в Linux — `~/.config/wheelalign`). Там настройки (`settings.json`), текущая работа — машина на стенде, введённые числа, снимки (`session.json`), ваши допуски (папка `vehicles`), калибровки телефонов (`phones.json`) и доступ для них (`phone-link.json`), сертификат для телефона (`tls`) и журнал работы `wheelalign.log` — его стоит приложить к сообщению об ошибке.
 
 Ключи запуска: `-browser` — открыть в браузере вместо окна; `-data <папка>` — хранить данные в другом месте (например, рядом с программой на флешке). Полный список — `wheelalign -h`.
 
@@ -65,6 +69,12 @@
 | **Включённый угол** | SAI + развал. | Разный слева и справа больше чем на 1° — деталь погнута; регулировкой развала это не лечится. |
 | **Угол тяги** | Куда направлена задняя ось относительно оси симметрии машины: половина разности схождения задних колёс. | Машина едет «боком», руль при прямом ходе стоит криво, хотя переднее схождение в норме. |
 
+<img src="img/illus/camber-ru.svg" width="320" alt="Развал — наклон колеса поперёк машины. Разница развала слева и справа уводит машину в сторону большего плюса."> <img src="img/illus/toe-ru.svg" width="320" alt="Схождение — поворот колёс в плане. Главный угол для износа шин; на увод машины почти не влияет, но от него зависит, ровно ли стоит руль."> <img src="img/illus/caster-ru.svg" width="320" alt="Кастер возвращает руль прямо. Машину тянет в сторону колеса с меньшим кастером.">
+
+<img src="img/illus/sai-ru.svg" width="320" alt="SAI задан конструкцией. Разница слева и справа больше 1° — признак погнутой детали: меньший SAI — чаще нижний рычаг, больший — верхняя опора стойки (бюллетень Hyundai 20-SS-001H)."> <img src="img/illus/thrust-ru.svg" width="320" alt="Задняя ось задаёт направление движения. Поэтому сначала регулируют её, затем выравнивают и фиксируют руль, и только потом — перед.">
+
+Коротко о том, что уводит машину (бюллетень Hyundai 20-SS-001H): её тянет к колесу с большим положительным развалом — разница развала передних колёс должна быть меньше 0,5°, — и к колесу с меньшим кастером. Схождение на увод не влияет, но от него зависят износ шин и то, ровно ли стоит руль. Увести машину могут и шины (разное давление, «кривой» корд), подтормаживающий тормоз, просевшая пружина, уклон дороги и боковой ветер.
+
 <a id="ru-vehicle"></a>
 
 ## Шаг 1. Автомобиль
@@ -85,6 +95,8 @@
 
 ## Шаг 2. Подготовка
 
+У пунктов с рисунком есть кнопка **«Как это выглядит»** — схема откроется прямо под пунктом.
+
 Чек-лист собран под выбранную подвеску: для шкворневой балки — люфт шкворней, для McPherson — опорные подшипники стоек, для рессор — стремянки и центральный болт. Пункты разбиты на группы — безопасность, инструмент, площадка, автомобиль, передняя и задняя подвеска; у каждой свой счётчик. Крупно — что сделать, мелко — почему. Отмечайте пункты по мере проверки — отметки сохраняются; когда отмечено всё, появится «Всё готово — можно мерить».
 
 Группа «Инструмент» зависит от способа замера: для струны — леска и угломер, для телефона — планка и общая сеть Wi-Fi, для камеры — мишени и штатив. Способ можно выбрать прямо в этой группе — на шаге «Замер» он уже будет выбран.
@@ -98,6 +110,12 @@
 <a id="ru-tools"></a>
 
 ## Инструмент и площадка
+
+<img src="img/illus/level-ru.svg" width="320" alt="Ямка 5 мм под одним колесом — это уже около 0,2° ошибки развала."> <img src="img/illus/settle-ru.svg" width="320" alt="После подъёма подвеска «висит». Покачайте кузов и прокатите машину вперёд — она встанет в рабочее положение."> <img src="img/illus/rideHeight-ru.svg" width="320" alt="Просевшая пружина меняет развал и кастер. Высоту проверяют до регулировки, а не после.">
+
+<img src="img/illus/play-ru.svg" width="320" alt="Колесо вывешено, качайте его руками. Любой ощутимый люфт — сначала ремонт: на изношенных шарнирах углы «плавают»."> <img src="img/illus/dryPark-ru.svg" width="320" alt="Так находят люфт в рулевых тягах и наконечниках, рейке, маятниковом рычаге (методика ASE).">
+
+<img src="img/illus/turnplates-ru.svg" width="320" alt="Без поворотных кругов кастер не измерить: колесо должно поворачиваться, не сдвигаясь в сторону. Скользящие площадки сзади дают подвеске встать свободно."> <img src="img/illus/pedal-ru.svg" width="320" alt="Упор педали тормоза нужен для кастера: если колесо прокатится при повороте руля, замер испорчен."> <img src="img/illus/wheelLock-ru.svg" width="320" alt="Перед регулировкой схождения руль ставят строго прямо и фиксируют — иначе схождение выйдет верным, а руль кривым.">
 
 | Что | Зачем | Чем заменить |
 |---|---|---|
@@ -119,24 +137,34 @@
 1. **Струны** — вдоль бортов, снаружи колёс, на высоте центра ступиц, натянуты грузом. Отступ от струны до центра ступицы спереди и сзади **не обязан быть одинаковым**: при разной колее передней и задней оси разница должна быть (колея зад − колея перед) / 2. Введите четыре отступа в «Проверку установки струн» — программа скажет, какой конец и на сколько сдвинуть.
 2. **Развал** — угломер на планку, прижатую к закраинам обода (не к резине). «Плюс» — верх колеса наружу. Если ваш угломер показывает наоборот, отметьте это галочкой. Затем прокатите машину на пол-оборота колеса (метка мелом на шине) и приложите угломер к тому же месту обода. Программа усреднит два числа и уберёт биение диска; биение больше 0,5° — диск погнут, замеры этого колеса ненадёжны.
 3. **Схождение** — от струны до закраины обода спереди и сзади колеса, строго на высоте ступицы. Выше или ниже — в замер подмешивается развал. Колесо смотрит внутрь — переднее расстояние больше; так и вводите.
-4. **Кастер** — на поворотных кругах: развал при повороте колеса на 20° наружу и на 20° внутрь. Программа решает задачу точно, а не по правилу «размах × 1,5», которое на машинах с большим кастером ошибается до 0,27°. Угол поворота считывайте со шкалы кругов или отметьте на полу мелом.
+4. **Кастер** — на поворотных кругах: развал при повороте колеса на 20° наружу и на 20° внутрь. «Наружу» для левого колеса — руль влево, для правого — руль вправо. Программа решает задачу точно, а не по правилу «размах × 1,5», которое на машинах с большим кастером ошибается до 0,27°. Угол поворота считывайте со шкалы кругов или отметьте на полу мелом.
 
-Каждое введённое число сразу уходит на экран регулировки. Во время работы: повернули тягу — перемерили — ввели новое число. Экран обновится сразу.
+Каждое введённое число сразу уходит на экран регулировки и сохраняется. Во время работы: повернули тягу — перемерили — ввели новое число. Экран обновится сразу. Стёрли число — оно уйдёт и с экрана; «Очистить все поля» убирает всё введённое вручную разом.
+
+<img src="img/illus/bar-ru.svg" width="320" alt="Угломер и телефон прикладывают к ровной планке, лежащей на закраинах обода."> <img src="img/illus/strings-ru.svg" width="320" alt="Расстояния меряют на высоте центра ступицы. Выше или ниже — к схождению подмешивается развал."> <img src="img/illus/runout-ru.svg" width="320" alt="Два замера в одном месте обода через пол-оборота: их среднее — настоящий развал, разница — биение диска.">
+
+<img src="img/illus/steer-left-ru.svg" width="320" alt="«Наружу» для левого колеса — руль влево, для правого — вправо."> <img src="img/illus/steer-right-ru.svg" width="320" alt="«Наружу» для левого колеса — руль влево, для правого — вправо.">
 
 <a id="ru-phone"></a>
 
 ## Замер: телефон на колесе
 
-1. На вкладке «Замер → Телефон на колесе» нажмите «Разрешить подключение по Wi-Fi» и отсканируйте QR-код камерой телефона. Телефон и компьютер должны быть в одной сети Wi-Fi (подойдёт точка доступа на самом телефоне).
+1. Нажмите **«Телефон»** вверху справа — с любого экрана — и отсканируйте QR-код камерой телефона. Доступ по Wi-Fi включится сам. То же — на вкладке «Замер → Телефон на колесе». Телефон и компьютер должны быть в одной сети Wi-Fi (подойдёт точка доступа на самом телефоне).
 2. Браузер телефона предупредит о сертификате — он создан этой программой, а не удостоверяющим центром. «Дополнительно» → «Перейти на сайт». Windows может спросить разрешение для брандмауэра — разрешите в частных сетях.
 3. На телефоне нажмите на колесо — кнопки стоят там же, где колёса у машины, — и «Включить датчики». На iPhone Safari спросит доступ к датчикам движения — разрешите.
 4. Наверху три вкладки — что меряем: **Развал**, **Кастер**, **Схождение**.
 5. **Развал → «Подготовка телефона»**, один раз: **1. Калибровка телефона** — на столе экраном вверх, затем экраном вниз; так вычитается собственная ошибка акселерометра, у телефонов она бывает до 1–2°. **2. Калибровка крепления** — телефон на планке на ободе, затем вверх ногами на том же месте; так вычитается перекос из-за выступа камеры и чехла. **3. Биение диска** — по желанию: замер, прокатить машину на пол-оборота, снова замер. Сделанные шаги отмечаются ✓ и запоминаются.
 6. Прижмите телефон к планке экраном наружу — развал идёт на экран регулировки в реальном времени. Метка «стабильно» означает, что можно записывать.
-7. **Кастер** (только передние колёса): колёса на поворотных кругах, тормоз зажат упором, «Начать замер кастера». Телефон сам ведёт: прямо, наружу на ~20°, внутрь — угол поворота он меряет гироскопом.
+7. **Кастер** (только передние колёса): колёса на поворотных кругах, тормоз зажат упором, «Начать замер кастера». Телефон сам ведёт: прямо, затем «поверните руль влево» или «вправо» примерно на 20°, затем в другую сторону — угол поворота он меряет гироскопом.
 8. **Схождение** — вкладка объясняет, почему телефон на ободе его не меряет, и одной кнопкой переводит телефон в режим камеры с мишенями.
 
-Приложенный к ободу телефон схождение не меряет: схождение — это поворот колеса вокруг вертикали, а акселерометр чувствует только наклон, сила тяжести при таком повороте не меняется. Гироскоп поворот чувствует, но копит ошибку — за минуту больше, чем весь допуск на схождение. Поэтому схождение берите струной или камерой: тот же телефон, поставленный на штатив, работает камерой в живом режиме (раздел «Камера и мишени»). Два телефона на колёсах — два колеса сразу, четыре — все четыре. Когда закончите, выключите доступ по Wi-Fi. Телефон, подключённый по ошибке, отключается кнопкой «Отключить» в списке.
+Приложенный к ободу телефон схождение не меряет: схождение — это поворот колеса вокруг вертикали, а акселерометр чувствует только наклон, сила тяжести при таком повороте не меняется. Гироскоп поворот чувствует, но копит ошибку — за минуту больше, чем весь допуск на схождение. Поэтому схождение берите струной или камерой: тот же телефон, поставленный на штатив, работает камерой в живом режиме (раздел «Камера и мишени»). Два телефона на колёсах — два колеса сразу, четыре — все четыре. Телефон, подключённый по ошибке, отключается кнопкой «Отключить» в списке.
+
+**Проверка точности** — четвёртый шаг «Подготовки телефона», по желанию. Телефон снова кладут на стол экраном вверх и вниз, затем прикладывают к планке вертикально и вверх ногами — но калибровка не меняется, а сверяется. «Ноль» показывает, насколько с калибровки ушёл ноль акселерометра (бывает на морозе и с годами), «крепление» — насколько сдвинулся телефон на планке (новый чехол, другая планка). Больше 0,1° — телефон подскажет, какой шаг калибровки повторить. Так проверяют и профессиональные угломеры: переворотом на 180° смещение нуля меняет знак, а сам угол — нет.
+
+**Гироскоп старых телефонов.** Chrome на Android до 66-й версии отдавал скорость поворота в радианах, а не в градусах, — угол поворота колеса вышел бы в 57 раз меньше. Программа сама узнаёт это по перевороту телефона при калибровке (это всегда не меньше 180°) и пересчитывает. Если кастер вышел отрицательным, телефон предупредит: чаще всего это значит, что руль сначала повернули не в ту сторону.
+
+**Один раз настроили — дальше само.** Программа помнит, что доступ включён: после перезапуска он включается снова, адрес и код остаются прежними, а телефон с открытой страницей подключается сам и помнит своё колесо и калибровку. Страницу можно добавить на главный экран телефона. Если код видел кто-то посторонний — «Сменить ключ»: все телефоны отключатся, и каждому нужно будет отсканировать новый код. Когда телефоны больше не нужны — «Выключить доступ по Wi-Fi».
 
 <img src="img/phone.png" width="220" alt="Страница на телефоне">
 
@@ -176,6 +204,7 @@
 - **«Показания стабильны».** Пока значения меняются, внизу написано «показания меняются…». Записывать и затягивать контргайки — только когда стабильно.
 - **Нажмите на любой угол** — справа откроется панель: что это за угол, чем он регулируется на вашей подвеске, что написано для этой модели.
 - **Помощник «сколько крутить».** В той же панели: нажмите «Запомнить положение», поверните тягу или эксцентрик на известную величину (¼, ½, 1 оборот) и нажмите, на сколько повернули. Программа посчитает, сколько даёт один оборот на вашей машине, и дальше будет подсказывать: «до номинала ≈ 1¼ оборота, в ту же сторону».
+- **«Что дальше»** — строка под итогом. Подсказывает следующий шаг: снимок «до», затем угол, который регулировать сейчас, в правильном порядке (задняя ось → кастер → развал → схождение), и сколько до допуска; потом снимок «после» и протокол. Кнопка справа делает это или открывает панель угла. Если угол на вашей подвеске не регулируется, строка так и скажет — ищите износ или деформацию.
 - **Строка источников** вверху показывает, откуда идут данные: телефон, датчик, камера, ручной ввод, демо.
 - **Звук и голос** — кнопки рядом с единицами, клавиши <kbd>F7</kbd> и <kbd>F8</kbd>: подсказки, когда экрана не видно (подробно — «Настройки и доступность»).
 
@@ -193,6 +222,12 @@
 
 **Куда крутить тягу, если не знаете:** четверть оборота — и смотрите на стрелку. Живой экран отвечает на этот вопрос быстрее любой схемы.
 
+Этот же порядок — в заводских методиках: бюллетень Hyundai 20-SS-001H велит сначала выставить развал и схождение задних колёс, затем поставить руль прямо и зафиксировать его, и только потом регулировать передние кастер, развал и схождение; руководство Tesla — то же: задний развал, заднее схождение, передние развал и кастер, переднее схождение. Углы ставят в середину допуска, а не «чтобы вошло».
+
+**Руль встал криво, хотя схождение в норме?** Значит, схождение поделено между колёсами неровно. Панель переднего схождения на экране регулировки подскажет, куда будет смотреть руль, — выставьте руль прямо и доведите каждое колесо до его номинала.
+
+<img src="img/illus/thrust-ru.svg" width="320" alt="Задняя ось задаёт направление движения. Поэтому сначала регулируют её, затем выравнивают и фиксируют руль, и только потом — перед."> <img src="img/illus/tieRod-ru.svg" width="320" alt="Не знаете, где тяга, — поверните на четверть оборота и смотрите на стрелку: экран ответит быстрее любой схемы.">
+
 <a id="ru-report"></a>
 
 ## Шаг 5. Отчёт
@@ -200,6 +235,60 @@
 Протокол строится из двух снимков: «до» — перед регулировкой, «после» — когда всё выставлено. F5 на экране регулировки делает снимок в один нажим (сначала «до», затем «после»). Для снимка нужны развал и схождение всех четырёх колёс.
 
 В протокол можно вписать госномер или VIN, пробег и имя. «Печать / PDF» открывает системный диалог печати — выберите «Сохранить как PDF», чтобы получить файл. В протоколе указан источник допусков, порядок регулировки и замечания (биение дисков, разница включённых углов и т. п.).
+
+Закончили с машиной — **«Новый автомобиль»**: показания, снимки, отметки подготовки и поля протокола очистятся, и следующая машина начнётся с чистого листа.
+
+<a id="ru-tyres"></a>
+
+## Износ шин подскажет
+
+Прежде чем мерить, посмотрите и проведите ладонью по протектору передних и задних шин: износ часто сразу говорит, какой угол сбит или что изношено. Запишите, что увидели, — после регулировки будет с чем сравнить.
+
+|   | Износ | О чём говорит |
+|---|---|---|
+| <img src="img/illus/wear-center-ru.svg" width="160" alt=""> | **Середина** | Перекачана шина. |
+| <img src="img/illus/wear-edges-ru.svg" width="160" alt=""> | **Оба края** | Шина недокачана. |
+| <img src="img/illus/wear-inner-ru.svg" width="160" alt=""> | **Внутренний край** | Отрицательный развал или расхождение; изношенные сайлентблоки, просевшие пружины. Самый частый износ. |
+| <img src="img/illus/wear-outer-ru.svg" width="160" alt=""> | **Наружный край** | Положительный развал или схождение; бывает и от резкой езды в поворотах. |
+| <img src="img/illus/wear-feather-ru.svg" width="160" alt=""> | **«Пила» — острые кромки шашек с одной стороны** | Схождение. Острая кромка с внутренней стороны шашек — избыточное схождение, с наружной — расхождение. |
+| <img src="img/illus/wear-cupping-ru.svg" width="160" alt=""> | **Пятна по окружности** | Изношенные амортизаторы или стойки, люфты в подвеске, дисбаланс колеса. |
+
+По справочнику MOOG «Understanding Tire Wear» и бюллетеню Hyundai 20-SS-001H. «Пилу» проще нащупать, чем увидеть: проведите ладонью поперёк протектора в одну и в другую сторону — с одной стороны кромки шашек острые. Пятна по окружности — не дело регулировки: сначала амортизаторы, балансировка и люфты.
+
+<a id="ru-diag"></a>
+
+## Диагностика: что погнуто
+
+Развал и схождение регулируются, а поперечный наклон оси (SAI) и включённый угол (SAI + развал) заданы деталями. Если они не в норме или разные слева и справа, регулировка не поможет — что-то погнуто. Сравнивайте борта между собой.
+
+| Развал | SAI | Включённый угол | Вероятная причина |
+|---|---|---|---|
+| не в норме | в норме | в норме | Кулак цел. Сбит регулировочный эксцентрик, сдвинут подрамник, погнут рычаг или смещена опора стойки. |
+| не в норме | не в норме | в норме | Кулак цел. Погнута стойка, рычаг или смещена верхняя опора стойки. |
+| не в норме | любой | не в норме | Погнут поворотный кулак (цапфа) — меняют кулак. |
+
+По бюллетеню Hyundai 20-SS-001H: разница SAI слева и справа больше 1° — ищите повреждённые детали; SAI меньше на одной стороне — чаще погнут нижний рычаг, больше — повреждена верхняя опора стойки. SAI из замера с поворотом колеса неточен: ошибка нуля угломера 0,1° даёт почти 2° SAI, поэтому такой вывод подтверждайте камерой.
+
+**Углы поворота колёс.** На поворотных кругах поверните руль так, чтобы наружное колесо стояло на 20°, и запишите угол внутреннего; затем в другую сторону («Замер → Углы поворота колёс»). Внутреннее колесо обычно поворачивается больше наружного, но главное — чтобы влево и вправо было одинаково: разница больше 1° — погнут поворотный рычаг кулака или рулевая тяга, даже если схождение в норме. Такую машину не регулируют, а чинят.
+
+Таблица — по учебным материалам к экзамену ASE A4; точные значения SAI, включённого угла и углов поворота для вашей модели — в руководстве по ремонту.
+
+<a id="ru-road"></a>
+
+## Контрольная поездка
+
+Регулировку проверяют дорогой. Методика из бюллетеня Hyundai 20-SS-001H:
+
+1. Прямой ровный участок не короче 250 м, без колеи, ветра и заметного уклона; полоса шириной 3–3,5 м.
+2. Давление в шинах по норме, в машине только водитель.
+3. Скорость около 64 км/ч (40 миль/ч). Поставьте руль так, чтобы машина шла прямо, и легко его отпустите.
+4. Засеките, за сколько секунд машину уведёт на метр — от одного края полосы к другому. **Дольше 6 с — норма, 6 с и быстрее — уводит.**
+5. Повторите в обратную сторону по той же дороге: если увод сменил сторону, виновата дорога или ветер, а не машина.
+6. Если машина едет прямо, а руль стоит криво, — повторите регулировку схождения с зафиксированным прямо рулём.
+
+<img src="img/illus/roadTest-ru.svg" width="320" alt="Методика из бюллетеня Hyundai 20-SS-001H: ровная прямая дорога без ветра, 64 км/ч, руль отпущен. Повторите в обратную сторону.">
+
+Итог поездки записывается в протокол — раздел «Контрольная поездка» внизу отчёта.
 
 <a id="ru-susp"></a>
 
@@ -268,11 +357,29 @@
 | Окно не открывается, программа открылась в браузере | Не установлен Microsoft Edge WebView2 Runtime (бывает на старых Windows 10). Установите его с сайта Microsoft — или работайте в браузере, это та же программа. |
 | Телефон не открывает адрес | Телефон и компьютер в одной сети? Гостевой Wi-Fi часто изолирует устройства — подключите оба к точке доступа телефона. В Windows сеть должна быть «Частной», а брандмауэр — разрешать программу в частных сетях. |
 | «Подключение не защищено» на телефоне | Так и должно быть: сертификат создан программой. «Дополнительно» → «Перейти на сайт». |
-| «Ссылка устарела» | Доступ по Wi-Fi выключали и включали снова — ключ сменился. Отсканируйте QR-код заново. |
+| «Ссылка устарела» | Ключ в адресе сменили кнопкой «Сменить ключ». Отсканируйте новый QR-код. |
+| Телефон пишет «нет связи с компьютером» | Программа на компьютере закрыта или телефон вышел из сети Wi-Fi. Как только программа снова запущена, а телефон в той же сети, связь вернётся сама — сканировать заново не нужно. Если у компьютера сменился адрес в сети, отсканируйте код ещё раз. |
 | Датчики телефона не отвечают | Откройте страницу в Chrome (Android) или Safari (iPhone); на iPhone разрешите доступ к датчикам движения. Встроенные браузеры мессенджеров датчики не дают. |
 | Цифры «прыгают» | Телефон не прижат к планке, планка опирается на резину, ветер качает струну, кто-то сидит в машине. Дождитесь «показания стабильны». |
 | Калибровка камеры «плохая» | Больше снимков, доска во всех углах кадра и под наклоном, доска наклеена на жёсткий плоский лист, размер клетки измерен штангенциркулем. |
+| Кастер вышел отрицательным | Чаще всего руль сначала повернули не в ту сторону. Для левого колеса — сначала влево, потом вправо; для правого — сначала вправо. Повторите замер кастера. |
+| Проверка точности телефона не пройдена | «Ноль» — повторите калибровку телефона на столе (шаг 1), «крепление» — калибровку крепления на планке (шаг 2). Проверьте, что планка ровная и прижата к закраинам обода. |
 | Нашли ошибку | Опишите её в Issues на GitHub и приложите `wheelalign.log` из папки данных. |
+
+<a id="ru-sources"></a>
+
+## Откуда методика
+
+Порядок работы, проверки и пороги в программе взяты из открытых документов производителей и учебных материалов, а не придуманы:
+
+- **Hyundai, бюллетень 20-SS-001H** «Wheel Alignment Requirements and Best Practices» (2020, опубликован NHTSA): порядок регулировки, увод от развала и кастера, разница развала 0,5°, разница SAI 1°, контрольная поездка.
+- **Tesla, руководство Model 3**, «Four Wheel Alignment Check and Adjust»: подготовка, нагрузка, высота кузова, упор педали, фиксация руля, порядок «зад — перед», контрольная поездка.
+- **MOOG (Federal-Mogul), «Understanding Tire Wear»**: износ шин и его причины.
+- **Учебные материалы к экзамену ASE A4** (подвеска и рулевое управление): осмотр перед регулировкой, проверка люфтов, качание руля, диагностика по SAI и включённому углу, углы поворота колёс.
+- **Analog Devices, AN-1057** «Using an Accelerometer for Inclination Sensing»: калибровка датчика наклона переворотом на 180° — на ней основаны калибровка и проверка телефона.
+- **W3C, «Device Orientation and Motion»**, и изменение Chromium для Chrome 66: скорость поворота — в градусах в секунду; до Chrome 66 на Android — в радианах.
+
+Заводские допуски вашей машины — только из её руководства по ремонту: см. «Откуда берутся допуски».
 
 <a id="ru-safety"></a>
 
@@ -317,7 +424,7 @@ Wheel alignment is neither magic nor a workshop secret. It is four wheels, a few
 
 The same guide is inside the program — press **F1**. Method and accuracy in depth — [PROCEDURE.md](PROCEDURE.md#eng).
 
-**Contents:** [In short: five steps](#en-start) · [Installing and first start](#en-install) · [Settings and accessibility](#en-access) · [The angles in plain words](#en-angles) · [Step 1. Vehicle](#en-vehicle) · [Step 2. Preparation](#en-prep) · [Tools and floor](#en-tools) · [Measuring: strings and an inclinometer](#en-string) · [Measuring: a phone on the wheel](#en-phone) · [Measuring: camera and targets](#en-optical) · [Measuring: a sensor of your own](#en-sensor) · [Step 4. The adjustment screen](#en-live) · [Adjustment order — do not change it](#en-order) · [Step 5. The report](#en-report) · [Suspension types](#en-susp) · [Trucks, buses, vans](#en-trucks) · [When adjustment will not help](#en-bent) · [Where the specifications come from](#en-data) · [If something does not work](#en-trouble) · [Safety](#en-safety) · [Keys](#en-keys)
+**Contents:** [In short: five steps](#en-start) · [Installing and first start](#en-install) · [Settings and accessibility](#en-access) · [The angles in plain words](#en-angles) · [Step 1. Vehicle](#en-vehicle) · [Step 2. Preparation](#en-prep) · [Tools and floor](#en-tools) · [Measuring: strings and an inclinometer](#en-string) · [Measuring: a phone on the wheel](#en-phone) · [Measuring: camera and targets](#en-optical) · [Measuring: a sensor of your own](#en-sensor) · [Step 4. The adjustment screen](#en-live) · [Adjustment order — do not change it](#en-order) · [Step 5. The report](#en-report) · [What tyre wear tells you](#en-tyres) · [Diagnosis: what is bent](#en-diag) · [Road test](#en-road) · [Suspension types](#en-susp) · [Trucks, buses, vans](#en-trucks) · [When adjustment will not help](#en-bent) · [Where the specifications come from](#en-data) · [If something does not work](#en-trouble) · [Where the method comes from](#en-sources) · [Safety](#en-safety) · [Keys](#en-keys)
 
 <a id="en-start"></a>
 
@@ -328,6 +435,10 @@ The same guide is inside the program — press **F1**. Method and accuracy in de
 3. **Measurement.** Choose what to measure with: strings and an inclinometer, a phone, a camera or a sensor of your own. Methods can be combined — for example camber and caster by phone, toe by string.
 4. **Adjustment.** A screen like an alignment bench: big figures, green when in spec, red when not; above each, a tolerance scale with a pointer. Tap an angle and a panel shows what adjusts it on your car. Before the first turn of a spanner, take the “before” snapshot (F5).
 5. **Report.** When everything is green, take the “after” snapshot (F5) and open the report with its before/after table (F6). It can be printed or saved as PDF.
+
+**Nothing gets lost.** The chosen vehicle, the figures you typed, the “before” and “after” snapshots, the checklist and the plate number are kept by the program: close it, open it tomorrow — everything is still there, and the screen opens where you stopped. Start the next car with **“New vehicle”** in the menu on the left (or in the report): everything of the previous one is cleared, while phone and camera calibrations stay.
+
+**The “what next” line** on the adjustment screen leads you through the whole job: the “before” snapshot, then the angles in the right order, the “after” snapshot, the report. Its button does the next thing right away.
 
 > New to this? Start the demonstration (F9 on the adjustment screen) and press F10 — the program shows by itself in which order and how the angles are set. With the ← → keys you can “turn” any angle yourself and watch what happens to the others.
 
@@ -340,7 +451,7 @@ The same guide is inside the program — press **F1**. Method and accuracy in de
 3. **Language** — the RU / EN switch in the top right corner. On first start the system language is used; your choice is remembered.
 4. **No internet needed.** Everything runs on this computer. Only the phone sensor needs a network, and a local one (Wi-Fi) at that, not the internet.
 
-Where your data lives: `%APPDATA%\wheelalign` (on Linux `~/.config/wheelalign`). It holds the settings (`settings.json`), your own specifications (the `vehicles` folder), the phone certificate (`tls`) and the log `wheelalign.log` — attach it when reporting a bug.
+Where your data lives: `%APPDATA%\wheelalign` (on Linux `~/.config/wheelalign`). It holds the settings (`settings.json`), the current job — the vehicle on the stand, the figures typed in, the snapshots (`session.json`), your own specifications (the `vehicles` folder), phone calibrations (`phones.json`) and phone access (`phone-link.json`), the phone certificate (`tls`) and the log `wheelalign.log` — attach it when reporting a bug.
 
 Start options: `-browser` — open in the browser instead of a window; `-data <folder>` — keep the data elsewhere (for example next to the program on a USB stick). Full list: `wheelalign -h`.
 
@@ -374,6 +485,12 @@ The program should suit everyone: whoever works in a bright garage, sees poorly 
 | **Included angle** | SAI + camber. | Differs left to right by more than 1° — a part is bent; camber adjustment will not cure it. |
 | **Thrust angle** | Where the rear axle points relative to the car's centreline: half the difference of the rear wheels' toe. | The car “crabs”, the steering wheel is off-centre when driving straight although the front toe is in spec. |
 
+<img src="img/illus/camber-en.svg" width="320" alt="Camber is the tilt of the wheel across the car. A left–right camber difference pulls the car towards the more positive side."> <img src="img/illus/toe-en.svg" width="320" alt="Toe is the turn of the wheels seen from above. The main angle for tyre wear; it hardly causes a pull, but whether the steering wheel sits straight depends on it."> <img src="img/illus/caster-en.svg" width="320" alt="Caster returns the steering wheel to centre. The car pulls towards the wheel with less caster.">
+
+<img src="img/illus/sai-en.svg" width="320" alt="SAI is set by design. A left–right difference over 1° points to a bent part: lower SAI — usually the lower control arm, higher — the upper strut mount (Hyundai bulletin 20-SS-001H)."> <img src="img/illus/thrust-en.svg" width="320" alt="The rear axle sets the direction of travel. So it is adjusted first, then the steering wheel is centred and locked, and only then the front.">
+
+In short, what pulls a car (Hyundai bulletin 20-SS-001H): it pulls towards the wheel with more positive camber — the front camber difference should be under 0.5° — and towards the wheel with less caster. Toe does not cause a pull, but tyre wear and whether the steering wheel sits straight depend on it. Tyres (unequal pressure, ply steer and conicity), a dragging brake, a sagging spring, road crown and crosswind can pull a car too.
+
 <a id="en-vehicle"></a>
 
 ## Step 1. Vehicle
@@ -394,6 +511,8 @@ You can also work without choosing a vehicle — the angles are then shown witho
 
 ## Step 2. Preparation
 
+Items with a picture have a **“What it looks like”** button — the diagram opens right under the item.
+
 The checklist follows the chosen suspension: kingpin play for a beam axle, strut top bearings for MacPherson, U-bolts and the centre bolt for leaf springs. The items are grouped — safety, tools, floor, vehicle, front and rear suspension — and each group has its own counter. In large type: what to do; in small type: why. Tick items off as you go — the ticks are saved; once everything is ticked, “All done — ready to measure” appears.
 
 The “Tools” group depends on the way of measuring: a line and an inclinometer for strings, a bar and a shared Wi-Fi network for a phone, targets and a tripod for a camera. You can choose the way right in this group — the “Measurement” step will already have it selected.
@@ -407,6 +526,12 @@ The “Tools” group depends on the way of measuring: a line and an inclinomete
 <a id="en-tools"></a>
 
 ## Tools and floor
+
+<img src="img/illus/level-en.svg" width="320" alt="A 5 mm dip under one wheel is already about 0.2° of camber error."> <img src="img/illus/settle-en.svg" width="320" alt="After lifting, the suspension hangs. Bounce the body and roll the car forward — it settles into its working position."> <img src="img/illus/rideHeight-en.svg" width="320" alt="A sagging spring changes camber and caster. Ride height is checked before the alignment, not after.">
+
+<img src="img/illus/play-en.svg" width="320" alt="With the wheel off the ground, rock it by hand. Any play you can feel means repair first: on worn joints the angles wander."> <img src="img/illus/dryPark-en.svg" width="320" alt="This finds play in tie rods and their ends, the rack, the idler arm (ASE practice).">
+
+<img src="img/illus/turnplates-en.svg" width="320" alt="Caster cannot be measured without turn plates: the wheel must turn without being dragged sideways. Slip plates at the rear let the suspension settle freely."> <img src="img/illus/pedal-en.svg" width="320" alt="The brake pedal depressor is needed for caster: if the wheel rolls while steering, the reading is spoilt."> <img src="img/illus/wheelLock-en.svg" width="320" alt="Before toe is adjusted, the steering wheel is set dead straight and locked — otherwise the toe comes out right and the steering wheel crooked.">
 
 | What | What for | Substitute |
 |---|---|---|
@@ -428,24 +553,34 @@ The “Tools” group depends on the way of measuring: a line and an inclinomete
 1. **Strings** run along both sides, outside the wheels, at hub-centre height, tensioned by weights. The distance from the string to the hub centre at the front and at the rear **need not be equal**: with different front and rear track widths the difference must be (rear track − front track) / 2. Enter the four distances in “String setup check” and the program tells you which end to move and by how much.
 2. **Camber** — the inclinometer on a bar held against the rim flanges (not the tyre). “Plus” — the top of the wheel leans out. If your inclinometer reads the other way, tick the box. Then roll the car half a wheel turn (a chalk mark on the tyre) and measure the same spot of the rim again. The program averages the two readings and removes rim runout; runout above 0.5° means a bent rim and unreliable readings for that wheel.
 3. **Toe** — from the string to the rim flange at the front and rear of the wheel, strictly at hub height. Higher or lower mixes camber into the reading. A wheel pointing inwards has the larger front distance; enter it as it is.
-4. **Caster** — on turn plates: camber with the wheel steered 20° out and 20° in. The program solves this exactly, not with the “swing × 1.5” rule, which is off by up to 0.27° on cars with large caster. Read the steer angle off the turn plate scale or chalk it on the floor.
+4. **Caster** — on turn plates: camber with the wheel steered 20° out and 20° in. “Out” for the left wheel is the steering wheel turned left, for the right wheel — turned right. The program solves this exactly, not with the “swing × 1.5” rule, which is off by up to 0.27° on cars with large caster. Read the steer angle off the turn plate scale or chalk it on the floor.
 
-Every figure you enter goes straight to the adjustment screen. While working: turn the tie rod, measure, enter the new figure. The screen updates at once.
+Every figure you enter goes straight to the adjustment screen and is kept. While working: turn the tie rod, measure, enter the new figure. The screen updates at once. Delete a figure and it leaves the screen too; “Clear all fields” removes everything typed by hand at once.
+
+<img src="img/illus/bar-en.svg" width="320" alt="The gauge and the phone are held against a straight bar resting on the rim flanges."> <img src="img/illus/strings-en.svg" width="320" alt="Distances are measured at hub centre height. Higher or lower mixes camber into the toe."> <img src="img/illus/runout-en.svg" width="320" alt="Two readings at the same spot of the rim, half a turn apart: their mean is the true camber, the difference is the rim runout.">
+
+<img src="img/illus/steer-left-en.svg" width="320" alt="“Out” for the left wheel is the steering wheel turned left, for the right wheel — turned right."> <img src="img/illus/steer-right-en.svg" width="320" alt="“Out” for the left wheel is the steering wheel turned left, for the right wheel — turned right.">
 
 <a id="en-phone"></a>
 
 ## Measuring: a phone on the wheel
 
-1. On “Measurement → Phone on the wheel” press “Allow Wi-Fi connection” and scan the QR code with the phone's camera. Phone and computer must be on the same Wi-Fi network (a hotspot on the phone itself will do).
+1. Press **“Phone”** at the top right — from any screen — and scan the QR code with the phone's camera. Wi-Fi access switches on by itself. The same is on “Measurement → Phone on the wheel”. Phone and computer must be on the same Wi-Fi network (a hotspot on the phone itself will do).
 2. The phone's browser warns about the certificate — it was made by this program, not by a certificate authority. “Advanced” → “Proceed to the site”. Windows may ask for firewall permission — allow private networks.
 3. On the phone, tap the wheel — the buttons sit where the wheels are on the car — and press “Start sensors”. On an iPhone Safari asks for motion sensor access — allow it.
 4. At the top there are three tabs — what you measure: **Camber**, **Caster**, **Toe**.
 5. **Camber → “Preparing the phone”**, once: **1. Phone calibration** — on a table screen up, then screen down; this removes the accelerometer's own error, which on phones can reach 1–2°. **2. Mount calibration** — the phone on the bar on the rim, then upside down on the same spot; this removes the tilt caused by the camera bump and the case. **3. Rim runout** — optional: a reading, roll the car half a wheel turn, another reading. Finished steps get a ✓ and are remembered.
 6. Press the phone against the bar, screen facing out — camber flows to the adjustment screen in real time. The “steady” tag means the reading can be trusted.
-7. **Caster** (front wheels only): wheels on turn plates, brake held with a prop, “Measure caster”. The phone leads the way: straight, out about 20°, in — it measures the steer angle with its gyroscope.
+7. **Caster** (front wheels only): wheels on turn plates, brake held with a prop, “Measure caster”. The phone leads the way: straight, then “turn the steering wheel left” or “right” about 20°, then the other way — it measures the steer angle with its gyroscope.
 8. **Toe** — the tab explains why a phone on the rim cannot measure it, and one button turns the phone into a camera with targets.
 
-A phone held to the rim does not measure toe: toe is a rotation of the wheel about the vertical, and the accelerometer senses only tilt — gravity does not change under such a rotation. The gyroscope does sense it, but drifts — within a minute by more than the whole toe tolerance. So take toe by string or by camera: the same phone on a tripod works as a camera in live mode (see “Camera and targets”). Two phones on the wheels measure two wheels at once, four — all four. When you are done, switch Wi-Fi access off. A phone connected by mistake is removed with “Disconnect” in the list.
+A phone held to the rim does not measure toe: toe is a rotation of the wheel about the vertical, and the accelerometer senses only tilt — gravity does not change under such a rotation. The gyroscope does sense it, but drifts — within a minute by more than the whole toe tolerance. So take toe by string or by camera: the same phone on a tripod works as a camera in live mode (see “Camera and targets”). Two phones on the wheels measure two wheels at once, four — all four. A phone connected by mistake is removed with “Disconnect” in the list.
+
+**Accuracy check** — the fourth, optional step of “Preparing the phone”. The phone goes on the table screen up and down again, then on the bar upright and upside down — but the calibration is compared, not changed. “Zero” shows how far the accelerometer's zero has moved since calibration (it does in the cold and with age), “mount” — how far the phone has shifted on the bar (a new case, another bar). Over 0.1° and the phone tells you which calibration step to repeat. Professional inclinometers are checked the same way: turned over by 180°, the zero offset changes sign and the angle does not.
+
+**The gyroscope of older phones.** Chrome on Android before version 66 gave the rotation rate in radians rather than degrees — the wheel's steer angle would come out 57 times too small. The program finds this out from the turn-over during calibration (always at least 180°) and converts. If caster comes out negative, the phone warns: most often the steering wheel was turned the wrong way first.
+
+**Set up once — then it just works.** The program remembers that access is on: after a restart it switches on again, the address and the code stay the same, and a phone with the page open reconnects by itself, keeping its wheel and its calibration. You can add the page to the phone's home screen. If someone else has seen the code, press “New key”: every phone is disconnected and each has to scan the new code. When the phones are no longer needed, “Switch Wi-Fi access off”.
 
 <img src="img/phone.png" width="220" alt="The phone page">
 
@@ -485,6 +620,7 @@ Any device on your network — a home-made ESP32 head, a laser sensor, another p
 - **“Readings steady”.** While values are changing the screen says “readings changing…”. Record figures and tighten lock nuts only when steady.
 - **Tap any angle** — a panel opens on the right: what the angle is, what adjusts it on your suspension, what the data says for this model.
 - **The “how far to turn” helper.** In the same panel: press “Remember position”, turn the tie rod or eccentric by a known amount (¼, ½, 1 turn) and press how far you turned it. The program works out what one turn does on your car and from then on tells you: “to nominal ≈ 1¼ turns, the same way”.
+- **“What next”** — the line under the verdict. It shows the next step: the “before” snapshot, then the angle to adjust now, in the right order (rear axle → caster → camber → toe), and how far it is from the spec; then the “after” snapshot and the report. The button on the right does it or opens the angle's panel. If the angle has no adjuster on your suspension, the line says so — look for wear or a bent part.
 - **The source bar** at the top shows where data comes from: phone, sensor, camera, manual entry, demo.
 - **Sound and voice** — the buttons next to the units, keys <kbd>F7</kbd> and <kbd>F8</kbd>: guidance when you cannot see the screen (see “Settings and accessibility”).
 
@@ -502,6 +638,12 @@ Any device on your network — a home-made ESP32 head, a laser sensor, another p
 
 **Which way to turn the tie rod if you don't know:** a quarter turn, then watch the pointer. The live screen answers that question faster than any diagram.
 
+Factory procedures use the same order: Hyundai bulletin 20-SS-001H says to set rear camber and toe first, then centre and lock the steering wheel, and only then adjust front caster, camber and toe; the Tesla manual likewise goes rear camber, rear toe, front camber and caster, front toe. Set angles to the centre of the specification, not just “inside it”.
+
+**Steering wheel crooked although toe is in spec?** Then the toe is split unevenly between the wheels. The front toe panel on the adjustment screen tells which way the steering wheel will point — set the steering wheel straight and bring each wheel to its own nominal.
+
+<img src="img/illus/thrust-en.svg" width="320" alt="The rear axle sets the direction of travel. So it is adjusted first, then the steering wheel is centred and locked, and only then the front."> <img src="img/illus/tieRod-en.svg" width="320" alt="Not sure where the tie rod is? Turn it a quarter turn and watch the pointer: the screen answers faster than any diagram.">
+
 <a id="en-report"></a>
 
 ## Step 5. The report
@@ -509,6 +651,60 @@ Any device on your network — a home-made ESP32 head, a laser sensor, another p
 The report is built from two snapshots: “before” — ahead of adjustment, and “after” — once everything is set. F5 on the adjustment screen takes a snapshot in one press (“before” first, then “after”). A snapshot needs camber and toe of all four wheels.
 
 You can add the plate number or VIN, the mileage and your name. “Print / PDF” opens the system print dialog — choose “Save as PDF” to get a file. The report lists the source of the specifications, the adjustment order and remarks (rim runout, included-angle differences and so on).
+
+Finished with the car — **“New vehicle”**: readings, snapshots, the checklist and the report fields are cleared, and the next car starts with a clean sheet.
+
+<a id="en-tyres"></a>
+
+## What tyre wear tells you
+
+Before measuring, look at the front and rear tyres and run your palm over the tread: wear often tells at once which angle is off or what is worn. Write down what you see — after the alignment you will have something to compare with.
+
+|   | Wear | What it tells |
+|---|---|---|
+| <img src="img/illus/wear-center-en.svg" width="160" alt=""> | **Centre** | The tyre is overinflated. |
+| <img src="img/illus/wear-edges-en.svg" width="160" alt=""> | **Both edges** | The tyre is underinflated. |
+| <img src="img/illus/wear-inner-en.svg" width="160" alt=""> | **Inner edge** | Negative camber or toe-out; worn bushings, sagging springs. The most common wear. |
+| <img src="img/illus/wear-outer-en.svg" width="160" alt=""> | **Outer edge** | Positive camber or toe-in; also hard cornering. |
+| <img src="img/illus/wear-feather-en.svg" width="160" alt=""> | **Feathering — tread blocks sharp on one side** | Toe. A sharp edge on the inside of the blocks means too much toe-in, on the outside — toe-out. |
+| <img src="img/illus/wear-cupping-en.svg" width="160" alt=""> | **Cupping around the tyre** | Worn shock absorbers or struts, play in the suspension, an unbalanced wheel. |
+
+From MOOG's “Understanding Tire Wear” and Hyundai bulletin 20-SS-001H. Feathering is easier to feel than to see: run your palm across the tread one way and the other — on one side the block edges are sharp. Cupping is not an alignment matter: dampers, wheel balance and play come first.
+
+<a id="en-diag"></a>
+
+## Diagnosis: what is bent
+
+Camber and toe are adjusted, but steering axis inclination (SAI) and the included angle (SAI + camber) are set by the parts. If they are out of spec or differ left to right, adjustment will not help — something is bent. Compare the two sides with each other.
+
+| Camber | SAI | Included angle | Probable cause |
+|---|---|---|---|
+| out of spec | in spec | in spec | The knuckle is sound. A misadjusted cam bolt, a shifted subframe, a bent control arm or a displaced strut tower. |
+| out of spec | out of spec | in spec | The knuckle is sound. A bent strut, a bent control arm or a displaced upper strut mount. |
+| out of spec | any | out of spec | A bent steering knuckle (spindle) — the knuckle is replaced. |
+
+Per Hyundai bulletin 20-SS-001H: an SAI difference between left and right of more than 1° means damaged parts; lower SAI on one side often means a bent lower control arm, higher — a damaged upper strut mount. SAI from a wheel sweep is not precise: a 0.1° zero error of the gauge gives almost 2° of SAI, so confirm such a finding with the camera.
+
+**Steering lock angles.** On turn plates, steer until the outer wheel stands at 20° and note the angle of the inner one; then the other way (“Measurement → Steering lock angles”). The inner wheel usually turns further than the outer, but what matters is that left and right match: a difference over 1° means a bent steering arm or tie rod, even when toe is in spec. Such a car is repaired, not adjusted.
+
+The table follows study material for the ASE A4 exam; the exact SAI, included angle and lock angles for your model are in its workshop manual.
+
+<a id="en-road"></a>
+
+## Road test
+
+An alignment is checked on the road. The procedure from Hyundai bulletin 20-SS-001H:
+
+1. A straight, level stretch at least 250 m long, no ruts, wind or noticeable crown; a lane 3–3.5 m wide.
+2. Tyre pressures to specification, only the driver in the car.
+3. About 64 km/h (40 mph). Set the steering wheel so the car goes straight and let it go lightly.
+4. Time how many seconds the car takes to drift one metre — from one side of the lane to the other. **More than 6 s passes, 6 s or less fails.**
+5. Repeat in the opposite direction on the same road: if the drift changes side, the road or the wind is to blame, not the car.
+6. If the car goes straight but the steering wheel is crooked, redo the toe with the steering wheel locked straight.
+
+<img src="img/illus/roadTest-en.svg" width="320" alt="The procedure from Hyundai bulletin 20-SS-001H: a straight level road without wind, 64 km/h, steering wheel let go. Repeat in the opposite direction.">
+
+The result goes into the report — the “Road test” section at the bottom.
 
 <a id="en-susp"></a>
 
@@ -577,11 +773,29 @@ Have a workshop manual? The “Enter specs” button on the left: the program ch
 | No window, the program opened in the browser | Microsoft Edge WebView2 Runtime is missing (happens on older Windows 10). Install it from Microsoft's site — or keep using the browser, it is the same program. |
 | The phone cannot open the address | Are phone and computer on the same network? Guest Wi-Fi often isolates devices — connect both to the phone's hotspot. In Windows the network must be “Private” and the firewall must allow the program on private networks. |
 | “Connection is not private” on the phone | That is expected: the certificate was made by the program. “Advanced” → “Proceed to the site”. |
-| “Link expired” | Wi-Fi access was switched off and on again, so the key changed. Scan the QR code again. |
+| “Link expired” | The key in the address was changed with “New key”. Scan the new QR code. |
+| The phone says “no connection to the computer” | The program on the computer is closed or the phone has left the Wi-Fi network. As soon as the program is running again and the phone is on the same network, the connection comes back by itself — no need to scan again. If the computer's network address has changed, scan the code once more. |
 | The phone's sensors do not respond | Open the page in Chrome (Android) or Safari (iPhone); on an iPhone allow motion sensor access. Browsers built into messengers do not provide the sensors. |
 | Figures jump around | The phone is not pressed to the bar, the bar rests on the tyre, wind shakes the string, someone is sitting in the car. Wait for “readings steady”. |
 | Camera calibration is “poor” | More photos, the board in every corner of the frame and tilted, the board glued to a rigid flat sheet, the square size measured with calipers. |
+| Caster came out negative | Most often the steering wheel was first turned the wrong way. For the left wheel — left first, then right; for the right wheel — right first. Measure caster again. |
+| The phone's accuracy check failed | “Zero” — redo the phone calibration on the table (step 1); “mount” — the mount calibration on the bar (step 2). Check that the bar is straight and pressed against the rim flanges. |
 | You found a bug | Describe it in Issues on GitHub and attach `wheelalign.log` from the data folder. |
+
+<a id="en-sources"></a>
+
+## Where the method comes from
+
+The working order, the checks and the thresholds in the program come from manufacturers' open documents and training material, not invention:
+
+- **Hyundai, bulletin 20-SS-001H** “Wheel Alignment Requirements and Best Practices” (2020, published by NHTSA): the adjustment order, pull from camber and caster, the 0.5° camber difference, the 1° SAI difference, the road test.
+- **Tesla, Model 3 service manual**, “Four Wheel Alignment Check and Adjust”: preparation, load, ride height, brake pedal depressor, steering wheel lock, rear-then-front order, road test.
+- **MOOG (Federal-Mogul), “Understanding Tire Wear”**: tyre wear and its causes.
+- **Study material for the ASE A4 exam** (suspension and steering): pre-alignment inspection, play checks, the dry park test, SAI and included angle diagnosis, steering lock angles.
+- **Analog Devices, AN-1057** “Using an Accelerometer for Inclination Sensing”: calibrating a tilt sensor by turning it over by 180° — the phone's calibration and check rest on it.
+- **W3C, “Device Orientation and Motion”**, and the Chromium change for Chrome 66: rotation rate in degrees per second; before Chrome 66 on Android — in radians.
+
+Your car's factory tolerances come only from its workshop manual: see “Where the specifications come from”.
 
 <a id="en-safety"></a>
 

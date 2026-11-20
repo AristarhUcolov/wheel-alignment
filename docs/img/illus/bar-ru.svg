@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" font-family="Segoe UI, Arial, sans-serif" class="illus-svg" viewBox="0 0 320 200" role="img" aria-label="Планка на закраинах обода"><rect width="320" height="200" rx="10" fill="#e3e8f0"/><title>Планка на закраинах обода</title><circle cx="110" cy="100" r="86" fill="#2b3242" stroke="#1a202d" stroke-width="2"/>
+    <circle cx="110" cy="100" r="58.5" fill="#9aa8bf" stroke="#8b9cb8" stroke-width="2"/>
+    <circle cx="110" cy="100" r="51.6" fill="#d9e1ee"/>
+    <circle cx="110" cy="100" r="11.2" fill="#9aa8bf"/>
+      <rect x="104" y="36" width="12" height="128" rx="3" fill="#955700" opacity=".85"/>
+      <rect x="90" y="74" width="40" height="52" rx="6" fill="#ffffff" stroke="#0e1828" stroke-width="2"/>
+      <g transform="translate(132 41)"><circle r="11" fill="#0b8a3c"/><path d="M-5 0 L-1 4 L6 -4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></g><g transform="translate(132 159)"><circle r="11" fill="#0b8a3c"/><path d="M-5 0 L-1 4 L6 -4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></g>
+      <text x="150" y="28" text-anchor="start" font-size="12" font-weight="400" fill="#0b8a3c">касается закраин обода</text>
+      <text x="206" y="98" text-anchor="start" font-size="11" font-weight="400" fill="#44536b">угломер или</text><text x="206" y="112" text-anchor="start" font-size="11" font-weight="400" fill="#44536b">телефон на планке</text>
+      <g transform="translate(210 158)"><circle r="11" fill="#c81e1e"/><path d="M-4.5 -4.5 L4.5 4.5 M4.5 -4.5 L-4.5 4.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></g><text x="226" y="162" text-anchor="start" font-size="12" font-weight="400" fill="#c81e1e">не на шину</text>
+      <text x="160" y="196" text-anchor="middle" font-size="11" font-weight="400" fill="#44536b">шина мягкая и выпуклая — замер по ней неверен</text></svg>

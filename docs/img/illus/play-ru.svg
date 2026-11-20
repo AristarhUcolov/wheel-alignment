@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" font-family="Segoe UI, Arial, sans-serif" class="illus-svg" viewBox="0 0 320 200" role="img" aria-label="Проверка люфтов: качать колесо"><rect width="320" height="200" rx="10" fill="#e3e8f0"/><title>Проверка люфтов: качать колесо</title><circle cx="96" cy="104" r="66" fill="#2b3242" stroke="#1a202d" stroke-width="2"/>
+    <circle cx="96" cy="104" r="44.9" fill="#9aa8bf" stroke="#8b9cb8" stroke-width="2"/>
+    <circle cx="96" cy="104" r="39.6" fill="#d9e1ee"/>
+    <circle cx="96" cy="104" r="8.6" fill="#9aa8bf"/>
+      <text x="78" y="30" text-anchor="end" font-size="11" font-weight="400" fill="#0e1828">12</text><text x="78" y="188" text-anchor="end" font-size="11" font-weight="400" fill="#0e1828">6</text>
+      <circle cx="96" cy="40" r="7" fill="#955700"/><circle cx="96" cy="168" r="7" fill="#955700"/>
+      <circle cx="32" cy="104" r="7" fill="#1c5fd6"/><circle cx="160" cy="104" r="7" fill="#1c5fd6"/>
+      <text x="184" y="40" text-anchor="start" font-size="12" font-weight="600" fill="#955700">сверху-снизу (12 и 6 ч):</text>
+      <text x="184" y="56" text-anchor="start" font-size="11" font-weight="400" fill="#44536b">подшипник ступицы,</text><text x="184" y="70" text-anchor="start" font-size="11" font-weight="400" fill="#44536b">шаровые опоры, шкворни</text>
+      <text x="184" y="112" text-anchor="start" font-size="12" font-weight="600" fill="#1c5fd6">по бокам (3 и 9 ч):</text>
+      <text x="184" y="128" text-anchor="start" font-size="11" font-weight="400" fill="#44536b">рулевые тяги</text><text x="184" y="142" text-anchor="start" font-size="11" font-weight="400" fill="#44536b">и наконечники</text>
+      <text x="184" y="176" text-anchor="start" font-size="11" font-weight="400" fill="#5a6880">колесо вывешено</text></svg>

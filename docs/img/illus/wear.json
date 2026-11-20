@@ -1,0 +1,110 @@
+{
+ "ru": [
+  {
+   "kind": "center",
+   "title": "Середина",
+   "why": "Перекачана шина."
+  },
+  {
+   "kind": "edges",
+   "title": "Оба края",
+   "why": "Шина недокачана."
+  },
+  {
+   "kind": "inner",
+   "title": "Внутренний край",
+   "why": "Отрицательный развал или расхождение; изношенные сайлентблоки, просевшие пружины. Самый частый износ."
+  },
+  {
+   "kind": "outer",
+   "title": "Наружный край",
+   "why": "Положительный развал или схождение; бывает и от резкой езды в поворотах."
+  },
+  {
+   "kind": "feather",
+   "title": "«Пила» — острые кромки шашек с одной стороны",
+   "why": "Схождение. Острая кромка с внутренней стороны шашек — избыточное схождение, с наружной — расхождение."
+  },
+  {
+   "kind": "cupping",
+   "title": "Пятна по окружности",
+   "why": "Изношенные амортизаторы или стойки, люфты в подвеске, дисбаланс колеса."
+  }
+ ],
+ "ru_captions": {
+  "camber": "Развал — наклон колеса поперёк машины. Разница развала слева и справа уводит машину в сторону большего плюса.",
+  "toe": "Схождение — поворот колёс в плане. Главный угол для износа шин; на увод машины почти не влияет, но от него зависит, ровно ли стоит руль.",
+  "caster": "Кастер возвращает руль прямо. Машину тянет в сторону колеса с меньшим кастером.",
+  "sai": "SAI задан конструкцией. Разница слева и справа больше 1° — признак погнутой детали: меньший SAI — чаще нижний рычаг, больший — верхняя опора стойки (бюллетень Hyundai 20-SS-001H).",
+  "thrust": "Задняя ось задаёт направление движения. Поэтому сначала регулируют её, затем выравнивают и фиксируют руль, и только потом — перед.",
+  "level": "Ямка 5 мм под одним колесом — это уже около 0,2° ошибки развала.",
+  "turnplates": "Без поворотных кругов кастер не измерить: колесо должно поворачиваться, не сдвигаясь в сторону. Скользящие площадки сзади дают подвеске встать свободно.",
+  "pedal": "Упор педали тормоза нужен для кастера: если колесо прокатится при повороте руля, замер испорчен.",
+  "wheelLock": "Перед регулировкой схождения руль ставят строго прямо и фиксируют — иначе схождение выйдет верным, а руль кривым.",
+  "settle": "После подъёма подвеска «висит». Покачайте кузов и прокатите машину вперёд — она встанет в рабочее положение.",
+  "rideHeight": "Просевшая пружина меняет развал и кастер. Высоту проверяют до регулировки, а не после.",
+  "play": "Колесо вывешено, качайте его руками. Любой ощутимый люфт — сначала ремонт: на изношенных шарнирах углы «плавают».",
+  "dryPark": "Так находят люфт в рулевых тягах и наконечниках, рейке, маятниковом рычаге (методика ASE).",
+  "bar": "Угломер и телефон прикладывают к ровной планке, лежащей на закраинах обода.",
+  "strings": "Расстояния меряют на высоте центра ступицы. Выше или ниже — к схождению подмешивается развал.",
+  "runout": "Два замера в одном месте обода через пол-оборота: их среднее — настоящий развал, разница — биение диска.",
+  "tieRod": "Не знаете, где тяга, — поверните на четверть оборота и смотрите на стрелку: экран ответит быстрее любой схемы.",
+  "roadTest": "Методика из бюллетеня Hyundai 20-SS-001H: ровная прямая дорога без ветра, 64 км/ч, руль отпущен. Повторите в обратную сторону.",
+  "steer:left": "«Наружу» для левого колеса — руль влево, для правого — вправо.",
+  "steer:right": "«Наружу» для левого колеса — руль влево, для правого — вправо."
+ },
+ "en": [
+  {
+   "kind": "center",
+   "title": "Centre",
+   "why": "The tyre is overinflated."
+  },
+  {
+   "kind": "edges",
+   "title": "Both edges",
+   "why": "The tyre is underinflated."
+  },
+  {
+   "kind": "inner",
+   "title": "Inner edge",
+   "why": "Negative camber or toe-out; worn bushings, sagging springs. The most common wear."
+  },
+  {
+   "kind": "outer",
+   "title": "Outer edge",
+   "why": "Positive camber or toe-in; also hard cornering."
+  },
+  {
+   "kind": "feather",
+   "title": "Feathering — tread blocks sharp on one side",
+   "why": "Toe. A sharp edge on the inside of the blocks means too much toe-in, on the outside — toe-out."
+  },
+  {
+   "kind": "cupping",
+   "title": "Cupping around the tyre",
+   "why": "Worn shock absorbers or struts, play in the suspension, an unbalanced wheel."
+  }
+ ],
+ "en_captions": {
+  "camber": "Camber is the tilt of the wheel across the car. A left–right camber difference pulls the car towards the more positive side.",
+  "toe": "Toe is the turn of the wheels seen from above. The main angle for tyre wear; it hardly causes a pull, but whether the steering wheel sits straight depends on it.",
+  "caster": "Caster returns the steering wheel to centre. The car pulls towards the wheel with less caster.",
+  "sai": "SAI is set by design. A left–right difference over 1° points to a bent part: lower SAI — usually the lower control arm, higher — the upper strut mount (Hyundai bulletin 20-SS-001H).",
+  "thrust": "The rear axle sets the direction of travel. So it is adjusted first, then the steering wheel is centred and locked, and only then the front.",
+  "level": "A 5 mm dip under one wheel is already about 0.2° of camber error.",
+  "turnplates": "Caster cannot be measured without turn plates: the wheel must turn without being dragged sideways. Slip plates at the rear let the suspension settle freely.",
+  "pedal": "The brake pedal depressor is needed for caster: if the wheel rolls while steering, the reading is spoilt.",
+  "wheelLock": "Before toe is adjusted, the steering wheel is set dead straight and locked — otherwise the toe comes out right and the steering wheel crooked.",
+  "settle": "After lifting, the suspension hangs. Bounce the body and roll the car forward — it settles into its working position.",
+  "rideHeight": "A sagging spring changes camber and caster. Ride height is checked before the alignment, not after.",
+  "play": "With the wheel off the ground, rock it by hand. Any play you can feel means repair first: on worn joints the angles wander.",
+  "dryPark": "This finds play in tie rods and their ends, the rack, the idler arm (ASE practice).",
+  "bar": "The gauge and the phone are held against a straight bar resting on the rim flanges.",
+  "strings": "Distances are measured at hub centre height. Higher or lower mixes camber into the toe.",
+  "runout": "Two readings at the same spot of the rim, half a turn apart: their mean is the true camber, the difference is the rim runout.",
+  "tieRod": "Not sure where the tie rod is? Turn it a quarter turn and watch the pointer: the screen answers faster than any diagram.",
+  "roadTest": "The procedure from Hyundai bulletin 20-SS-001H: a straight level road without wind, 64 km/h, steering wheel let go. Repeat in the opposite direction.",
+  "steer:left": "“Out” for the left wheel is the steering wheel turned left, for the right wheel — turned right.",
+  "steer:right": "“Out” for the left wheel is the steering wheel turned left, for the right wheel — turned right."
+ }
+}

@@ -123,7 +123,10 @@ go build -ldflags "-H=windowsgui" -o wheelalign.exe ./cmd/wheelalign
 
 Телефон прикладывается к ровной планке на закраинах обода и передаёт развал в
 реальном времени — стрелки на экране двигаются, пока вы крутите регулировку.
-Приложение ставить не нужно: отсканируйте QR-код на экране компьютера.
+Приложение ставить не нужно: нажмите **«Телефон»** вверху экрана программы — с
+любого шага — и отсканируйте появившийся QR-код. Программа запоминает доступ:
+после перезапуска адрес тот же, и телефон с открытой страницей подключается сам,
+помня своё колесо и калибровку.
 
 На телефоне три вкладки — **Развал**, **Кастер**, **Схождение**: сразу видно,
 что телефон меряет сам, а для чего нужна струна или камера. Колесо выбирается
@@ -137,9 +140,16 @@ go build -ldflags "-H=windowsgui" -o wheelalign.exe ./cmd/wheelalign
 недостатками: ошибка развала — **0,02° СКО, 0,05° в худшем случае**.
 
 **Кастер телефоном**: колёса на поворотных кругах, телефон ведёт по шагам
-«прямо → наружу → внутрь», угол поворота меряет гироскоп (его собственный уход
-измеряется в положении «прямо» и вычитается). Ровно 20° выдерживать не нужно:
-программа решает задачу точно при любых двух углах поворота.
+«прямо → руль влево → руль вправо» со шкалой, показывающей, докуда повернуть,
+угол поворота меряет гироскоп (его собственный уход измеряется в положении
+«прямо» и вычитается). Ровно 20° выдерживать не нужно: программа решает задачу
+точно при любых двух углах поворота. Старые телефоны, где браузер отдаёт
+гироскоп в радианах (Chrome на Android до версии 66), программа распознаёт сама.
+
+**Проверка точности**: телефон снова переворачивают на столе и на планке, а
+программа сверяет показания с калибровкой — «ноль» и «крепление», с допуском
+0,1°. Так видно, что пора перекалибровать: после нового чехла, другой планки
+или на морозе.
 
 <br clear="right">
 
@@ -175,6 +185,34 @@ go build -ldflags "-H=windowsgui" -o wheelalign.exe ./cmd/wheelalign
 
 - **Приветствие при первом запуске**: язык, тема и размер — и сразу подсказка,
   с чего начать и чем мерить. Пропустить можно одной клавишей.
+- **Работа не теряется.** Машина, введённые числа, снимки «до» и «после»,
+  отметки подготовки и госномер хранятся программой: закрыли, открыли завтра —
+  всё на месте. Следующая машина — кнопкой **«Новый автомобиль»**.
+- **Подсказка «что дальше»** на экране регулировки: снимок «до», затем угол,
+  который крутить сейчас, — в правильном порядке и с тем, сколько осталось до
+  допуска, — потом снимок «после» и протокол. Порядок помнить не нужно.
+- **Телефон в один щелчок**: кнопка «Телефон» вверху сразу показывает QR-код.
+- **Рисунки к каждому шагу**: как выровнять площадку гидроуровнем, приложить
+  планку к ободу, натянуть струны, зажать педаль, куда повернуть руль для
+  кастера и куда крутить рулевую тягу — у пунктов подготовки кнопка «Как это
+  выглядит», в панели угла и в инструкции. Схемы берут цвета темы.
+
+### Как у профессионалов
+
+Порядок и проверки взяты из открытых заводских методик — бюллетеня Hyundai
+20-SS-001H (опубликован NHTSA) и руководства Tesla по сход-развалу — и учебных
+материалов ASE; источники перечислены в инструкции, раздел «Откуда методика».
+
+- **Осмотр перед регулировкой**: шины одной модели на оси, износ шин с
+  картинками и причинами (по справочнику MOOG), высота кузова, люфты колеса и
+  рулевых тяг.
+- **Диагностика**: таблица «что погнуто» по SAI и включённому углу, разница
+  SAI слева и справа больше 1°, углы поворота колёс при 20° — погнутый
+  поворотный рычаг видно, даже когда схождение в норме.
+- **Руль ровно**: панель схождения подсказывает, куда будет смотреть руль, если
+  схождение поделено между колёсами неровно.
+- **Контрольная поездка** по методике Hyundai: увод на метр дольше 6 с при
+  64 км/ч — норма; итог попадает в протокол.
 - **Три темы**: тёмная, как экран стенда; светлая — для яркого гаража и солнца;
   высокий контраст — для слабого зрения. **Крупный и очень крупный** размер
   увеличивает весь интерфейс.
@@ -518,7 +556,10 @@ mode](docs/OPTICAL.md#live-mode-the-phone-as-a-camera).
 
 The phone is held against a straight bar on the rim flanges and sends camber in
 real time — the pointers on the screen move while you turn the adjusters. No
-app to install: scan the QR code on the computer screen.
+app to install: press **"Phone"** at the top of the program's screen — from any
+step — and scan the QR code that appears. The program remembers the access:
+after a restart the address is the same, and a phone with the page open
+reconnects by itself, keeping its wheel and calibration.
 
 The phone page has three tabs — **Camber**, **Caster**, **Toe** — so you see at
 once what the phone measures itself and what needs a string or a camera. You
@@ -531,10 +572,18 @@ removes the zero offset, the second the tilt from the camera bump and the axes'
 cross-sensitivity. Tested on a physical model of a phone with all these flaws:
 camber error **0.02° RMS, 0.05° worst case**.
 
-**Caster by phone**: wheels on turn plates, the phone guides you through
-“straight → out → in”, the gyroscope measures the steer angle (its own drift is
-measured while straight and subtracted). You need not hold exactly 20°: the
-program solves the problem exactly for any two steer angles.
+**Caster by phone**: wheels on turn plates, the phone guides you step by step
+"straight → steering wheel left → steering wheel right" with a scale showing how
+far to turn, the steering angle is measured by the gyroscope (its own drift is
+measured in the "straight" position and subtracted). There is no need to hold
+exactly 20°: the program solves the problem exactly for any two steering angles.
+Older phones whose browser gives the gyroscope in radians (Chrome on Android
+before version 66) are recognised automatically.
+
+**Accuracy check**: the phone is turned over on the table and on the bar again,
+and the program compares the readings with the calibration — "zero" and
+"mount", within 0.1°. That tells when to recalibrate: after a new case, another
+bar, or in the cold.
 
 <br clear="right">
 
@@ -571,6 +620,36 @@ Anyone should be able to use the program — someone who has never heard the wor
 
 - **A welcome on first start**: language, theme and size, then where to begin
   and what to measure with. One key skips it.
+- **Nothing gets lost.** The vehicle, the figures typed in, the before and after
+  snapshots, the checklist and the plate number are kept by the program: close
+  it, open it tomorrow — everything is there. The next car starts with
+  **"New vehicle"**.
+- **A "what next" line** on the adjustment screen: the "before" snapshot, then
+  the angle to turn now — in the right order and with how far it is from the
+  spec — then the "after" snapshot and the report. No order to remember.
+- **A phone in one click**: the "Phone" button at the top shows the QR code at
+  once.
+- **A picture for every step**: levelling the floor with a water level, holding
+  the bar on the rim, running the strings, the brake pedal depressor, which way
+  to steer for caster and which way to turn the tie rod — a "What it looks
+  like" button on the preparation items, in the angle panel and in the guide.
+  The diagrams follow the theme's colours.
+
+### Like the professionals
+
+The order and the checks come from open factory procedures — Hyundai bulletin
+20-SS-001H (published by NHTSA) and Tesla's alignment procedure — and ASE study
+material; the sources are listed in the guide, "Where the method comes from".
+
+- **Pre-alignment inspection**: matching tyres on an axle, tyre wear with
+  pictures and causes (after MOOG), ride height, wheel and steering linkage play.
+- **Diagnosis**: a "what is bent" table from SAI and the included angle, an SAI
+  difference over 1° between sides, steering lock angles at 20° — a bent
+  steering arm shows even when toe is in spec.
+- **A straight steering wheel**: the toe panel tells which way the steering
+  wheel will point if the toe is split unevenly between the wheels.
+- **Road test** after Hyundai's procedure: drifting one metre in more than 6 s
+  at 64 km/h passes; the result goes into the report.
 - **Three themes**: dark, like an aligner's screen; light, for a bright garage
   and sunlight; high contrast, for low vision. **Large and extra large** sizes
   enlarge the whole interface.
